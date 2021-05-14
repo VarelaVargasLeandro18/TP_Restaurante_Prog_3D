@@ -3,7 +3,7 @@
 /**
  * Representa el permiso que tiene un Empleado según el Sector en el que esté. 
  */
-class PermisosEmpleado
+class PermisosEmpleado implements JsonSerializable
 {
 
     private int $id;
@@ -32,8 +32,8 @@ class PermisosEmpleado
 
     /**
      * Get the value of tipo
-     */ 
-    public function getTipo() : TipoEmpleado
+     */
+    public function getTipo(): TipoEmpleado
     {
         return $this->tipo;
     }
@@ -42,8 +42,8 @@ class PermisosEmpleado
      * Set the value of tipo
      *
      * @return  self
-     */ 
-    public function setTipo(TipoEmpleado $tipo) : self
+     */
+    public function setTipo(TipoEmpleado $tipo): self
     {
         $this->tipo = $tipo;
 
@@ -52,8 +52,8 @@ class PermisosEmpleado
 
     /**
      * Get the value of sector
-     */ 
-    public function getSector() : Sector
+     */
+    public function getSector(): Sector
     {
         return $this->sector;
     }
@@ -62,11 +62,21 @@ class PermisosEmpleado
      * Set the value of sector
      *
      * @return  self
-     */ 
-    public function setSector(Sector $sector) : self
+     */
+    public function setSector(Sector $sector): self
     {
         $this->sector = $sector;
 
         return $this;
     }
+
+    public function jsonSerialize() : mixed
+    {
+        $ret = array();
+        $ret["id"] = $this->id;
+        $ret["tipo"] = $this->tipo->jsonSerialize();
+        $ret["sector"] = $this->sector->jsonSerialize();
+        return $ret;
+    }
+
 }

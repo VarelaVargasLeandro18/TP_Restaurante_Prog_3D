@@ -1,6 +1,6 @@
 <?php
 
-class Empleado
+class Empleado implements JsonSerializable
 {
 
     private int $id;
@@ -92,7 +92,7 @@ class Empleado
     /**
      * Get the value of tipo
      */
-    public function getTipo() : TipoEmpleado
+    public function getTipo(): TipoEmpleado
     {
         return $this->tipo;
     }
@@ -102,11 +102,22 @@ class Empleado
      *
      * @return  self
      */
-    public function setTipo(TipoEmpleado $tipo) : self
+    public function setTipo(TipoEmpleado $tipo): self
     {
         $this->tipo = $tipo;
 
         return $this;
     }
 
+    public function jsonSerialize(): mixed
+    {
+        $ret = array();
+        $ret["id"] = $this->id;
+        $ret["nombre"] = $this->nombre;
+        $ret["apellido"] = $this->apellido;
+        $ret["sector"] = $this->sector->jsonSerialize();
+        $ret["tipo"] = $this->tipo->jsonSerialize();
+
+        return $ret;
+    }
 }
