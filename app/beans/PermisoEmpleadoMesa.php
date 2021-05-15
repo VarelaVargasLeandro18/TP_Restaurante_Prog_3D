@@ -3,12 +3,19 @@
 /**
  * Esta clase representa los permisos que tiene un Empleado para cambiar el estado de una Mesa.
  */
-class PermisosEmpleadoMesa implements JsonSerializable
+class PermisoEmpleadoMesa implements JsonSerializable
 {
 
     private int $id;
     private TipoEmpleado $tipoEmpleado;
     private EstadoMesa $estadoMesa;
+
+    public function __construct(int $id, TipoEmpleado $tipoEmpleado, EstadoMesa $estadoMesa)
+    {
+        $this->id = $id;
+        $this->tipoEmpleado = $tipoEmpleado;
+        $this->estadoMesa = $estadoMesa;
+    }
 
     /**
      * Get the value of id
