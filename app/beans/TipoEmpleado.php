@@ -9,6 +9,12 @@ class TipoEmpleado implements JsonSerializable
     private int $id;
     private string $tipo;
 
+    public function __construct(int $id, string $tipo)
+    {
+        $this->id = $id;
+        $this->tipo = $tipo;
+    }
+
     /**
      * Get the value of id
      */
@@ -42,7 +48,7 @@ class TipoEmpleado implements JsonSerializable
      *
      * @return  self
      */
-    public function setTipo($tipo)
+    public function setTipo(string $tipo)
     {
         $this->tipo = $tipo;
 

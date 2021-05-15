@@ -7,7 +7,12 @@ class AccesoDatos
     private function __construct()
     {
         try {
-            $this->objetoPDO = new PDO('mysql:host='.getenv('MYSQL_HOST').';dbname='.getenv('MYSQL_DB').';charset=utf8', getenv('MYSQL_USER'), getenv('MYSQL_PASS'), array(PDO::ATTR_EMULATE_PREPARES => false, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+            $host = $_ENV['MYSQL_HOST'];
+            $db = $_ENV['MYSQL_DB'];
+            $usr = $_ENV['MYSQL_USER'];
+            $pass = $_ENV['MYSQL_PASS'];
+
+            $this->objetoPDO = new PDO('mysql:host='.$host.';dbname='.$db.';charset=utf8', $usr, $pass, array(PDO::ATTR_EMULATE_PREPARES => false, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
             $this->objetoPDO->exec("SET CHARACTER SET utf8");
         } catch (PDOException $e) {
             print "Error: " . $e->getMessage();
@@ -15,7 +20,7 @@ class AccesoDatos
         }
     }
 
-    public static function obtenerInstancia()
+    public static function obtenerInstancia() : self
     {
         if (!isset(self::$objAccesoDatos)) {
             self::$objAccesoDatos = new AccesoDatos();
@@ -23,12 +28,12 @@ class AccesoDatos
         return self::$objAccesoDatos;
     }
 
-    public function prepararConsulta($sql)
+    public function prepararConsulta($sql) : PDOStatement
     {
         return $this->objetoPDO->prepare($sql);
     }
 
-    public function obtenerUltimoId()
+    public function obtenerUltimoId() : mixed
     {
         return $this->objetoPDO->lastInsertId();
     }

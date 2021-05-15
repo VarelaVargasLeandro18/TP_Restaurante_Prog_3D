@@ -6,7 +6,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 /**
  * Define las operaciones CRUD a realizar según un HttpRequest.
  */
-interface ICRUD
+interface ICRUDApi
 {
 	public function read (Request $request, Response $response, Array $args) : Response;
 	public function readAll (Request $request, Response $response, Array $args) : Response;

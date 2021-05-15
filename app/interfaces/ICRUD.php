@@ -22,7 +22,7 @@ interface ICRUD
 	/**
 	 * Inserta un objeto.
 	 */
-	public static function insertObject (mixed $obj) : void;
+	public static function insertObject (mixed $obj) : bool;
 
 	/**
 	 * Borra un objeto basado en su ID.
@@ -37,12 +37,5 @@ interface ICRUD
 	 * @return bool True si se actualizó correctamente. False caso contrario.
 	 */
 	public static function updateObject (mixed $obj) : bool;
-
-	/**
-	 * Lee un objeto en base a sus parametros.
-	 * 
-	 * @return mixed Objeto leido.
-	 */
-	public static function readByParams ( array $params ) : mixed;
 
 }
