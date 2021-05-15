@@ -6,6 +6,26 @@ require_once __DIR__ . '/../interfaces/ICRUD.php';
 
 class PedidoEstadoModel implements ICRUD{
 
+    private static string $columnaId = 'Id';
+    private static string $columnaEstado = 'Estado';
+
+    private static function crearEstadosMesas (array $allAssoc) : array {
+        $ret = array();
+        
+        foreach ( $allAssoc as $key => $assoc ) {
+            $ret [$key] = self::crearPedidoEstado($assoc);
+        }
+
+        return $ret;
+    }
+
+    private static function crearPedidoEstado (array $assoc) : PedidoEstado {
+        $Id = intval($assoc[self::$columnaId]);
+        $estado = $assoc[self::$columnaEstado];
+
+        return new PedidoEstado($Id, $estado);
+    }
+
     public static function readById(mixed $id): mixed
     {
         $ret = NULL;

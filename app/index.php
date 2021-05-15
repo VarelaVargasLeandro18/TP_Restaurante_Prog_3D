@@ -17,8 +17,8 @@ $settings = [
 $app = new \Slim\App( [ 'settings' => $settings ] );
 
 $app->get( "/", function (Request $req, Response $res) {
-    require_once './models/SectorModel.php';
-    $obj = SectorModel::updateObject(new Sector(1, 'Barra de tragos y vinos'));
+    require_once './models/EstadoMesaModel.php';
+    $obj = EstadoMesaModel::updateObject(new EstadoMesa(1, 'cerrada'));
     var_dump($obj);
 } );
 

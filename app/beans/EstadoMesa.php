@@ -9,6 +9,12 @@ class EstadoMesa implements JsonSerializable
     private int $id;
     private string $estado;
 
+    public function __construct(int $id, string $estado)
+    {
+        $this->id = $id;
+        $this->estado = $estado;
+    }
+
     /**
      * Get the value of id
      */
