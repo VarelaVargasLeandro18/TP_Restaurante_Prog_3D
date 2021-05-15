@@ -17,9 +17,7 @@ $settings = [
 $app = new \Slim\App( [ 'settings' => $settings ] );
 
 $app->get( "/", function (Request $req, Response $res) {
-    require_once './models/EstadoMesaModel.php';
-    $obj = EstadoMesaModel::updateObject(new EstadoMesa(1, 'cerrada'));
-    var_dump($obj);
+    
 } );
 
 $app->run();
