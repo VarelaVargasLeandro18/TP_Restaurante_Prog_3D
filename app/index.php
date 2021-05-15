@@ -17,8 +17,8 @@ $settings = [
 $app = new \Slim\App( [ 'settings' => $settings ] );
 
 $app->get( "/", function (Request $req, Response $res) {
-    require_once './models/TipoEmpleadoModel.php';
-    $obj = TipoEmpleadoModel::insertObject(new TipoEmpleado(7, "#socio"));
+    require_once './models/SectorModel.php';
+    $obj = SectorModel::updateObject(new Sector(1, 'Barra de tragos y vinos'));
     var_dump($obj);
 } );
 

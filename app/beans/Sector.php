@@ -9,6 +9,12 @@ class Sector implements JsonSerializable
     private int $id;
     private string $nombre;
 
+    public function __construct(int $id, string $nombre)
+    {
+        $this->id = $id;
+        $this->nombre = $nombre;
+    }
+
     /**
      * Get the value of id
      */
