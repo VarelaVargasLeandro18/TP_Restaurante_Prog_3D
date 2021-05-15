@@ -1,14 +1,21 @@
 <?php
 
 /**
- * Representa el permiso que tiene un Empleado según el Sector en el que esté. 
+ * Representa el permiso que tiene un Empleado para cambiar estado de un Pedido según el Sector en el que esté. 
  */
-class PermisosEmpleado implements JsonSerializable
+class PermisosEmpleadoSector implements JsonSerializable
 {
 
     private int $id;
     private TipoEmpleado $tipo;
     private Sector $sector;
+
+    public function __construct(int $id, TipoEmpleado $tipo, Sector $sector)
+    {
+        $this->id = $id;
+        $this->tipo = $tipo;
+        $this->sector = $sector;
+    }
 
     /**
      * Get the value of id

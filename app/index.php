@@ -17,7 +17,9 @@ $settings = [
 $app = new \Slim\App( [ 'settings' => $settings ] );
 
 $app->get( "/", function (Request $req, Response $res) {
-    
+    require_once './models';
+    $obj = PermisosEmpleadoSectorModel::deleteById(15);
+    var_dump($obj);
 } );
 
 $app->run();
