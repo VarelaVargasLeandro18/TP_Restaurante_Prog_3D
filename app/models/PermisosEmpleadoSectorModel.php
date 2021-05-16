@@ -47,7 +47,7 @@ class PermisosEmpleadoSectorModel implements ICRUD {
 
         if ( $executed ) {
             $assoc = $statement->fetch(PDO::FETCH_ASSOC);
-            $ret = ($assoc !== false) ? self::crearPermisoEmpleadoSector($assoc) : NULL;
+            $ret = ($assoc !== false) ? self::crearPermisoEmpleadoSector($assoc) : $ret;
         }
 
         return $ret;
@@ -64,7 +64,7 @@ class PermisosEmpleadoSectorModel implements ICRUD {
         $executed = $statement->execute();
         if ( $executed ) {
             $allAssoc = $statement->fetchAll(PDO::FETCH_ASSOC);
-            $ret = ($allAssoc !== false) ? self::crearPermisosEmpleadosSector($allAssoc) : NULL;
+            $ret = ($allAssoc !== false) ? self::crearPermisosEmpleadosSector($allAssoc) : $ret;
         }
 
         return $ret;
@@ -120,6 +120,31 @@ class PermisosEmpleadoSectorModel implements ICRUD {
         $statement->bindValue(':idSector', $obj->getSector()->getId());
         $ret = $statement->execute();
 
+        return $ret;
+    }
+
+    // FUNCIONES PROPIAS
+
+    public static function comprobarTipoSector(int $sectorId, int $tipoId) : bool {
+        $ret = false;
+        $access = AccesoDatos::obtenerInstancia();
+        $statement = $access->prepararConsulta(
+            '
+            SELECT 	PermisosEmpleadoSector.Id
+            FROM PermisosEmpleadoSector
+            WHERE 
+            PermisosEmpleadoSector.TipoempleadoId = :tipoId AND
+            PermisosEmpleadoSector.SectorId = :sectorId ;
+            '
+        );
+        $statement->bindValue(':tipoId', $tipoId, PDO::PARAM_INT);
+        $statement->bindValue(':sectorId', $sectorId, PDO::PARAM_INT);
+        $executed = $statement->execute();
+
+        if ( $executed ) {
+            $ret = $statement->rowCount() >= 1;
+        }
+        
         return $ret;
     }
 

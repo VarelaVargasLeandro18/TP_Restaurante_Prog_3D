@@ -8,6 +8,25 @@ class Empleado implements JsonSerializable
     private string $apellido;
     private Sector $sector;
     private TipoEmpleado $tipo;
+    private string $usuario;
+    private string $contraseniaHash;
+
+    public function __construct(int $id, 
+                                string $nombre, 
+                                string $apellido,
+                                Sector $sector,
+                                TipoEmpleado $tipo,
+                                string $usuario,
+                                string $contraseniaHash)
+    {
+        $this->id = $id;
+        $this->nombre = $nombre;
+        $this->apellido = $apellido;
+        $this->sector = $sector;
+        $this->tipo = $tipo;
+        $this->usuario = $usuario;
+        $this->contraseniaHash = $contraseniaHash;
+    }
 
     /**
      * Get the value of id
@@ -105,6 +124,46 @@ class Empleado implements JsonSerializable
     public function setTipo(TipoEmpleado $tipo): self
     {
         $this->tipo = $tipo;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of usuario
+     */ 
+    public function getUsuario() : string
+    {
+        return $this->usuario;
+    }
+
+    /**
+     * Set the value of usuario
+     *
+     * @return  self
+     */ 
+    public function setUsuario(string $usuario) : self
+    {
+        $this->usuario = $usuario;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of contraseniaHash
+     */ 
+    public function getContraseniaHash()
+    {
+        return $this->contraseniaHash;
+    }
+
+    /**
+     * Set the value of contraseniaHash
+     *
+     * @return  self
+     */ 
+    public function setContraseniaHash($contraseniaHash)
+    {
+        $this->contraseniaHash = $contraseniaHash;
 
         return $this;
     }

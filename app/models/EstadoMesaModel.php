@@ -40,7 +40,7 @@ class EstadoMesaModel implements ICRUD{
 
         if ( $executed ) {
             $assoc = $statement->fetch(PDO::FETCH_ASSOC);
-            $ret = ($assoc !== false) ? self::crearEstadoMesa($assoc) : NULL;
+            $ret = ($assoc !== false) ? self::crearEstadoMesa($assoc) : $ret;
         }
 
         return $ret;
@@ -58,7 +58,7 @@ class EstadoMesaModel implements ICRUD{
 
         if ( $executed ) {
             $assoc = $statement->fetchAll(PDO::FETCH_ASSOC);
-            $ret = ($assoc !== false) ? self::crearEstadosMesas($assoc) : NULL;
+            $ret = ($assoc !== false) ? self::crearEstadosMesas($assoc) : $ret;
         }
 
         return $ret;

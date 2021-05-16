@@ -40,7 +40,7 @@ class PedidoEstadoModel implements ICRUD{
 
         if ( $executed ) {
             $assoc = $statement->fetch(PDO::FETCH_ASSOC);
-            $ret = ($assoc !== false) ? self::crearPedidoEstado($assoc) : NULL;
+            $ret = ($assoc !== false) ? self::crearPedidoEstado($assoc) : $ret;
         }
 
         return $ret;
@@ -58,7 +58,7 @@ class PedidoEstadoModel implements ICRUD{
 
         if ( $executed ) {
             $assoc = $statement->fetchAll(PDO::FETCH_ASSOC);
-            $ret = ($assoc !== false) ? self::crearPedidosEstados($assoc) : NULL;
+            $ret = ($assoc !== false) ? self::crearPedidosEstados($assoc) : $ret;
         }
 
         return $ret;

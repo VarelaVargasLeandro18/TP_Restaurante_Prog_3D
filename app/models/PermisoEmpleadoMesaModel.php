@@ -47,7 +47,7 @@ class PermisoEmpleadoMesaModel implements ICRUD {
 
         if ( $executed ) {
             $assoc = $statement->fetch(PDO::FETCH_ASSOC);
-            $ret = ($assoc !== false) ? self::crearPermisoEmpleadoMesa($assoc) : NULL;
+            $ret = ($assoc !== false) ? self::crearPermisoEmpleadoMesa($assoc) : $ret;
         }
 
         return $ret;
@@ -64,7 +64,7 @@ class PermisoEmpleadoMesaModel implements ICRUD {
         $executed = $statement->execute();
         if ( $executed ) {
             $allAssoc = $statement->fetchAll(PDO::FETCH_ASSOC);
-            $ret = ($allAssoc !== false) ? self::crearPermisosEmpleadosSector($allAssoc) : NULL;
+            $ret = ($allAssoc !== false) ? self::crearPermisosEmpleadosSector($allAssoc) : $ret;
         }
 
         return $ret;

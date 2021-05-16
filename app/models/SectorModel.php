@@ -41,7 +41,7 @@ class SectorModel implements ICRUD {
 
         if ( $executed ) {
             $assoc = $statement->fetch(PDO::FETCH_ASSOC);
-            $ret = ($assoc !== false) ? self::crearSector($assoc) : NULL;
+            $ret = ($assoc !== false) ? self::crearSector($assoc) : $ret;
         }
 
         return $ret;
@@ -59,7 +59,7 @@ class SectorModel implements ICRUD {
 
         if ( $executed ) {
             $allAssoc = $statement->fetchAll(PDO::FETCH_ASSOC);
-            $ret = ($allAssoc !== false) ? self::crearSectores($allAssoc) : NULL;
+            $ret = ($allAssoc !== false) ? self::crearSectores($allAssoc) : $ret;
         }
 
         return $ret;
