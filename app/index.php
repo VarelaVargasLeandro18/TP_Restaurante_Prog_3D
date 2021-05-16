@@ -17,8 +17,7 @@ $settings = [
 $app = new \Slim\App( [ 'settings' => $settings ] );
 
 $app->get( "/", function (Request $req, Response $res) {
-    require_once './models/EmpleadoModel.php';
-    
+    require_once './models/ProductoModel.php';
 } );
 
 $app->run();

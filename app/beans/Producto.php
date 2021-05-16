@@ -11,6 +11,14 @@ class Producto implements JsonSerializable
     private string $tipo;
     private Sector $sector;
 
+    public function __construct(int $id, string $nombre, string $tipo, Sector $sector)
+    {
+        $this->id = $id;
+        $this->nombre = $nombre;
+        $this->tipo = $tipo;
+        $this->sector = $sector;
+    }
+
     /**
      * Get the value of id
      */
