@@ -9,10 +9,16 @@ class Mesa implements JsonSerializable
     private string $id;
     private EstadoMesa $estado;
 
+    public function __construct(string $id, EstadoMesa $estado )
+    {
+        $this->id = $id;
+        $this->estado = $estado;
+    }
+
     /**
      * Get the value of id
      */
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }
@@ -22,7 +28,7 @@ class Mesa implements JsonSerializable
      *
      * @return  self
      */
-    public function setId(int $id): self
+    public function setId(string $id): self
     {
         $this->id = $id;
 

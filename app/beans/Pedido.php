@@ -11,10 +11,22 @@ class Pedido implements JsonSerializable
     private Mesa $mesa;
     private PedidoEstado $estado;
 
+    public function __construct(
+                                string $id,
+                                Producto $producto,
+                                Mesa $mesa,
+                                PedidoEstado $estado)
+    {
+        $this->id = $id;
+        $this->producto = $producto;
+        $this->mesa = $mesa;
+        $this->estado = $estado;
+    }
+
     /**
      * Get the value of id
      */
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }
@@ -24,7 +36,7 @@ class Pedido implements JsonSerializable
      *
      * @return  self
      */
-    public function setId(int $id): self
+    public function setId(string $id): self
     {
         $this->id = $id;
 
