@@ -18,5 +18,6 @@ $app = new \Slim\App( [ 'settings' => $settings ] );
 
 //require_once './routes/PermisoEmpleadoSectorRoute.php';
 require_once './routes/EmpleadoRoute.php';
+require_once './routes/ProductoRoute.php';
 
 $app->run();

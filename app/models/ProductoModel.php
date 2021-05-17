@@ -22,7 +22,7 @@ class ProductoModel implements ICRUD {
         return $ret;
     }
 
-    private static function crearProducto (array $assoc) : Producto {
+    public static function crearProducto (array $assoc) : Producto {
         $id = intval($assoc[self::$columnaId]);
         $nombre = $assoc[self::$columnaNombre];
         $tipo = $assoc[self::$columnaTipo];
