@@ -151,7 +151,7 @@ class Empleado implements JsonSerializable
     /**
      * Get the value of contraseniaHash
      */ 
-    public function getContraseniaHash()
+    public function getContraseniaHash() : string
     {
         return $this->contraseniaHash;
     }
@@ -161,7 +161,7 @@ class Empleado implements JsonSerializable
      *
      * @return  self
      */ 
-    public function setContraseniaHash($contraseniaHash)
+    public function setContraseniaHash(string $contraseniaHash)
     {
         $this->contraseniaHash = $contraseniaHash;
 

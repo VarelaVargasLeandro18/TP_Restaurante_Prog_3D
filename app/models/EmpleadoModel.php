@@ -109,41 +109,45 @@ class EmpleadoModel implements ICRUD {
     public static function insertObject(mixed $obj): bool
     {
         $ret = false;
-        $access = AccesoDatos::obtenerInstancia();
-        $statement = $access->prepararConsulta(
-            '
-            INSERT INTO Empleado (
-                Empleado.Nombre,
-                Empleado.Apellido,
-                Empleado.SectorId,
-                Empleado.TipoEmpleadoId,
-                Empleado.Usuario,
-                Empleado.Contrasenia_hash
-            )
-            VALUES (
-                :nombre, 
-                :apellido, 
-                :sectorId, 
-                :tipoId, 
-                :usuario, 
-                :ctrsnia
+        $check = self::readByUsrPass( $obj->getUsuario(), $obj->getContraseniaHash() );
+
+        if ( $check == NULL ) {
+            $access = AccesoDatos::obtenerInstancia();
+            $statement = $access->prepararConsulta(
+                '
+                INSERT INTO Empleado (
+                    Empleado.Nombre,
+                    Empleado.Apellido,
+                    Empleado.SectorId,
+                    Empleado.TipoEmpleadoId,
+                    Empleado.Usuario,
+                    Empleado.Contrasenia_hash
+                )
+                VALUES (
+                    :nombre, 
+                    :apellido, 
+                    :sectorId, 
+                    :tipoId, 
+                    :usuario, 
+                    :ctrsnia
+                );
+                '
             );
-            '
-        );
-        $statement->bindValue(':nombre', $obj->getNombre());
-        $statement->bindValue(':apellido', $obj->getApellido());
-        $statement->bindValue(':sectorId', $obj->getSector()->getId(), PDO::PARAM_INT);
-        $statement->bindValue(':tipoId', $obj->getTipo()->getId(), PDO::PARAM_INT);
-        $statement->bindValue(':usuario', $obj->getUsuario());
-        $statement->bindValue(':ctrsnia', $obj->getContraseniaHash());
-        
-        if ( PermisosEmpleadoSectorModel::comprobarTipoSector(
-                    $obj->getSector()->getId(),
-                    $obj->getTipo()->getId()) ) {
-            $ret = $statement->execute();
+            $statement->bindValue(':nombre', $obj->getNombre());
+            $statement->bindValue(':apellido', $obj->getApellido());
+            $statement->bindValue(':sectorId', $obj->getSector()->getId(), PDO::PARAM_INT);
+            $statement->bindValue(':tipoId', $obj->getTipo()->getId(), PDO::PARAM_INT);
+            $statement->bindValue(':usuario', $obj->getUsuario());
+            $statement->bindValue(':ctrsnia', $obj->getContraseniaHash());
+            
+            if ( PermisosEmpleadoSectorModel::comprobarTipoSector(
+                        $obj->getSector()->getId(),
+                        $obj->getTipo()->getId()) ) {
+                $ret = $statement->execute();
+            }
+            else
+                $ret = false;
         }
-        else
-            $ret = false;
 
         return $ret;
     }
@@ -200,6 +204,36 @@ class EmpleadoModel implements ICRUD {
         }
         else
             $ret = false;
+
+        return $ret;
+    }
+
+    // FUNCIONES PROPIAS
+    public static function readByUsrPass (string $usuario, string $contrasenia) : mixed {
+        $ret = NULL;
+        $access = AccesoDatos::obtenerInstancia();
+        $statement = $access->prepararConsulta(
+            '
+            SELECT 
+                Empleado.Id,
+                Empleado.Nombre,
+                Empleado.Apellido,
+                Empleado.SectorId,
+                Empleado.TipoEmpleadoId,
+                Empleado.Usuario,
+                Empleado.Contrasenia_hash
+            FROM Empleado
+            WHERE Empleado.Usuario = :usuario AND Empleado.Contrasenia_hash = :cntr_hash;
+            '
+        );
+        $statement->bindValue(':usuario', $usuario);
+        $statement->bindValue(':cntr_hash', $contrasenia);
+        $executed = $statement->execute();
+
+        if ( $executed ) {
+            $assoc = $statement->fetch(PDO::FETCH_ASSOC);
+            $ret = ($assoc !== false) ? self::crearEmpleado($assoc) : $ret;
+        }
 
         return $ret;
     }
