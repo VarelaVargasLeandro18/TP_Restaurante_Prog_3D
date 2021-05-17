@@ -7,10 +7,5 @@ require_once __DIR__ . '/../models/PermisosEmpleadoSectorModel.php';
 
 class Logger
 {
-    public static function LogOperacion( Request $request, Response $response, callable $next)
-    {
-        $params = $request->getParsedBody();
-        $usuario = $params['usuario'];
-        $contrasenia = $params['contrasenia'];
-    }
+    
 }

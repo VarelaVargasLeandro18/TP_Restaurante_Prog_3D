@@ -109,9 +109,10 @@ class EmpleadoModel implements ICRUD {
     public static function insertObject(mixed $obj): bool
     {
         $ret = false;
-        $check = self::readByUsrPass( $obj->getUsuario(), $obj->getContraseniaHash() );
+        $check = self::checkUsrPassAll( $obj->getUsuario(), $obj->getContraseniaHash() );
 
-        if ( $check == NULL ) {
+        if ( $check == false ) {
+            $contrasenia = password_hash($obj->getContraseniaHash(), PASSWORD_BCRYPT);
             $access = AccesoDatos::obtenerInstancia();
             $statement = $access->prepararConsulta(
                 '
@@ -138,7 +139,7 @@ class EmpleadoModel implements ICRUD {
             $statement->bindValue(':sectorId', $obj->getSector()->getId(), PDO::PARAM_INT);
             $statement->bindValue(':tipoId', $obj->getTipo()->getId(), PDO::PARAM_INT);
             $statement->bindValue(':usuario', $obj->getUsuario());
-            $statement->bindValue(':ctrsnia', $obj->getContraseniaHash());
+            $statement->bindValue(':ctrsnia', $contrasenia );
             
             if ( PermisosEmpleadoSectorModel::comprobarTipoSector(
                         $obj->getSector()->getId(),
@@ -209,33 +210,25 @@ class EmpleadoModel implements ICRUD {
     }
 
     // FUNCIONES PROPIAS
-    public static function readByUsrPass (string $usuario, string $contrasenia) : mixed {
-        $ret = NULL;
-        $access = AccesoDatos::obtenerInstancia();
-        $statement = $access->prepararConsulta(
-            '
-            SELECT 
-                Empleado.Id,
-                Empleado.Nombre,
-                Empleado.Apellido,
-                Empleado.SectorId,
-                Empleado.TipoEmpleadoId,
-                Empleado.Usuario,
-                Empleado.Contrasenia_hash
-            FROM Empleado
-            WHERE Empleado.Usuario = :usuario AND Empleado.Contrasenia_hash = :cntr_hash;
-            '
-        );
-        $statement->bindValue(':usuario', $usuario);
-        $statement->bindValue(':cntr_hash', $contrasenia);
-        $executed = $statement->execute();
+    /**
+     * Chequea si la contrasenia y ell usuario están usados.
+     */
+    public static function checkUsrPassAll (string $usuario, string $contrasenia) : bool {
+        $ret = false;
+        $empleados = self::readAllObjects();
 
-        if ( $executed ) {
-            $assoc = $statement->fetch(PDO::FETCH_ASSOC);
-            $ret = ($assoc !== false) ? self::crearEmpleado($assoc) : $ret;
+        for ( $index = 0; $index < count($empleados); $index++ ) {
+            $empleado = $empleados[$index];
+
+            if ( $ret = self::checkUsrPass( $empleado, $usuario, $contrasenia ) )
+                break;
         }
-
         return $ret;
+    }
+
+    public static function checkUsrPass ( Empleado $empleado, string $usuario, string $contrasenia ) : bool {
+        return  password_verify( $contrasenia, $empleado->getContraseniaHash() ) &&
+                $empleado->getUsuario() == $usuario;
     }
 
 }
