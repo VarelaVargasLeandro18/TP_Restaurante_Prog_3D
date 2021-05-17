@@ -24,7 +24,7 @@ class PedidoModel implements ICRUD {
         return $ret;
     }
     
-    private static function crearPedido (array $assoc) : mixed {
+    public static function crearPedido (array $assoc) : mixed {
         $id = $assoc[self::$columnaId];
         $ProductoId = intval($assoc[self::$columnaProductoId]);
         $producto = ProductoModel::readById($ProductoId);
