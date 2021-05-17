@@ -8,9 +8,9 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  */
 interface ICRUDApi
 {
-	public function read (Request $request, Response $response, Array $args) : Response;
-	public function readAll (Request $request, Response $response, Array $args) : Response;
-	public function insert (Request $request, Response $response, Array $args) : Response;
-	public function delete (Request $request, Response $response, Array $args) : Response;
-	public function update (Request $request, Response $response, Array $args) : Response;
+	public static function read (Request $request, Response $response, Array $args) : Response;
+	public static function readAll (Request $request, Response $response, Array $args) : Response;
+	public static function insert (Request $request, Response $response, Array $args) : Response;
+	public static function delete (Request $request, Response $response, Array $args) : Response;
+	public static function update (Request $request, Response $response, Array $args) : Response;
 }

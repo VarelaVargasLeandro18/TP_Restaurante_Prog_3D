@@ -11,7 +11,7 @@ class SectorModel implements ICRUD {
 
     private static function crearSector(array $assoc) : Sector {
         $Id = intval($assoc[self::$columnaId]);
-        $Nombre = intval($assoc[self::$columnaNombre]);
+        $Nombre = $assoc[self::$columnaNombre];
         
         return new Sector ( $Id, $Nombre );
     }

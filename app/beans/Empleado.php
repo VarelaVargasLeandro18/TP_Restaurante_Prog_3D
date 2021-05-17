@@ -176,6 +176,7 @@ class Empleado implements JsonSerializable
         $ret["apellido"] = $this->apellido;
         $ret["sector"] = $this->sector->jsonSerialize();
         $ret["tipo"] = $this->tipo->jsonSerialize();
+        $ret["usuario"] = $this->usuario;
 
         return $ret;
     }

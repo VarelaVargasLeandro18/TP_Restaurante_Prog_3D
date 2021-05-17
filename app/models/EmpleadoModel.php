@@ -27,7 +27,7 @@ class EmpleadoModel implements ICRUD {
         return $ret;
     }
 
-    private static function crearEmpleado(array $assoc) : Empleado {
+    public static function crearEmpleado(array $assoc) : Empleado {
         $ret = NULL;
         $id = intval($assoc[self::$columnaId]);
         $nombre = $assoc[self::$columnaNombre];
