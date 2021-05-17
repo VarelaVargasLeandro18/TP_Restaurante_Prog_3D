@@ -10,6 +10,8 @@ $app->group( '/producto', function() {
 
     $this->post( '/', ProductoController::class . ':insert' );
 
+    $this->delete( '/{id}', ProductoController::class . ':delete' );
     
+    $this->put( '/', ProductoController::class . ':update' );
 
 } );

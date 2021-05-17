@@ -10,6 +10,8 @@ $app->group( '/empleado', function() {
 
     $this->post( '/', EmpleadoController::class . ':insert' );
 
+    $this->delete( '/{id}', EmpleadoController::class . ':delete' );
     
+    $this->put( '/', EmpleadoController::class . ':update' );
 
 } );

@@ -20,7 +20,7 @@ class MesaModel implements ICRUD {
         return $ret;
     }
 
-    private static function crearMesa (array $assoc) : Mesa {
+    public static function crearMesa (array $assoc) : Mesa {
         $id = $assoc[self::$columnaId];
         $estadoId = intval($assoc[self::$columnaEstadoId]);
         $estado = EstadoMesaModel::readById($estadoId);
