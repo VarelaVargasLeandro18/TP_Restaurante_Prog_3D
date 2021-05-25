@@ -1,5 +1,6 @@
 <?php
 
+use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Http\StatusCode;
@@ -12,16 +13,22 @@ class MesaController implements ICRUDApi {
     {
         $id = $args['id'];
         $mesa = MesaModel::readById($id);
+        $jsonMesa = json_encode($mesa);
 
-        if ( $mesa === NULL ) return $response->withStatus( StatusCode::HTTP_NOT_FOUND );
+        if ( $mesa === NULL ) return $response->withStatus( StatusCodeInterface::STATUS_NOT_FOUND );
 
-        return $response->withJson($mesa);
+        $response->getBody()->write($jsonMesa);
+
+        return $response->withAddedHeader('Content-Type', 'json/application');
     }
 
     public static function readAll(Request $request, Response $response, array $args): Response
     {
         $mesas = MesaModel::readAllObjects();
-        return $response->withJson($mesas);
+        $jsonMesas = json_encode($mesas);
+        $response->getBody()->write($jsonMesas);
+
+        return $response->withAddedHeader('Content-Type', 'application/json');
     }
 
     public static function insert(Request $request, Response $response, array $args): Response
@@ -29,25 +36,28 @@ class MesaController implements ICRUDApi {
         $json = $request->getBody();
         $assoc = json_decode($json, true);
         
-        if ( $assoc === NULL ) return $response->withStatus( StatusCode::HTTP_BAD_REQUEST );
+        if ( $assoc === NULL ) return $response->withStatus( StatusCodeInterface::STATUS_BAD_REQUEST );
 
         $mesa = MesaModel::crearmesa($assoc);
         $inserted = MesaModel::insertObject($mesa);
         
-        if ( !$inserted ) return $response->withStatus( StatusCode::HTTP_CONFLICT );
+        if ( !$inserted ) return $response->withStatus( StatusCodeInterface::STATUS_CONFLICT );
         // NO SE INSERTA SÍ, MAL TIPO O MAL SECTOR O USUARIO Y PASS USADOS.
 
-        return $response->withStatus( StatusCode::HTTP_CREATED );
+        return $response->withStatus( StatusCodeInterface::STATUS_CREATED );
     }
 
     public static function delete(Request $request, Response $response, array $args): Response
     {
         $id = $args['id'];
         $deleted = MesaModel::deleteById($id);
+        $jsonDeleted = json_encode($deleted);
 
-        if ( $deleted === NULL ) return $response->withStatus( StatusCode::HTTP_NOT_FOUND );
+        if ( $deleted === NULL ) return $response->withStatus( StatusCodeInterface::STATUS_NOT_FOUND );
         
-        return $response->withJson( $deleted );
+        $response->getBody()->write($jsonDeleted);
+
+        return $response->withAddedHeader('Content-Type', 'application/json');
     }
 
     public static function update(Request $request, Response $response, array $args): Response
@@ -58,10 +68,10 @@ class MesaController implements ICRUDApi {
         $mesa = MesaModel::crearMesa($assoc);
         $updated = MesaModel::updateObject($mesa);
 
-        if ( !$updated ) return $response->withStatus( StatusCode::HTTP_CONFLICT );
+        if ( !$updated ) return $response->withStatus( StatusCodeInterface::STATUS_CONFLICT );
         // NO SE INSERTA SÍ, MAL TIPO O MAL SECTOR O USUARIO Y PASS USADOS.
 
-        return $response->withStatus( StatusCode::HTTP_NO_CONTENT );
+        return $response->withStatus( StatusCodeInterface::STATUS_NO_CONTENT );
     }
 
 }

@@ -1,17 +1,19 @@
 <?php
 
+use Slim\Routing\RouteCollectorProxy;
+
 require_once __DIR__ . '/../controllers/EmpleadoController.php';
 
-$app->group( '/empleado', function() {
+$app->group( '/empleado', function(RouteCollectorProxy $group) {
 
-    $this->get( '/', EmpleadoController::class . ':readAll' );
+    $group->get( '/', EmpleadoController::class . ':readAll' );
 
-    $this->get( '/{id}', EmpleadoController::class . ':read' );
+    $group->get( '/{id}', EmpleadoController::class . ':read' );
 
-    $this->post( '/', EmpleadoController::class . ':insert' );
+    $group->post( '/', EmpleadoController::class . ':insert' );
 
-    $this->delete( '/{id}', EmpleadoController::class . ':delete' );
+    $group->delete( '/{id}', EmpleadoController::class . ':delete' );
     
-    $this->put( '/', EmpleadoController::class . ':update' );
+    $group->put( '/', EmpleadoController::class . ':update' );
 
 } );

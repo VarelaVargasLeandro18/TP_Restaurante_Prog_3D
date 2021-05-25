@@ -1,24 +1,34 @@
 <?php
+error_reporting(-1);
+ini_set('display_errors', 1);
 
-use Dotenv\Dotenv;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Server\RequestHandlerInterface;
+use Slim\Factory\AppFactory;
+use Slim\Routing\RouteCollectorProxy;
+use Slim\Routing\RouteContext;
 
-require '../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-$dotEnv = \Dotenv\Dotenv::createImmutable('../');
-$dotEnv->load();
+require_once './db/AccesoDatos.php';
+// require_once './middlewares/Logger.php';
 
-$settings = [ 
-    'addContentLengthHeader' => false
-    ,'displayErrorDetails' => true
-];
+// Load ENV
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->safeLoad();
 
-$app = new \Slim\App( [ 'settings' => $settings ] );
+// Instantiate App
+$app = AppFactory::create();
+$app->setBasePath('/TP_Restaurante/slim-php-mysql-heroku/app');
 
-$app->get('/', function( Request $request, Response $response ) {
-    $response->getBody()->write('PRUEBA');
-    return $response;
+$app->addBodyParsingMiddleware();
+$app->addRoutingMiddleware();
+$app->addErrorMiddleware(true, true, true);
+
+$app->get('/', function( Request $req, Response $rep ) {
+    $rep->getBody()->write("AAA");
+    return $rep;
 });
 
 //require_once './routes/PermisoEmpleadoSectorRoute.php';

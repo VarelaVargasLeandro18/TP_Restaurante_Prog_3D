@@ -10,6 +10,8 @@ class Empleado implements JsonSerializable
     private TipoEmpleado $tipo;
     private string $usuario;
     private string $contraseniaHash;
+    private DateTime $fechaIngreso;
+    private int $cantOperaciones;
 
     public function __construct(int $id, 
                                 string $nombre, 
@@ -164,6 +166,47 @@ class Empleado implements JsonSerializable
     public function setContraseniaHash(string $contraseniaHash)
     {
         $this->contraseniaHash = $contraseniaHash;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of fechaIngreso
+     */ 
+    public function getFechaIngreso() : DateTime
+    {
+        return $this->fechaIngreso;
+    }
+
+    /**
+     * Set the value of fechaIngreso
+     *
+     * @return  self
+     */ 
+    public function setFechaIngreso(DateTime $fechaIngreso)
+    {
+        $this->fechaIngreso = $fechaIngreso;
+
+        return $this;
+    }
+
+
+    /**
+     * Get the value of cantOperaciones
+     */ 
+    public function getCantOperaciones()
+    {
+        return $this->cantOperaciones;
+    }
+
+    /**
+     * Set the value of cantOperaciones
+     *
+     * @return  self
+     */ 
+    public function setCantOperaciones($cantOperaciones)
+    {
+        $this->cantOperaciones = $cantOperaciones;
 
         return $this;
     }

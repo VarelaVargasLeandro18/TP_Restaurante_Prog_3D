@@ -1,17 +1,21 @@
 <?php
 
+use Slim\Psr7\Request;
+use Slim\Psr7\Response;
+use Slim\Routing\RouteCollectorProxy;
+
 require_once __DIR__ . '/../controllers/PedidoController.php';
 
-$app->group( '/pedido', function() {
+$app->group( '/pedido', function(RouteCollectorProxy $group) {
 
-    $this->get( '/', PedidoController::class . ':readAll' );
+    $group->get( '/', PedidoController::class . ':readAll' );
 
-    $this->get( '/{id}', PedidoController::class . ':read' );
+    $group->get( '/{id}', PedidoController::class . ':read' );
 
-    $this->post( '/', PedidoController::class . ':insert' );
+    $group->post( '/', PedidoController::class . ':insert' );
 
-    $this->delete( '/{id}', PedidoController::class . ':delete' );
+    $group->delete( '/{id}', PedidoController::class . ':delete' );
     
-    $this->put( '/', PedidoController::class . ':update' );
+    $group->put( '/', PedidoController::class . ':update' );
 
 } );

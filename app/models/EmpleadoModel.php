@@ -9,6 +9,7 @@ require_once __DIR__ . '/PermisosEmpleadoSectorModel.php';
 
 class EmpleadoModel implements ICRUD {
 
+    private static string $nombreTabla = 'Empleado';
     private static string $columnaId = 'Id';
     private static string $columnaNombre = 'Nombre';
     private static string $columnaApellido = 'Apellido';
@@ -16,6 +17,8 @@ class EmpleadoModel implements ICRUD {
     private static string $columnaTipoEmpleadoId = 'TipoEmpleadoId';
     private static string $columnaUsuario = 'Usuario';
     private static string $columnaContraseniaHash = 'Contrasenia_hash';
+    private static string $columnaFechaIngreso = 'FechaIngreso';
+    private static string $columnaCantidadOperaciones = 'CantidadOperaciones';
 
     private static function crearEmpleados(array $allAssoc) : array {
         $ret = array();

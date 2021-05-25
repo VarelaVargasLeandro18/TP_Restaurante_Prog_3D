@@ -1,17 +1,20 @@
 <?php
 
 require_once __DIR__ . '/../controllers/ProductoController.php';
+use Slim\Psr7\Request;
+use Slim\Psr7\Response;
+use Slim\Routing\RouteCollectorProxy;
 
-$app->group( '/producto', function() {
+$app->group( '/producto', function(RouteCollectorProxy $group) {
 
-    $this->get( '/', ProductoController::class . ':readAll' );
+    $group->get( '/', ProductoController::class . ':readAll' );
 
-    $this->get( '/{id}', ProductoController::class . ':read' );
+    $group->get( '/{id}', ProductoController::class . ':read' );
 
-    $this->post( '/', ProductoController::class . ':insert' );
+    $group->post( '/', ProductoController::class . ':insert' );
 
-    $this->delete( '/{id}', ProductoController::class . ':delete' );
+    $group->delete( '/{id}', ProductoController::class . ':delete' );
     
-    $this->put( '/', ProductoController::class . ':update' );
+    $group->put( '/', ProductoController::class . ':update' );
 
 } );
