@@ -1,9 +1,11 @@
 <?php
 
+require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
+
 /**
  * Representa un Sector del local
  */
-class Sector implements JsonSerializable
+class Sector implements SerializeWithJSON
 {
 
     private int $id;
@@ -61,6 +63,22 @@ class Sector implements JsonSerializable
         $ret["id"] = $this->id;
         $ret["nombre"] = $this->nombre;
         return $ret;
+    }
+
+    public static function decode ( string $serialized ) : mixed {
+        
+        try {
+            $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
+        
+            $id = intval($assoc['id']);
+            $nombre = $assoc['nombre'];
+            $ret = new Sector( $id, $nombre );
+            return $ret;
+        }
+        catch ( JsonException $ex ) {
+            return NULL;
+        }
+
     }
 
 }

@@ -1,9 +1,11 @@
 <?php
 
+require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
+
 /**
  * Representa un Tipo de Empleado.
  */
-class TipoEmpleado implements JsonSerializable
+class TipoEmpleado implements SerializeWithJSON
 {
 
     private int $id;
@@ -62,4 +64,22 @@ class TipoEmpleado implements JsonSerializable
         $ret["tipo"] = $this->tipo;
         return $ret;
     }
+
+    public static function decode ( string $serialized ) : mixed {
+        
+        try {
+            $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
+
+            $id = intval($assoc['id']);
+            $tipo = $assoc['tipo'];
+            $ret = new TipoEmpleado( $id, $tipo );
+
+            return $ret;
+        }
+        catch ( JsonException $ex ) {
+            return NULL;
+        }
+        
+    }
+    
 }

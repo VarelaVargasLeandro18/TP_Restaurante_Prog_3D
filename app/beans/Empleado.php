@@ -1,6 +1,8 @@
 <?php
 
-class Empleado implements JsonSerializable
+require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
+
+class Empleado implements SerializeWithJSON
 {
 
     private int $id;
@@ -10,7 +12,7 @@ class Empleado implements JsonSerializable
     private TipoEmpleado $tipo;
     private string $usuario;
     private string $contraseniaHash;
-    private DateTime $fechaIngreso;
+    private string $fechaIngreso;
     private int $cantOperaciones;
 
     public function __construct(int $id, 
@@ -173,7 +175,7 @@ class Empleado implements JsonSerializable
     /**
      * Get the value of fechaIngreso
      */ 
-    public function getFechaIngreso() : DateTime
+    public function getFechaIngreso() : string
     {
         return $this->fechaIngreso;
     }
@@ -183,7 +185,7 @@ class Empleado implements JsonSerializable
      *
      * @return  self
      */ 
-    public function setFechaIngreso(DateTime $fechaIngreso)
+    public function setFechaIngreso(string $fechaIngreso)
     {
         $this->fechaIngreso = $fechaIngreso;
 
@@ -220,7 +222,47 @@ class Empleado implements JsonSerializable
         $ret["sector"] = $this->sector->jsonSerialize();
         $ret["tipo"] = $this->tipo->jsonSerialize();
         $ret["usuario"] = $this->usuario;
+        $ret["fechaIngreso"] = $this->fechaIngreso;
+        $ret["cantOperaciones"] = $this->cantOperaciones;
 
         return $ret;
     }
+
+    /**
+     * 
+     */
+    public static function decode( string $serialized ) : mixed {
+        
+        try {
+            $assoc = json_decode($serialized, true);
+
+            $id = intval($assoc['id']);
+            $nombre = $assoc['nombre'];
+            $apellido = $assoc['apellido'];
+            $sector = new Sector( intval($assoc['sector']['id']), $assoc['sector']['nombre'] );
+            $tipo = new TipoEmpleado( intval($assoc['tipo']['id']), $assoc['tipo']['tipo'] );
+            $usuario = $assoc['usuario'];
+            $contrasenia = '';
+            $fecha = $assoc['fechaIngreso'];
+            $cantOp = intval($assoc['cantOperaciones']);
+
+            $ret = new Empleado( 
+                $id,
+                $nombre, $apellido,
+                $sector,
+                $tipo,
+                $usuario,
+                $contrasenia
+            );
+            $ret->setFechaIngreso($fecha);
+            $ret->setCantOperaciones($cantOp);
+
+            return $ret;
+        }
+        catch ( JsonException $ex ) {
+            return NULL;
+        }
+
+    }
+
 }

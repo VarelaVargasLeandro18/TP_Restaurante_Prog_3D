@@ -20,6 +20,7 @@ class EmpleadoModel implements ICRUD {
     private static string $columnaFechaIngreso = 'FechaIngreso';
     private static string $columnaCantidadOperaciones = 'CantidadOperaciones';
 
+
     private static function crearEmpleados(array $allAssoc) : array {
         $ret = array();
         
@@ -32,6 +33,8 @@ class EmpleadoModel implements ICRUD {
 
     public static function crearEmpleado(array $assoc) : Empleado {
         $ret = NULL;
+        $strNow = date('Y-m-d H:i:s');
+
         $id = intval($assoc[self::$columnaId]);
         $nombre = $assoc[self::$columnaNombre];
         $apellido = $assoc[self::$columnaApellido];
@@ -41,8 +44,11 @@ class EmpleadoModel implements ICRUD {
         $tipo = TipoEmpleadoModel::readById($tipoId);
         $usuario = $assoc[self::$columnaUsuario];
         $contraseniaHash = $assoc[self::$columnaContraseniaHash];
+        $fechaIngreso = ($assoc[self::$columnaFechaIngreso] === NULL) ?
+                        $strNow : $assoc[self::$columnaFechaIngreso];
+        $cantOperaciones = intval($assoc[self::$columnaCantidadOperaciones]);
 
-        return new Empleado(
+        $ret = new Empleado(
             $id,
             $nombre,
             $apellido,
@@ -51,26 +57,59 @@ class EmpleadoModel implements ICRUD {
             $usuario,
             $contraseniaHash
         );
+        
+        $ret->setFechaIngreso( $fechaIngreso );
+        $ret->setCantOperaciones( $cantOperaciones );
+        
+
+        return $ret;
+    }
+
+    private static function columns () : string {
+        $columnaId = self::$columnaId;
+        $columnaNombre = self::$columnaNombre;
+        $columnaApellido = self::$columnaApellido;
+        $columnaSectorId = self::$columnaSectorId;
+        $columnaTipoEmpleadoId = self::$columnaTipoEmpleadoId;
+        $columnaUsuario = self::$columnaUsuario;
+        $columnaContraseniaHash = self::$columnaContraseniaHash;
+        $columnaFechaIngreso = self::$columnaFechaIngreso;
+        $columnaCantidadOperaciones = self::$columnaCantidadOperaciones;
+
+        $ret = "
+                $columnaId,
+                $columnaNombre,
+                $columnaApellido,
+                $columnaSectorId,
+                $columnaTipoEmpleadoId,
+                $columnaUsuario,
+                $columnaContraseniaHash,
+                $columnaFechaIngreso,
+                $columnaCantidadOperaciones
+
+        ";
+        
+        return $ret;
     }
 
     public static function readById(mixed $id): mixed
     {
         $ret = NULL;
         $access = AccesoDatos::obtenerInstancia();
+        
+        $columns = self::columns();
+        $table = self::$nombreTabla;
+        $columnaId = self::$columnaId;
+
         $statement = $access->prepararConsulta(
-            '
+            "
             SELECT 
-                Empleado.Id,
-                Empleado.Nombre,
-                Empleado.Apellido,
-                Empleado.SectorId,
-                Empleado.TipoEmpleadoId,
-                Empleado.Usuario,
-                Empleado.Contrasenia_hash
-            FROM Empleado
-            WHERE Empleado.Id = :id;
-            '
+                $columns
+            FROM $table
+            WHERE $columnaId = :id;
+            "
         );
+
         $statement->bindValue(':id', $id, PDO::PARAM_INT);
         $executed = $statement->execute();
         
@@ -86,18 +125,15 @@ class EmpleadoModel implements ICRUD {
     {
         $ret = array();
         $access= AccesoDatos::obtenerInstancia();
+
+        $columns = self::columns();
+        
         $statement = $access->prepararConsulta(
-            '
+            "
             SELECT 
-                Empleado.Id,
-                Empleado.Nombre,
-                Empleado.Apellido,
-                Empleado.SectorId,
-                Empleado.TipoEmpleadoId,
-                Empleado.Usuario,
-                Empleado.Contrasenia_hash
+                $columns
             FROM Empleado;
-            '
+            "
         );
         $executed = $statement->execute();
 
@@ -117,32 +153,35 @@ class EmpleadoModel implements ICRUD {
         if ( $check == false ) {
             $contrasenia = password_hash($obj->getContraseniaHash(), PASSWORD_BCRYPT);
             $access = AccesoDatos::obtenerInstancia();
+            $columns = self::columns();
             $statement = $access->prepararConsulta(
-                '
+                "
                 INSERT INTO Empleado (
-                    Empleado.Nombre,
-                    Empleado.Apellido,
-                    Empleado.SectorId,
-                    Empleado.TipoEmpleadoId,
-                    Empleado.Usuario,
-                    Empleado.Contrasenia_hash
+                    $columns
                 )
                 VALUES (
+                    :id,
                     :nombre, 
                     :apellido, 
                     :sectorId, 
                     :tipoId, 
                     :usuario, 
-                    :ctrsnia
+                    :ctrsnia,
+                    :fecha,
+                    :cantop
                 );
-                '
+                "
             );
+            $strNow = date('Y-m-d H:i:s');
+            $statement->bindValue(':id', 0, PDO::PARAM_INT);
             $statement->bindValue(':nombre', $obj->getNombre());
             $statement->bindValue(':apellido', $obj->getApellido());
             $statement->bindValue(':sectorId', $obj->getSector()->getId(), PDO::PARAM_INT);
             $statement->bindValue(':tipoId', $obj->getTipo()->getId(), PDO::PARAM_INT);
             $statement->bindValue(':usuario', $obj->getUsuario());
             $statement->bindValue(':ctrsnia', $contrasenia );
+            $statement->bindValue(':fecha', $strNow);
+            $statement->bindValue( ':cantop', 0 );
             
             if ( PermisosEmpleadoSectorModel::comprobarTipoSector(
                         $obj->getSector()->getId(),
@@ -160,14 +199,17 @@ class EmpleadoModel implements ICRUD {
     {
         $ret = self::readById($id);
 
+        $table = self::$nombreTabla;
+        $columnaId = self::$columnaId;
+
         if ( $ret !== NULL ) {
             $access = AccesoDatos::obtenerInstancia();
             $statement = $access->prepararConsulta(
-                '
+                "
                 DELETE
-                FROM Empleado
-                WHERE Empleado.Id = :id
-                '
+                FROM $columnaId
+                WHERE $table = :id
+                "
             );
             $statement->bindValue(':id', $id, PDO::PARAM_INT);
             $statement->execute();
@@ -179,19 +221,29 @@ class EmpleadoModel implements ICRUD {
     {
         $ret = false;
         $access = AccesoDatos::obtenerInstancia();
+
+        $table = self::$nombreTabla;
+        $columnaId = self::$columnaId;
+        $columnaNombre = self::$columnaNombre;
+        $columnaApellido = self::$columnaApellido;
+        $columnaSector = self::$columnaSectorId;
+        $columnaTipo = self::$columnaTipoEmpleadoId;
+        $columnaUsuario = self::$columnaUsuario;
+        $columnaCtr = self::$columnaContraseniaHash;
+
         $statement = $access->prepararConsulta(
-            '
+            "
             UPDATE 
-                Empleado
+                $table
             SET
-                Empleado.Nombre = :nombre,
-                Empleado.Apellido = :apellido,
-                Empleado.SectorId = :sectorId,
-                Empleado.TipoEmpleadoId = :tipoId,
-                Empleado.Usuario = :usuario,
-                Empleado.Contrasenia_hash = :ctrsnia
-            WHERE Empleado.Id = :id;
-            '
+                $columnaNombre = :nombre,
+                $columnaApellido = :apellido,
+                $columnaSector = :sectorId,
+                $columnaTipo = :tipoId,
+                $columnaUsuario = :usuario,
+                $columnaCtr = :ctrsnia
+            WHERE $columnaId = :id;
+            "
         );
         $statement->bindValue(':id', $obj->getId(), PDO::PARAM_INT);
         $statement->bindValue(':nombre', $obj->getNombre());

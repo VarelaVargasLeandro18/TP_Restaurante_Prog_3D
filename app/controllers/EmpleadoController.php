@@ -5,6 +5,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
 require_once __DIR__ . '/../models/EmpleadoModel.php';
+require_once __DIR__ . '/../beans/Empleado.php';
 require_once __DIR__ . '/../interfaces/ICRUDApi.php';
 
 class EmpleadoController implements ICRUDApi {
@@ -15,7 +16,7 @@ class EmpleadoController implements ICRUDApi {
         $empleado = EmpleadoModel::readById($id);
         $jsonEmpleado = json_encode( $empleado );
 
-        if ( $empleado === NULL ) return $response->withStatus( StatusCodeInterface::STATUS_BAD_REQUEST );
+        if ( $empleado === NULL ) return $response->withStatus( StatusCodeInterface::STATUS_NOT_FOUND );
         
         $response->getBody()->write($jsonEmpleado);
 
@@ -34,11 +35,10 @@ class EmpleadoController implements ICRUDApi {
     public static function insert(Request $request, Response $response, array $args): Response
     {
         $json = $request->getBody();
-        $assoc = json_decode($json, true);
+        $empleado = Empleado::decode($json);
         
-        if ( $assoc === NULL ) return $response->withStatus( StatusCodeInterface::STATUS_BAD_REQUEST );
-
-        $empleado = EmpleadoModel::crearEmpleado($assoc);
+        if ( $empleado === NULL ) return $response->withStatus( StatusCodeInterface::STATUS_BAD_REQUEST );
+        
         $inserted = EmpleadoModel::insertObject($empleado);
         
         if ( !$inserted ) return $response->withStatus( StatusCodeInterface::STATUS_CONFLICT );
@@ -63,9 +63,10 @@ class EmpleadoController implements ICRUDApi {
     public static function update(Request $request, Response $response, array $args): Response
     {
         $json = $request->getBody();
-        $assoc = json_decode($json, true);
+        $empleado = Empleado::decode($json);
 
-        $empleado = EmpleadoModel::crearEmpleado($assoc);
+        if ( $empleado === NULL ) return $response->withStatus(StatusCodeInterface::STATUS_BAD_REQUEST);
+
         $updated = EmpleadoModel::updateObject($empleado);
 
         if ( !$updated ) return $response->withStatus( StatusCodeInterface::STATUS_CONFLICT );
