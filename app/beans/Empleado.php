@@ -242,7 +242,7 @@ class Empleado implements SerializeWithJSON
             $sector = new Sector( intval($assoc['sector']['id']), $assoc['sector']['nombre'] );
             $tipo = new TipoEmpleado( intval($assoc['tipo']['id']), $assoc['tipo']['tipo'] );
             $usuario = $assoc['usuario'];
-            $contrasenia = '';
+            $contrasenia = $assoc['contrasenia'];
             $fecha = $assoc['fechaIngreso'];
             $cantOp = intval($assoc['cantOperaciones']);
 

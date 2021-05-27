@@ -37,5 +37,6 @@ require_once './routes/EmpleadoRoute.php';
 require_once './routes/ProductoRoute.php';
 require_once './routes/MesaRoute.php';
 require_once './routes/PedidoRoute.php';
+require_once './routes/AuthRoute.php';
 
 $app->run();

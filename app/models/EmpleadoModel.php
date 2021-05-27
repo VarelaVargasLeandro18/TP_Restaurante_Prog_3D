@@ -148,7 +148,7 @@ class EmpleadoModel implements ICRUD {
     public static function insertObject(mixed $obj): bool
     {
         $ret = false;
-        $check = self::checkUsrPassAll( $obj->getUsuario(), $obj->getContraseniaHash() );
+        $check = self::checkUsrPassAll( $obj->getUsuario(), $obj->getContraseniaHash() ) !== NULL;
 
         if ( $check == false ) {
             $contrasenia = password_hash($obj->getContraseniaHash(), PASSWORD_BCRYPT);
@@ -207,8 +207,8 @@ class EmpleadoModel implements ICRUD {
             $statement = $access->prepararConsulta(
                 "
                 DELETE
-                FROM $columnaId
-                WHERE $table = :id
+                FROM $table
+                WHERE $columnaId = :id
                 "
             );
             $statement->bindValue(':id', $id, PDO::PARAM_INT);
@@ -265,23 +265,24 @@ class EmpleadoModel implements ICRUD {
     }
 
     // FUNCIONES PROPIAS
-    /**
-     * Chequea si la contrasenia y ell usuario están usados.
-     */
-    public static function checkUsrPassAll (string $usuario, string $contrasenia) : bool {
-        $ret = false;
+    
+    public static function checkUsrPassAll (string $usuario, string $contrasenia) : mixed {
+        $ret = NULL;
         $empleados = self::readAllObjects();
 
         for ( $index = 0; $index < count($empleados); $index++ ) {
             $empleado = $empleados[$index];
 
-            if ( $ret = self::checkUsrPass( $empleado, $usuario, $contrasenia ) )
+            if ( self::checkUsrPass( $empleado, $usuario, $contrasenia ) ){
+                $ret = $empleado;
                 break;
+            }
         }
+
         return $ret;
     }
 
-    public static function checkUsrPass ( Empleado $empleado, string $usuario, string $contrasenia ) : bool {
+    private static function checkUsrPass ( Empleado $empleado, string $usuario, string $contrasenia ) : bool {
         return  password_verify( $contrasenia, $empleado->getContraseniaHash() ) &&
                 $empleado->getUsuario() == $usuario;
     }
