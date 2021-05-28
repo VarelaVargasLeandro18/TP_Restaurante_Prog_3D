@@ -20,17 +20,13 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->safeLoad();
 
 // Instantiate App
+$basePath = str_replace( '/index.php', '', $_SERVER['PHP_SELF'] );
 $app = AppFactory::create();
-$app->setBasePath('/TP_Restaurante/slim-php-mysql-heroku/app');
+$app->setBasePath( $basePath );
 
 $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 $app->addErrorMiddleware(true, true, true);
-
-$app->get('/', function( Request $req, Response $rep ) {
-    $rep->getBody()->write("AAA");
-    return $rep;
-});
 
 //require_once './routes/PermisoEmpleadoSectorRoute.php';
 require_once './routes/EmpleadoRoute.php';

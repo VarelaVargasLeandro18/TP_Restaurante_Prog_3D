@@ -29,6 +29,8 @@ class Auth {
     public static function Verificar( string $token ) : bool {
         $payload = NULL;
 
+        if ( empty($token) ) return false;
+
         try {
             $payload = self::ObtenerPayload( $token );
         }
