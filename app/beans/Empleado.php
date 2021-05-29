@@ -14,14 +14,16 @@ class Empleado implements SerializeWithJSON
     private string $contraseniaHash;
     private string $fechaIngreso;
     private int $cantOperaciones;
+    private bool $suspendido;
 
-    public function __construct(int $id, 
-                                string $nombre, 
-                                string $apellido,
-                                Sector $sector,
-                                TipoEmpleado $tipo,
-                                string $usuario,
-                                string $contraseniaHash)
+    public function __construct(int $id = -1, 
+                                string $nombre = '', 
+                                string $apellido = '',
+                                ?Sector $sector = null,
+                                ?TipoEmpleado $tipo = null,
+                                string $usuario = '',
+                                string $contraseniaHash = '',
+                                bool $suspendido = false)
     {
         $this->id = $id;
         $this->nombre = $nombre;
@@ -30,6 +32,7 @@ class Empleado implements SerializeWithJSON
         $this->tipo = $tipo;
         $this->usuario = $usuario;
         $this->contraseniaHash = $contraseniaHash;
+        $this->suspendido = $suspendido;
     }
 
     /**
@@ -213,6 +216,26 @@ class Empleado implements SerializeWithJSON
         return $this;
     }
 
+    /**
+     * Get the value of suspendido
+     */ 
+    public function getSuspendido()
+    {
+        return $this->suspendido;
+    }
+
+    /**
+     * Set the value of suspendido
+     *
+     * @return  self
+     */ 
+    public function setSuspendido($suspendido)
+    {
+        $this->suspendido = $suspendido;
+
+        return $this;
+    }
+
     public function jsonSerialize(): mixed
     {
         $ret = array();
@@ -224,6 +247,7 @@ class Empleado implements SerializeWithJSON
         $ret["usuario"] = $this->usuario;
         $ret["fechaIngreso"] = $this->fechaIngreso;
         $ret["cantOperaciones"] = $this->cantOperaciones;
+        $ret["suspendido"] = $this->suspendido;
 
         return $ret;
     }
@@ -245,6 +269,7 @@ class Empleado implements SerializeWithJSON
             $contrasenia = $assoc['contrasenia'];
             $fecha = $assoc['fechaIngreso'];
             $cantOp = intval($assoc['cantOperaciones']);
+            $suspendido = $assoc['suspendido'] === "true";
 
             $ret = new Empleado( 
                 $id,
@@ -252,7 +277,8 @@ class Empleado implements SerializeWithJSON
                 $sector,
                 $tipo,
                 $usuario,
-                $contrasenia
+                $contrasenia,
+                $suspendido
             );
             $ret->setFechaIngreso($fecha);
             $ret->setCantOperaciones($cantOp);
@@ -264,5 +290,4 @@ class Empleado implements SerializeWithJSON
         }
 
     }
-
 }

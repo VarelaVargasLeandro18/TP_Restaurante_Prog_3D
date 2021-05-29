@@ -19,6 +19,7 @@ class EmpleadoModel implements ICRUD {
     private static string $columnaContraseniaHash = 'Contrasenia_hash';
     private static string $columnaFechaIngreso = 'FechaIngreso';
     private static string $columnaCantidadOperaciones = 'CantidadOperaciones';
+    private static string $columnaSuspendido = 'Suspendido';
 
 
     private static function crearEmpleados(array $allAssoc) : array {
@@ -47,6 +48,7 @@ class EmpleadoModel implements ICRUD {
         $fechaIngreso = ($assoc[self::$columnaFechaIngreso] === NULL) ?
                         $strNow : $assoc[self::$columnaFechaIngreso];
         $cantOperaciones = intval($assoc[self::$columnaCantidadOperaciones]);
+        $suspendido = boolval($assoc[self::$columnaSuspendido]);
 
         $ret = new Empleado(
             $id,
@@ -55,7 +57,8 @@ class EmpleadoModel implements ICRUD {
             $sector,
             $tipo,
             $usuario,
-            $contraseniaHash
+            $contraseniaHash,
+            $suspendido
         );
         
         $ret->setFechaIngreso( $fechaIngreso );
@@ -75,6 +78,7 @@ class EmpleadoModel implements ICRUD {
         $columnaContraseniaHash = self::$columnaContraseniaHash;
         $columnaFechaIngreso = self::$columnaFechaIngreso;
         $columnaCantidadOperaciones = self::$columnaCantidadOperaciones;
+        $columnaSuspendido = self::$columnaSuspendido;
 
         $ret = "
                 $columnaId,
@@ -85,7 +89,8 @@ class EmpleadoModel implements ICRUD {
                 $columnaUsuario,
                 $columnaContraseniaHash,
                 $columnaFechaIngreso,
-                $columnaCantidadOperaciones
+                $columnaCantidadOperaciones,
+                $columnaSuspendido
 
         ";
         
@@ -148,9 +153,9 @@ class EmpleadoModel implements ICRUD {
     public static function insertObject(mixed $obj): bool
     {
         $ret = false;
-        $check = self::checkUsrPassAll( $obj->getUsuario(), $obj->getContraseniaHash() ) !== NULL;
-
-        if ( $check == false ) {
+        $check = self::checkUsrPassAll( $obj->getUsuario(), $obj->getContraseniaHash() ) === NULL;
+        
+        if ( $check == true ) {
             $contrasenia = password_hash($obj->getContraseniaHash(), PASSWORD_BCRYPT);
             $access = AccesoDatos::obtenerInstancia();
             $columns = self::columns();
@@ -168,7 +173,8 @@ class EmpleadoModel implements ICRUD {
                     :usuario, 
                     :ctrsnia,
                     :fecha,
-                    :cantop
+                    :cantop,
+                    :suspendido
                 );
                 "
             );
@@ -182,6 +188,7 @@ class EmpleadoModel implements ICRUD {
             $statement->bindValue(':ctrsnia', $contrasenia );
             $statement->bindValue(':fecha', $strNow);
             $statement->bindValue( ':cantop', 0 );
+            $statement->bindValue(':suspendido', $obj->getSuspendido(), PDO::PARAM_BOOL);
             
             if ( PermisosEmpleadoSectorModel::comprobarTipoSector(
                         $obj->getSector()->getId(),
@@ -230,6 +237,7 @@ class EmpleadoModel implements ICRUD {
         $columnaTipo = self::$columnaTipoEmpleadoId;
         $columnaUsuario = self::$columnaUsuario;
         $columnaCtr = self::$columnaContraseniaHash;
+        $columnaSuspendido = self::$columnaSuspendido;
 
         $statement = $access->prepararConsulta(
             "
@@ -241,7 +249,8 @@ class EmpleadoModel implements ICRUD {
                 $columnaSector = :sectorId,
                 $columnaTipo = :tipoId,
                 $columnaUsuario = :usuario,
-                $columnaCtr = :ctrsnia
+                /*$columnaCtr = :ctrsnia,*/
+                $columnaSuspendido = :suspendido
             WHERE $columnaId = :id;
             "
         );
@@ -251,7 +260,8 @@ class EmpleadoModel implements ICRUD {
         $statement->bindValue(':sectorId', $obj->getSector()->getId(), PDO::PARAM_INT);
         $statement->bindValue(':tipoId', $obj->getTipo()->getId(), PDO::PARAM_INT);
         $statement->bindValue(':usuario', $obj->getUsuario());
-        $statement->bindValue(':ctrsnia', $obj->getContraseniaHash());
+        //$statement->bindValue(':ctrsnia',  password_hash( $obj->getContraseniaHash(), PASSWORD_BCRYPT ) );
+        $statement->bindValue(':suspendido', $obj->getSuspendido(), PDO::PARAM_BOOL);
         
         if ( PermisosEmpleadoSectorModel::comprobarTipoSector(
             $obj->getSector()->getId(),
@@ -275,6 +285,9 @@ class EmpleadoModel implements ICRUD {
 
             if ( self::checkUsrPass( $empleado, $usuario, $contrasenia ) ){
                 $ret = $empleado;
+                var_dump($empleado->getId());
+                var_dump( password_verify( $contrasenia, $empleado->getContraseniaHash() ) );
+                var_dump($contrasenia);
                 break;
             }
         }

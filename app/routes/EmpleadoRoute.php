@@ -20,4 +20,4 @@ $app->group( '/empleado', function(RouteCollectorProxy $group) {
     $group->put( '/', EmpleadoController::class . ':update' );
 
 } )
-->add( Logger::class . ':loguear' );
+->add( Logger::class . ':logSocio' );

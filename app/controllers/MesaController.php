@@ -74,4 +74,19 @@ class MesaController implements ICRUDApi {
         return $response->withStatus( StatusCodeInterface::STATUS_NO_CONTENT );
     }
 
+    private static function generarCodigo ( int $length = 5 ) : string {
+        $numeros = '0123456789';
+        $letras = 'abcdefghijklmnñopqrstuvwxyz';
+        $chars = $numeros . $letras;
+        $charsArr = str_split($chars);
+        $ret = '';
+
+        for ( $cantLetrasAgregadas = 0; $cantLetrasAgregadas < $length; $cantLetrasAgregadas++ ) {
+            $indexNrs = random_int( 0, count($charsArr) );
+            $ret .= $charsArr[$indexNrs];            
+        }
+        
+        return $ret;
+    }
+
 }

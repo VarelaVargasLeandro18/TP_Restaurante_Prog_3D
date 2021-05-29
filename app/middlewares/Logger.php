@@ -8,7 +8,7 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 
 class Logger
 {
-    public static function loguear ( Request $request, RequestHandler $handler ) {
+    private static function loguear ( Request $request, RequestHandler $handler, callable $func ) : Response {
         $response = new Response();
         $requestHeaders = $request->getHeaders();
 
@@ -18,8 +18,18 @@ class Logger
         
         if ( Auth::Verificar($jwt) === false ) return $response->withStatus( StatusCodeInterface::STATUS_FORBIDDEN );
         
+        if ( $func(Auth::ObtenerDatos($jwt)) === false ) return $response->withStatus( StatusCodeInterface::STATUS_FORBIDDEN );
+
         $response = $handler->handle($request);
 
         return $response;
     }
+
+
+    public static function logSocio ( Request $request, RequestHandler $handler ) : Response {
+        return self::loguear ( $request, $handler, function ( stdClass $empleado ) {
+            return $empleado->tipo->tipo === '#socio';
+        } );
+    }
+
 }
