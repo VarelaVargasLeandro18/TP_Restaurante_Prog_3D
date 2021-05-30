@@ -221,9 +221,6 @@ class Empleado implements SerializeWithJSON
         $ret["id"] = $this->id;
         $ret["nombre"] = $this->nombre;
         $ret["apellido"] = $this->apellido;
-
-        $ret["sector"] = null;
-        if ( $this->sector ) $ret["sector"] = $this->sector->jsonSerialize();
         
         $ret["tipo"] = null;
         if ( $this->tipo ) $ret["tipo"] = $this->tipo->jsonSerialize();
@@ -245,40 +242,39 @@ class Empleado implements SerializeWithJSON
         
         try {
             $assoc = json_decode($serialized, true);
-
-            $id = intval($assoc['id']);
-            $nombre = $assoc['nombre'];
-            $apellido = $assoc['apellido'];
-
-            $sector = null;
-            if ( $assoc['sector'] !== NULL ) $sector = new Sector( intval($assoc['sector']['id']), $assoc['sector']['nombre'] );
-
-            $tipo = null;
-            if ( $assoc['tipo'] !== NULL ) $tipo = new TipoEmpleado( intval($assoc['tipo']['id']), $assoc['tipo']['tipo'] );
-            
-            $usuario = $assoc['usuario'];
-            $contrasenia = $assoc['contrasenia'];
-            $fecha = $assoc['fechaIngreso'];
-            $cantOp = intval($assoc['cantOperaciones']);
-            $suspendido = $assoc['suspendido'] === "true";
-
-            $ret = new Empleado( 
-                $id,
-                $nombre, $apellido,
-                $sector,
-                $tipo,
-                $usuario,
-                $contrasenia,
-                $suspendido
-            );
-            $ret->setFechaIngreso($fecha);
-            $ret->setCantOperaciones($cantOp);
-
-            return $ret;
+            return self::assocToObj($assoc);
         }
         catch ( JsonException $ex ) {
             return NULL;
         }
 
     }
+
+    /*
+    private string $nombre;
+    private string $apellido;
+    private ?TipoEmpleado $tipo;
+    private string $usuario;
+    private string $contraseniaHash;
+    private string $fechaIngreso;
+    private int $cantOperaciones;
+    private bool $suspendido;*/
+
+    private static function assocToObj ( array $assoc ) : mixed {
+        $ret = new Empleado();
+        
+        if ( array_key_exists('Id', $assoc) ) 
+            $ret->setId( intval( $assoc['Id'] ) );
+
+        if ( array_key_exists('nombre', $assoc ) ) 
+            $ret->setNombre( $assoc['nombre'] );
+        
+        if ( array_key_exists('apellido', $assoc ) ) 
+            $ret->setApellido( $assoc['apellido'] ) ;
+
+        if ( array_key_exists('tipoId', $assoc ) )
+            $ret->setTipo( new TipoEmpleado( intval($assoc['id']) ) );
+
+    }
+
 }

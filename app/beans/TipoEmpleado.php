@@ -11,7 +11,9 @@ class TipoEmpleado implements SerializeWithJSON
     private int $id;
     private string $tipo;
 
-    public function __construct(int $id, string $tipo)
+    public function __construct(
+        int $id, 
+        string $tipo = '')
     {
         $this->id = $id;
         $this->tipo = $tipo;
