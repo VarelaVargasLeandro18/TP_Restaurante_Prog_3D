@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../interfaces/ICRUD.php';
 require_once __DIR__ . '/../db/AccesoDatos.php';
 
-/*abstract*/ class AbstractCRUD //implements ICRUD 
+abstract class AbstractCRUD //implements ICRUD 
 {
 
     /**
@@ -22,7 +22,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
      */
     private string $columnaId;
 
-    public function __construct( string $tabla, array $columnas, string $columnaId )
+    protected function __construct( string $tabla, array $columnas, string $columnaId )
     {
         $this->tabla = $tabla;
         $this->columnas = $columnas;
@@ -33,7 +33,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
     /**
      * Get nombre de la tabla.
      */ 
-    public function getTabla()
+    protected function getTabla()
     {
         return $this->tabla;
     }
@@ -41,7 +41,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
     /**
      * Get array que contiene nombre de columnas.
      */ 
-    public function getColumnas()
+    protected function getColumnas()
     {
         return $this->columnas;
     }    
@@ -49,7 +49,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
     /**
      * Get string con el nombre de la columna PRIMARY_KEY
      */
-    public function getColumnaId ()
+    protected function getColumnaId ()
     {
         return $this->columnaId;
     }
@@ -61,7 +61,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
      * @param valores Par columna/valor.
      * @return bool 'true' si se crea, 'false' si no.
      */
-    public final function create ( array $valores ) : bool {
+    protected final function create ( array $valores ) : bool {
         $access = AccesoDatos::obtenerInstancia();
         $statement = $access->prepararConsulta( $this->armarInsert( $valores ) );
         $this->bindParams( $valores, $statement );
@@ -73,7 +73,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
      * @param valores Par columna/valor o simplemente array de columnas.
      * @return array Filas SQL como array asociativo.
      */
-    public final function readAll ( array $valores ) : array {
+    protected final function readAll ( array $valores ) : array {
         $access = AccesoDatos::obtenerInstancia();
         $statement = $access->prepararConsulta( $this->armarSelect( $valores ) . ';' );
         $statement->execute();
@@ -86,7 +86,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
      * @param Id Id de la FILA a leer.
      * @return array Fila SQL como array asociativo.
      */
-    public final function readById ( array $valores, mixed $Id ) : array {
+    protected final function readById ( array $valores, mixed $Id ) : array {
         $access = AccesoDatos::obtenerInstancia();
         $query = $this->armarSelect( $valores ) . ' ' . $this->agregarWhereId();
         $statement = $access->prepararConsulta( $query );
@@ -99,7 +99,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
      * Actualiza el valor de la fila con el Id dado.
      * @param valores Par columna/valor. DEBE INCLUIR ID.
     */
-    public final function updateById ( array $valores ) : bool {
+    protected final function updateById ( array $valores ) : bool {
         $access = AccesoDatos::obtenerInstancia();
         $query = $this->armarUpdate( $valores );
         $statement = $access->prepararConsulta( $query );
@@ -112,7 +112,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
      * @param Id Id de la FILA a borrar.
      * @return array Fila SQL como array asociativo.
     */
-    public final function deleteById ( mixed $Id ) : array {
+    protected final function deleteById ( mixed $Id ) : array {
         $readed = $this->readById( $this->columnas, $Id );
 
         if ( count($readed) === 0 ) return $readed;
@@ -134,7 +134,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
      * @param valores Par clave/valor de parámetros SQL presentes en la query.
      * @return array Filas SQL como array asociativo.
      */
-    public final function query ( string $query, array $valores ) : array {
+    protected final function query ( string $query, array $valores ) : array {
         $access = AccesoDatos::obtenerInstancia();
         $statement = $access->prepararConsulta($query);
         $this->bindParams( $valores, $statement );
