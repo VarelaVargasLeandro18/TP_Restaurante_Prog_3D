@@ -8,7 +8,6 @@ class Empleado implements SerializeWithJSON
     private int $id;
     private string $nombre;
     private string $apellido;
-    private ?Sector $sector;
     private ?TipoEmpleado $tipo;
     private string $usuario;
     private string $contraseniaHash;
@@ -19,17 +18,15 @@ class Empleado implements SerializeWithJSON
     public function __construct(int $id = -1, 
                                 string $nombre = '', 
                                 string $apellido = '',
-                                ?Sector $sector = NULL,
                                 ?TipoEmpleado $tipo = NULL,
                                 string $usuario = '',
                                 string $contraseniaHash = '',
-                                int $cantOperaciones = 0
+                                int $cantOperaciones = 0,
                                 bool $suspendido = false)
     {
         $this->id = $id;
         $this->nombre = $nombre;
         $this->apellido = $apellido;
-        $this->sector = $sector;
         $this->tipo = $tipo;
         $this->usuario = $usuario;
         $this->contraseniaHash = $contraseniaHash;
@@ -93,26 +90,6 @@ class Empleado implements SerializeWithJSON
     public function setApellido(string $apellido): self
     {
         $this->apellido = $apellido;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of sector
-     */
-    public function getSector(): ?Sector
-    {
-        return $this->sector;
-    }
-
-    /**
-     * Set the value of sector
-     *
-     * @return  self
-     */
-    public function setSector(?Sector $sector)
-    {
-        $this->sector = $sector;
 
         return $this;
     }
@@ -245,7 +222,10 @@ class Empleado implements SerializeWithJSON
         $ret["nombre"] = $this->nombre;
         $ret["apellido"] = $this->apellido;
 
+        $ret["sector"] = null;
         if ( $this->sector ) $ret["sector"] = $this->sector->jsonSerialize();
+        
+        $ret["tipo"] = null;
         if ( $this->tipo ) $ret["tipo"] = $this->tipo->jsonSerialize();
 
         $ret["usuario"] = $this->usuario;
@@ -257,7 +237,9 @@ class Empleado implements SerializeWithJSON
     }
 
     /**
-     * 
+     * Convierte de un json a Empleado.
+     * @param string $serialized JSON de Empleado.
+     * @return mixed empleado.
      */
     public static function decode( string $serialized ) : mixed {
         
