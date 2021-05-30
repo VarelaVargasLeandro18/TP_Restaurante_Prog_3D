@@ -36,6 +36,10 @@ class MesaController implements ICRUDApi {
         $json = $request->getBody();
         $assoc = json_decode($json, true);
         
+        if ( empty($assoc['Id']) ) $assoc['Id'] = self::generarCodigoChequeado();
+
+        $assoc['EstadoMesaId'] = 1;
+        
         if ( $assoc === NULL ) return $response->withStatus( StatusCodeInterface::STATUS_BAD_REQUEST );
 
         $mesa = MesaModel::crearmesa($assoc);
@@ -74,9 +78,9 @@ class MesaController implements ICRUDApi {
         return $response->withStatus( StatusCodeInterface::STATUS_NO_CONTENT );
     }
 
-    private static function generarCodigo ( int $length = 5 ) : string {
+    private static function generarCodigo ( int $length ) : string {
         $numeros = '0123456789';
-        $letras = 'abcdefghijklmnñopqrstuvwxyz';
+        $letras = 'abcdefghijklmnopqrstuvwxyz';
         $chars = $numeros . $letras;
         $charsArr = str_split($chars);
         $ret = '';
@@ -85,8 +89,18 @@ class MesaController implements ICRUDApi {
             $indexNrs = random_int( 0, count($charsArr) );
             $ret .= $charsArr[$indexNrs];            
         }
-        
+
         return $ret;
+    }
+
+    private static function generarCodigoChequeado( int $length = 5 ) : string {
+        $cod = '';
+
+        do {
+            $cod = self::generarCodigo($length);
+        } while ( MesaModel::readById( $cod ) !== NULL );
+
+        return $cod;
     }
 
 }

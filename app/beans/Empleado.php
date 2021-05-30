@@ -8,8 +8,8 @@ class Empleado implements SerializeWithJSON
     private int $id;
     private string $nombre;
     private string $apellido;
-    private Sector $sector;
-    private TipoEmpleado $tipo;
+    private ?Sector $sector;
+    private ?TipoEmpleado $tipo;
     private string $usuario;
     private string $contraseniaHash;
     private string $fechaIngreso;
@@ -19,10 +19,11 @@ class Empleado implements SerializeWithJSON
     public function __construct(int $id = -1, 
                                 string $nombre = '', 
                                 string $apellido = '',
-                                ?Sector $sector = null,
-                                ?TipoEmpleado $tipo = null,
+                                ?Sector $sector = NULL,
+                                ?TipoEmpleado $tipo = NULL,
                                 string $usuario = '',
                                 string $contraseniaHash = '',
+                                int $cantOperaciones = 0
                                 bool $suspendido = false)
     {
         $this->id = $id;
@@ -32,6 +33,7 @@ class Empleado implements SerializeWithJSON
         $this->tipo = $tipo;
         $this->usuario = $usuario;
         $this->contraseniaHash = $contraseniaHash;
+        $this->cantOperaciones = $cantOperaciones;
         $this->suspendido = $suspendido;
     }
 
@@ -98,7 +100,7 @@ class Empleado implements SerializeWithJSON
     /**
      * Get the value of sector
      */
-    public function getSector(): Sector
+    public function getSector(): ?Sector
     {
         return $this->sector;
     }
@@ -108,7 +110,7 @@ class Empleado implements SerializeWithJSON
      *
      * @return  self
      */
-    public function setSector(Sector $sector)
+    public function setSector(?Sector $sector)
     {
         $this->sector = $sector;
 
@@ -118,7 +120,7 @@ class Empleado implements SerializeWithJSON
     /**
      * Get the value of tipo
      */
-    public function getTipo(): TipoEmpleado
+    public function getTipo(): ?TipoEmpleado
     {
         return $this->tipo;
     }
@@ -128,7 +130,7 @@ class Empleado implements SerializeWithJSON
      *
      * @return  self
      */
-    public function setTipo(TipoEmpleado $tipo): self
+    public function setTipo(?TipoEmpleado $tipo): self
     {
         $this->tipo = $tipo;
 
@@ -242,8 +244,10 @@ class Empleado implements SerializeWithJSON
         $ret["id"] = $this->id;
         $ret["nombre"] = $this->nombre;
         $ret["apellido"] = $this->apellido;
-        $ret["sector"] = $this->sector->jsonSerialize();
-        $ret["tipo"] = $this->tipo->jsonSerialize();
+
+        if ( $this->sector ) $ret["sector"] = $this->sector->jsonSerialize();
+        if ( $this->tipo ) $ret["tipo"] = $this->tipo->jsonSerialize();
+
         $ret["usuario"] = $this->usuario;
         $ret["fechaIngreso"] = $this->fechaIngreso;
         $ret["cantOperaciones"] = $this->cantOperaciones;
@@ -263,8 +267,13 @@ class Empleado implements SerializeWithJSON
             $id = intval($assoc['id']);
             $nombre = $assoc['nombre'];
             $apellido = $assoc['apellido'];
-            $sector = new Sector( intval($assoc['sector']['id']), $assoc['sector']['nombre'] );
-            $tipo = new TipoEmpleado( intval($assoc['tipo']['id']), $assoc['tipo']['tipo'] );
+
+            $sector = null;
+            if ( $assoc['sector'] !== NULL ) $sector = new Sector( intval($assoc['sector']['id']), $assoc['sector']['nombre'] );
+
+            $tipo = null;
+            if ( $assoc['tipo'] !== NULL ) $tipo = new TipoEmpleado( intval($assoc['tipo']['id']), $assoc['tipo']['tipo'] );
+            
             $usuario = $assoc['usuario'];
             $contrasenia = $assoc['contrasenia'];
             $fecha = $assoc['fechaIngreso'];

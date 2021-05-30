@@ -39,10 +39,19 @@ class EmpleadoModel implements ICRUD {
         $id = intval($assoc[self::$columnaId]);
         $nombre = $assoc[self::$columnaNombre];
         $apellido = $assoc[self::$columnaApellido];
-        $sectorId = intval($assoc[self::$columnaSectorId]);
-        $sector = SectorModel::readById($sectorId);
-        $tipoId = intval($assoc[self::$columnaTipoEmpleadoId]);
-        $tipo = TipoEmpleadoModel::readById($tipoId);
+
+        $sector = null;
+        if ( $assoc[self::$columnaSectorId] !== NULL ) {
+            $sectorId = intval($assoc[self::$columnaSectorId]);
+            $sector = SectorModel::readById($sectorId);
+        }
+
+        $tipo = null;
+        if ( $assoc[self::$columnaTipoEmpleadoId] !== NULL ) {
+            $tipoId = intval($assoc[self::$columnaTipoEmpleadoId]);
+            $tipo = TipoEmpleadoModel::readById($tipoId);
+        }
+        
         $usuario = $assoc[self::$columnaUsuario];
         $contraseniaHash = $assoc[self::$columnaContraseniaHash];
         $fechaIngreso = ($assoc[self::$columnaFechaIngreso] === NULL) ?
@@ -182,17 +191,23 @@ class EmpleadoModel implements ICRUD {
             $statement->bindValue(':id', 0, PDO::PARAM_INT);
             $statement->bindValue(':nombre', $obj->getNombre());
             $statement->bindValue(':apellido', $obj->getApellido());
-            $statement->bindValue(':sectorId', $obj->getSector()->getId(), PDO::PARAM_INT);
-            $statement->bindValue(':tipoId', $obj->getTipo()->getId(), PDO::PARAM_INT);
             $statement->bindValue(':usuario', $obj->getUsuario());
             $statement->bindValue(':ctrsnia', $contrasenia );
             $statement->bindValue(':fecha', $strNow);
             $statement->bindValue( ':cantop', 0 );
             $statement->bindValue(':suspendido', $obj->getSuspendido(), PDO::PARAM_BOOL);
-            
-            if ( PermisosEmpleadoSectorModel::comprobarTipoSector(
-                        $obj->getSector()->getId(),
-                        $obj->getTipo()->getId()) ) {
+
+            if ( $obj->getSector() ) $statement->bindValue(':sectorId', $obj->getSector()->getId(), PDO::PARAM_INT);
+                else $statement->bindValue(':sectorId', null, PDO::PARAM_NULL);
+
+            if ( $obj->getTipo() ) $statement->bindValue(':tipoId', $obj->getTipo()->getId(), PDO::PARAM_INT);
+                else $statement->bindValue(':tipoId', null, PDO::PARAM_NULL);
+
+            if ( !$obj->getSector() || !$obj->getTipo() // Si son NULL se ejecuta 
+                || 
+                PermisosEmpleadoSectorModel::comprobarTipoSector( // Si no son NULL comprobamos que tengan sentido el tipo y el sector y se ejecuta
+                $obj->getSector()->getId(),
+                $obj->getTipo()->getId()) ) {
                 $ret = $statement->execute();
             }
             else
@@ -257,11 +272,15 @@ class EmpleadoModel implements ICRUD {
         $statement->bindValue(':id', $obj->getId(), PDO::PARAM_INT);
         $statement->bindValue(':nombre', $obj->getNombre());
         $statement->bindValue(':apellido', $obj->getApellido());
-        $statement->bindValue(':sectorId', $obj->getSector()->getId(), PDO::PARAM_INT);
-        $statement->bindValue(':tipoId', $obj->getTipo()->getId(), PDO::PARAM_INT);
         $statement->bindValue(':usuario', $obj->getUsuario());
         //$statement->bindValue(':ctrsnia',  password_hash( $obj->getContraseniaHash(), PASSWORD_BCRYPT ) );
         $statement->bindValue(':suspendido', $obj->getSuspendido(), PDO::PARAM_BOOL);
+
+        if ( $obj->getSector() ) $statement->bindValue(':sectorId', $obj->getSector()->getId(), PDO::PARAM_INT);
+                else $statement->bindValue(':sectorId', null, PDO::PARAM_NULL);
+
+        if ( $obj->getSector() ) $statement->bindValue(':tipoId', $obj->getTipo()->getId(), PDO::PARAM_INT);
+            else $statement->bindValue(':tipoId', null, PDO::PARAM_NULL);
         
         if ( PermisosEmpleadoSectorModel::comprobarTipoSector(
             $obj->getSector()->getId(),
