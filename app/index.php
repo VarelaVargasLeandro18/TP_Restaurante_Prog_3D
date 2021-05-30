@@ -31,7 +31,9 @@ $app->addErrorMiddleware(true, true, true);
 $app->get( '/', function (Request $req, Response $res) {
     require_once __DIR__ . '/../app/models/AbstractCRUD.php';
     $crud = new AbstractCRUD('Empleado', ['id' => PDO::PARAM_INT, 'nombre' => PDO::PARAM_STR], 'id');
-    $crud->create( ['id' => 0, 'nombre' => 'lean'] );
+    //$crud->create( ['id' => 0, 'nombre' => 'lean'] );
+    //var_dump(  $crud->readAll( ['id', 'nombre', 'FechaIngreso', 'TipoEmpleadoId'] ) );
+    var_dump( $crud->readById( ['id', 'nombre', 'FechaIngreso', 'TipoEmpleadoId'], 8 ) );
     return $res;
 } );
 

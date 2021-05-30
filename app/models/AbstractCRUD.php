@@ -56,7 +56,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
      * Inserta los valores dados.
      * @param valores Par columna/valor.
      */
-    public final function create ( array $valores ) {
+    public final function create ( array $valores ) : bool {
         $access = AccesoDatos::obtenerInstancia();
         $statement = $access->prepararConsulta( $this->armarInsert( $valores ) );
         $this->bindParams( $valores, $statement );
@@ -65,19 +65,33 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
 
     /**
      * Lee los valores de las columnas dadas.
-     * @param valores Par columna/valor.
+     * @param valores Par columna/valor o simplemente array de columnas.
      */
-    public final function readAll ( array $valores ) {
+    public final function readAll ( array $valores ) : array {
         $access = AccesoDatos::obtenerInstancia();
         $statement = $access->prepararConsulta( $this->armarSelect( $valores ) . ';' );
         $statement->execute();
         return $statement->fetchAll( PDO::FETCH_ASSOC );
     }
 
+    /**
+     * Lee los valores de las columnas dadas por Id.
+     * @param valores Par columna/valor o simplemente array de columnas.
+     * @param Id Id de la FILA a leer.
+     */
+    public final function readById ( array $valores, mixed $Id ) : array {
+        $access = AccesoDatos::obtenerInstancia();
+        $query = $this->armarSelect( $valores ) . ' ' . $this->agregarWhereId();
+        $statement = $access->prepararConsulta( $query );
+        $this->bindParams( array ( $this->columnaId => $Id ), $statement );
+        $statement->execute();
+        return $statement->fetch(PDO::FETCH_ASSOC);        
+    }
+
     #region Funciones Privadas
     /**
      * Genera un string con la consulta INSERT SQL.
-     * @param arr Par columna/valor. 
+     * @param arr Par columna/valor.
      */
     private function armarInsert ( array $arr ) : string {
         $query = 'INSERT INTO ';
@@ -106,7 +120,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
         $query .= $this->tabla . ' SET ';
         $query .= $this->agregarSet( $arr );
         $query[ strrpos($query, ',') ] = ' ';
-        $query .= $this->agregarWhere($arr);
+        $query .= $this->agregarWhereId();
         $query .= ';';
         return $query;
     }
@@ -123,19 +137,26 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
     /**
      * Genera un string con la consulta SELECT.
      */
-    private function armarSelect () : string {
+    private function armarSelect ( array $arr ) : string {
         $query = 'SELECT ';
-        $query .= $this->agregarColumnas( $this->columnas );
+        $query .= $this->agregarColumnas( $arr );
+        $query[ strrpos($query, ',') ] = ' ';
         $query .= ' FROM ' . $this->tabla;
         return $query;
     }
 
     /**
      * Genera un string con las columnas separadas por ','
+     * @param arr Array con columnas. Puede ser par Clave/Valor o solo Columnas.
      */
     private function agregarColumnas ( array $arr ) : string {
         $ret = '';
-        $columns = array_keys($arr);
+        
+        if(array_keys($arr) === range(0, count($arr) - 1))
+            $columns = $arr;
+        else
+            $columns = array_keys($arr);
+
         
         foreach ( $columns as $col )
             $ret .= $col . ',';
@@ -172,7 +193,10 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
         return $ret;
     }
 
-    private function agregarWhere ( array $arr ) : string {
+    /**
+     * Armar el WHERE de SQL con el Id.
+     */
+    private function agregarWhereId () : string {
         $ret = 'WHERE ' . $this->columnaId . ' = :' . $this->columnaId;
         return $ret;
     }
