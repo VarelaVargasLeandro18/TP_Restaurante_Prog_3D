@@ -88,6 +88,18 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
         return $statement->fetch(PDO::FETCH_ASSOC);        
     }
 
+    /**
+     * Actualiza el valor de la fila con el Id dado.
+     * @param valores Par columna/valor. DEBE INCLUIR ID.
+    */
+    public final function updateById ( array $valores ) : bool {
+        $access = AccesoDatos::obtenerInstancia();
+        $query = $this->armarUpdate( $valores );
+        $statement = $access->prepararConsulta( $query );
+        $this->bindParams( $valores, $statement );
+        return $statement->execute();
+    }
+
     #region Funciones Privadas
     /**
      * Genera un string con la consulta INSERT SQL.
@@ -184,7 +196,8 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
         $ret = '';
         $columns = array_keys($arr);
         $idIndex = array_search( $this->columnaId, $columns );
-        unset($columns[$idIndex]);
+        
+        if ( $idIndex !== false ) unset($columns[$idIndex]);
 
         foreach ( $columns as $col ) {
             $ret .= $col . ' = ' . ':' . $col . ',';
