@@ -52,6 +52,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
     }
     #endregion GETTERS
 
+    #region CRUD
     /**
      * Inserta los valores dados.
      * @param valores Par columna/valor.
@@ -99,6 +100,27 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
         $this->bindParams( $valores, $statement );
         return $statement->execute();
     }
+
+    /**
+     * Borra una fila con el Id dado.
+     * @param Id Id de la FILA a borrar.
+    */
+    public final function deleteById ( mixed $Id ) : array {
+        $readed = $this->readById( $this->columnas, $Id );
+
+        if ( count($readed) === 0 ) return $readed;
+
+        $access = AccesoDatos::obtenerInstancia();
+        $query = $this->armarDelete();
+        $statement = $access->prepararConsulta($query);
+        $this->bindParams( array ( 'id' => $Id ), $statement );
+        
+        if ( $statement->execute() ) return $readed;
+
+        return array();
+    }
+
+    #endregion CRUD
 
     #region Funciones Privadas
     /**

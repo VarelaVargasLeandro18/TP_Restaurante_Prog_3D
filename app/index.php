@@ -33,8 +33,7 @@ $app->get( '/', function (Request $req, Response $res) {
     $crud = new AbstractCRUD('Empleado', ['id' => PDO::PARAM_INT, 'nombre' => PDO::PARAM_STR, 'apellido' => PDO::PARAM_STR], 'id');
     //$crud->create( ['id' => 0, 'nombre' => 'lean'] );
     //var_dump(  $crud->readAll( ['id', 'nombre', 'FechaIngreso', 'TipoEmpleadoId'] ) );
-    $crud->updateById( ['id' => 8, 'nombre' => 'B', 'apellido' => 'B'] );
-    var_dump( $crud->readById( ['id', 'nombre', 'FechaIngreso', 'TipoEmpleadoId'], 8 ) );
+    //var_dump( $crud->deleteById(10) );
     return $res;
 } );
 
