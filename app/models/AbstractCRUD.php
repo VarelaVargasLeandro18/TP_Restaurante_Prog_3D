@@ -46,6 +46,9 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
         return $this->columnas;
     }    
 
+    /**
+     * Get string con el nombre de la columna PRIMARY_KEY
+     */
     public function getColumnaId ()
     {
         return $this->columnaId;
@@ -56,6 +59,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
     /**
      * Inserta los valores dados.
      * @param valores Par columna/valor.
+     * @return bool 'true' si se crea, 'false' si no.
      */
     public final function create ( array $valores ) : bool {
         $access = AccesoDatos::obtenerInstancia();
@@ -67,6 +71,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
     /**
      * Lee los valores de las columnas dadas.
      * @param valores Par columna/valor o simplemente array de columnas.
+     * @return array Filas SQL como array asociativo.
      */
     public final function readAll ( array $valores ) : array {
         $access = AccesoDatos::obtenerInstancia();
@@ -79,6 +84,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
      * Lee los valores de las columnas dadas por Id.
      * @param valores Par columna/valor o simplemente array de columnas.
      * @param Id Id de la FILA a leer.
+     * @return array Fila SQL como array asociativo.
      */
     public final function readById ( array $valores, mixed $Id ) : array {
         $access = AccesoDatos::obtenerInstancia();
@@ -104,6 +110,7 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
     /**
      * Borra una fila con el Id dado.
      * @param Id Id de la FILA a borrar.
+     * @return array Fila SQL como array asociativo.
     */
     public final function deleteById ( mixed $Id ) : array {
         $readed = $this->readById( $this->columnas, $Id );
@@ -119,8 +126,21 @@ require_once __DIR__ . '/../db/AccesoDatos.php';
 
         return array();
     }
-
     #endregion CRUD
+
+    /**
+     * Ejecuta una query SQL determinada por el usuario.
+     * @param query Consulta SQL.
+     * @param valores Par clave/valor de parámetros SQL presentes en la query.
+     * @return array Filas SQL como array asociativo.
+     */
+    public final function query ( string $query, array $valores ) : array {
+        $access = AccesoDatos::obtenerInstancia();
+        $statement = $access->prepararConsulta($query);
+        $this->bindParams( $valores, $statement );
+        $statement->execute();
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     #region Funciones Privadas
     /**

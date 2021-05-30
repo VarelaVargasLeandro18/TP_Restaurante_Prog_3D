@@ -34,6 +34,7 @@ $app->get( '/', function (Request $req, Response $res) {
     //$crud->create( ['id' => 0, 'nombre' => 'lean'] );
     //var_dump(  $crud->readAll( ['id', 'nombre', 'FechaIngreso', 'TipoEmpleadoId'] ) );
     //var_dump( $crud->deleteById(10) );
+    //var_dump( $crud->query( 'SELECT * FROM Empleado WHERE id = :id', [ 'id' => 8 ] ) );
     return $res;
 } );
 
