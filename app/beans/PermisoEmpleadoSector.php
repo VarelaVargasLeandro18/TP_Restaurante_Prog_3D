@@ -3,7 +3,7 @@
 /**
  * Representa el permiso que tiene un Empleado para cambiar estado de un Pedido según el Sector en el que esté. 
  */
-class PermisosEmpleadoSector implements JsonSerializable
+class PermisoEmpleadoSector implements JsonSerializable
 {
 
     private int $id;
@@ -113,7 +113,7 @@ class PermisosEmpleadoSector implements JsonSerializable
     }
 
     /**
-     * Convierte de json a Producto.
+     * Convierte de json a PermisoEmpleadoSector.
      */
     public static function decode ( string $serialized ) : mixed {
         
@@ -128,7 +128,7 @@ class PermisosEmpleadoSector implements JsonSerializable
     }
 
     private static function asssocToObj( array $assoc ) : ?self {
-        $keysHasToHave = array_keys( (new PermisosEmpleadoSector())->jsonSerialize() );
+        $keysHasToHave = array_keys( (new PermisoEmpleadoSector())->jsonSerialize() );
         $keysHasHave = array_keys( $assoc );
         
         if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
@@ -136,7 +136,7 @@ class PermisosEmpleadoSector implements JsonSerializable
         $id = intval($assoc['id']);
         $sector = intval($assoc['sectorId']);
         $tipo = intval($assoc["tipoId"]);
-        $ret = new PermisosEmpleadoSector(
+        $ret = new PermisoEmpleadoSector(
                                             $id,
                                             new TipoUsuario($tipo),
                                             new Sector($sector),
