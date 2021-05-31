@@ -3,16 +3,16 @@
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
 /**
- * Representa un Tipo de Empleado.
+ * Representa un Tipo de Usuario.
  */
-class TipoEmpleado implements SerializeWithJSON
+class TipoUsuario implements SerializeWithJSON
 {
 
     private int $id;
     private string $tipo;
 
     public function __construct(
-        int $id, 
+        int $id = -1, 
         string $tipo = '')
     {
         $this->id = $id;
@@ -42,7 +42,7 @@ class TipoEmpleado implements SerializeWithJSON
     /**
      * Get the value of tipo
      */
-    public function getTipo()
+    public function getTipo() : string
     {
         return $this->tipo;
     }
@@ -52,7 +52,7 @@ class TipoEmpleado implements SerializeWithJSON
      *
      * @return  self
      */
-    public function setTipo(string $tipo)
+    public function setTipo(string $tipo) : self
     {
         $this->tipo = $tipo;
 
@@ -67,21 +67,31 @@ class TipoEmpleado implements SerializeWithJSON
         return $ret;
     }
 
+    /**
+     * Convierte de json a TipoUsuario.
+     */
     public static function decode ( string $serialized ) : mixed {
         
         try {
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
-
-            $id = intval($assoc['id']);
-            $tipo = $assoc['tipo'];
-            $ret = new TipoEmpleado( $id, $tipo );
-
-            return $ret;
+            return self::asssocToObj($assoc);
         }
-        catch ( JsonException $ex ) {
+        catch ( JsonException ) {
             return NULL;
         }
         
+    }
+
+    private static function asssocToObj( array $assoc ) : ?self {
+        $keysHasToHave = array_keys( (new TipoUsuario())->jsonSerialize() );
+        $keysHasHave = array_keys( $assoc );
+        
+        if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
+
+        $id = intval($assoc['id']);
+        $ret = new TipoUsuario( $id,
+                                $assoc['tipo'] );
+        return $ret;
     }
     
 }

@@ -2,15 +2,18 @@
 
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
-class Empleado implements SerializeWithJSON
+/**
+ * Representa un usuario.
+ */
+class Usuario implements SerializeWithJSON
 {
 
     private int $id;
     private string $nombre;
     private string $apellido;
-    private ?TipoEmpleado $tipo;
+    private ?TipoUsuario $tipo;
     private string $usuario;
-    private string $contraseniaHash;
+    private string $contrasenia;
     private string $fechaIngreso;
     private int $cantOperaciones;
     private bool $suspendido;
@@ -18,9 +21,9 @@ class Empleado implements SerializeWithJSON
     public function __construct(int $id = -1, 
                                 string $nombre = '', 
                                 string $apellido = '',
-                                ?TipoEmpleado $tipo = NULL,
+                                ?TipoUsuario $tipo = NULL,
                                 string $usuario = '',
-                                string $contraseniaHash = '',
+                                string $contrasenia = '',
                                 int $cantOperaciones = 0,
                                 bool $suspendido = false)
     {
@@ -29,7 +32,7 @@ class Empleado implements SerializeWithJSON
         $this->apellido = $apellido;
         $this->tipo = $tipo;
         $this->usuario = $usuario;
-        $this->contraseniaHash = $contraseniaHash;
+        $this->contrasenia = $contrasenia;
         $this->cantOperaciones = $cantOperaciones;
         $this->suspendido = $suspendido;
     }
@@ -97,7 +100,7 @@ class Empleado implements SerializeWithJSON
     /**
      * Get the value of tipo
      */
-    public function getTipo(): ?TipoEmpleado
+    public function getTipo(): ?TipoUsuario
     {
         return $this->tipo;
     }
@@ -107,7 +110,7 @@ class Empleado implements SerializeWithJSON
      *
      * @return  self
      */
-    public function setTipo(?TipoEmpleado $tipo): self
+    public function setTipo(?TipoUsuario $tipo): self
     {
         $this->tipo = $tipo;
 
@@ -135,21 +138,21 @@ class Empleado implements SerializeWithJSON
     }
 
     /**
-     * Get the value of contraseniaHash
+     * Get the value of contrasenia
      */ 
-    public function getContraseniaHash() : string
+    public function getContrasenia() : string
     {
-        return $this->contraseniaHash;
+        return $this->contrasenia;
     }
 
     /**
-     * Set the value of contraseniaHash
+     * Set the value of contrasenia
      *
      * @return  self
      */ 
-    public function setContraseniaHash(string $contraseniaHash)
+    public function setContrasenia(string $contrasenia)
     {
-        $this->contraseniaHash = $contraseniaHash;
+        $this->contrasenia = $contrasenia;
 
         return $this;
     }
@@ -167,18 +170,17 @@ class Empleado implements SerializeWithJSON
      *
      * @return  self
      */ 
-    public function setFechaIngreso(string $fechaIngreso)
+    public function setFechaIngreso(string $fechaIngreso) : self
     {
         $this->fechaIngreso = $fechaIngreso;
 
         return $this;
     }
 
-
     /**
      * Get the value of cantOperaciones
      */ 
-    public function getCantOperaciones()
+    public function getCantOperaciones() : int
     {
         return $this->cantOperaciones;
     }
@@ -188,7 +190,7 @@ class Empleado implements SerializeWithJSON
      *
      * @return  self
      */ 
-    public function setCantOperaciones($cantOperaciones)
+    public function setCantOperaciones(int $cantOperaciones) : self
     {
         $this->cantOperaciones = $cantOperaciones;
 
@@ -198,7 +200,7 @@ class Empleado implements SerializeWithJSON
     /**
      * Get the value of suspendido
      */ 
-    public function getSuspendido()
+    public function getSuspendido() : bool
     {
         return $this->suspendido;
     }
@@ -208,7 +210,7 @@ class Empleado implements SerializeWithJSON
      *
      * @return  self
      */ 
-    public function setSuspendido($suspendido)
+    public function setSuspendido(bool $suspendido) : self
     {
         $this->suspendido = $suspendido;
 
@@ -218,25 +220,23 @@ class Empleado implements SerializeWithJSON
     public function jsonSerialize(): mixed
     {
         $ret = array();
-        $ret["id"] = $this->id;
-        $ret["nombre"] = $this->nombre;
-        $ret["apellido"] = $this->apellido;
-        
-        $ret["tipo"] = null;
-        if ( $this->tipo ) $ret["tipo"] = $this->tipo->jsonSerialize();
-
-        $ret["usuario"] = $this->usuario;
-        $ret["fechaIngreso"] = $this->fechaIngreso;
-        $ret["cantOperaciones"] = $this->cantOperaciones;
-        $ret["suspendido"] = $this->suspendido;
+        $ret['id'] = $this->id;
+        $ret['nombre'] = $this->nombre;
+        $ret['apellido'] = $this->apellido;
+        $ret['tipoId'] = ( $this->tipo !== NULL ) ? $this->tipo->getId() : -1;
+        $ret['usuario'] = $this->usuario;
+        $ret['contrasenia'] = $this->contrasenia;
+        $ret['fechaIngreso'] = $this->fechaIngreso;
+        $ret['cantOperaciones'] = $this->cantOperaciones;
+        $ret['suspendido'] = $this->suspendido;
 
         return $ret;
     }
 
     /**
-     * Convierte de un json a Empleado.
+     * Convierte de un json a Usuario.
      * @param string $serialized JSON de Empleado.
-     * @return mixed empleado.
+     * @return mixed Usuario.
      */
     public static function decode( string $serialized ) : mixed {
         
@@ -244,37 +244,36 @@ class Empleado implements SerializeWithJSON
             $assoc = json_decode($serialized, true);
             return self::assocToObj($assoc);
         }
-        catch ( JsonException $ex ) {
+        catch ( JsonException ) {
             return NULL;
         }
 
     }
 
-    /*
-    private string $nombre;
-    private string $apellido;
-    private ?TipoEmpleado $tipo;
-    private string $usuario;
-    private string $contraseniaHash;
-    private string $fechaIngreso;
-    private int $cantOperaciones;
-    private bool $suspendido;*/
-
-    private static function assocToObj ( array $assoc ) : mixed {
-        $ret = new Empleado();
+    /**
+     * Convierte un array asociativo de un json_decode a un objeto de tipo Usuario.
+     */
+    private static function assocToObj( array $assoc ) : ?self {
+        $keysHasToHave = array_keys( (new Usuario())->jsonSerialize() );
+        $keysHasHave = array_keys( $assoc );
         
-        if ( array_key_exists('Id', $assoc) ) 
-            $ret->setId( intval( $assoc['Id'] ) );
+        if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
 
-        if ( array_key_exists('nombre', $assoc ) ) 
-            $ret->setNombre( $assoc['nombre'] );
-        
-        if ( array_key_exists('apellido', $assoc ) ) 
-            $ret->setApellido( $assoc['apellido'] ) ;
+        $id = intval($assoc['id']);
+        $tipoId = intval($assoc['tipoId']);
+        $cantOp = intval($assoc['cantOperaciones']);
+        $suspendido = boolval($assoc['suspendido']);
 
-        if ( array_key_exists('tipoId', $assoc ) )
-            $ret->setTipo( new TipoEmpleado( intval($assoc['id']) ) );
+        $ret = new Usuario( $id,
+                            $assoc['nombre'],
+                            $assoc['apellido'],
+                            new TipoUsuario( $tipoId ),
+                            $assoc['usuario'],
+                            $assoc['contrasenia'],
+                            $cantOp,
+                            $suspendido );
 
+        return $ret;
     }
 
 }
