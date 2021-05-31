@@ -1,22 +1,31 @@
 <?php
 
+require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
+
 /**
  * Representa un Producto que brinda un Sector determinado del local.
  */
-class Producto implements JsonSerializable
+class Producto implements SerializeWithJSON
 {
 
     private int $id;
     private string $nombre;
     private string $tipo;
-    private Sector $sector;
+    private ?Sector $sector;
+    private float $valor;
 
-    public function __construct(int $id, string $nombre, string $tipo, Sector $sector)
+    public function __construct(
+                                int $id = -1, 
+                                string $nombre = '', 
+                                string $tipo = '', 
+                                ?Sector $sector = NULL,
+                                float $valor = 0)
     {
         $this->id = $id;
         $this->nombre = $nombre;
         $this->tipo = $tipo;
         $this->sector = $sector;
+        $this->valor = $valor;
     }
 
     /**
@@ -99,13 +108,69 @@ class Producto implements JsonSerializable
         return $this;
     }
 
+    /**
+     * Get the value of valor
+     */ 
+    public function getValor() : float
+    {
+        return $this->valor;
+    }
+
+    /**
+     * Set the value of valor
+     *
+     * @return  self
+     */ 
+    public function setValor(float $valor)
+    {
+        $this->valor = $valor;
+
+        return $this;
+    }
+
     public function jsonSerialize(): mixed
     {
         $ret = array();
         $ret["id"] = $this->id;
         $ret["nombre"] = $this->nombre;
         $ret["tipo"] = $this->tipo;
-        $ret["sector"] = $this->sector->jsonSerialize();
+        $ret["sectorId"] = ( $this->sector !== NULL ) ? $this->sector->getId() : -1;
+        $ret["valor"] = $this->valor;
         return $ret;
     }
+
+    /**
+     * Convierte de json a Producto.
+     */
+    public static function decode ( string $serialized ) : mixed {
+        
+        try {
+            $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
+            return self::asssocToObj($assoc);
+        }
+        catch ( JsonException ) {
+            return NULL;
+        }
+        
+    }
+
+    private static function asssocToObj( array $assoc ) : ?self {
+        $keysHasToHave = array_keys( (new TipoUsuario())->jsonSerialize() );
+        $keysHasHave = array_keys( $assoc );
+        
+        if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
+
+        $id = intval($assoc['id']);
+        $sector = intval($assoc['sectorId']);
+        $valor = floatval( $assoc['valor'] );
+        $ret = new Producto( 
+                            $id,
+                            $assoc['nombre'],
+                            $assoc['tipo'],
+                            new Sector( $sector ),
+                            $valor );
+
+        return $ret;
+    }
+
 }
