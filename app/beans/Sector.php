@@ -11,7 +11,9 @@ class Sector implements SerializeWithJSON
     private int $id;
     private string $nombre;
 
-    public function __construct(int $id, string $nombre)
+    public function __construct(
+                                int $id = -1, 
+                                string $nombre = '')
     {
         $this->id = $id;
         $this->nombre = $nombre;
@@ -69,15 +71,24 @@ class Sector implements SerializeWithJSON
         
         try {
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
-        
-            $id = intval($assoc['id']);
-            $nombre = $assoc['nombre'];
-            $ret = new Sector( $id, $nombre );
-            return $ret;
+            return self::assocToObj($assoc);
         }
         catch ( JsonException $ex ) {
             return NULL;
         }
+
+    }
+
+    private static function assocToObj ( array $assoc ) : ?self {
+        $keysHasToHave = array_keys( (new Sector())->jsonSerialize() );
+        $keysHasHave = array_keys( $assoc );
+        
+        if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
+
+        $id = intval($assoc['id']);
+        $ret = new Sector( $id,
+                                $assoc['nombre'] );
+        return $ret;
 
     }
 

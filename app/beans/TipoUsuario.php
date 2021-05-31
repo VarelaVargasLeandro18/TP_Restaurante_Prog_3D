@@ -10,13 +10,16 @@ class TipoUsuario implements SerializeWithJSON
 
     private int $id;
     private string $tipo;
+    private ?Sector $sector;
 
     public function __construct(
         int $id = -1, 
-        string $tipo = '')
+        string $tipo = '',
+        ?Sector $sector = NULL)
     {
         $this->id = $id;
         $this->tipo = $tipo;
+        $this->sector = $sector;
     }
 
     /**
@@ -59,11 +62,32 @@ class TipoUsuario implements SerializeWithJSON
         return $this;
     }
 
+    /**
+     * Get the value of sector
+     */ 
+    public function getSector() : ?Sector
+    {
+        return $this->sector;
+    }
+
+    /**
+     * Set the value of sector
+     *
+     * @return  self
+     */ 
+    public function setSector(?Sector $sector) : self
+    {
+        $this->sector = $sector;
+
+        return $this;
+    }
+
     public function jsonSerialize(): mixed
     {
         $ret = array();
         $ret["id"] = $this->id;
         $ret["tipo"] = $this->tipo;
+        $ret["sectorId"] = ( $this->sector !== NULL ) ? $this->sector->getId() : -1;
         return $ret;
     }
 
@@ -89,8 +113,10 @@ class TipoUsuario implements SerializeWithJSON
         if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
 
         $id = intval($assoc['id']);
+        $sector = intval($assoc['sectorId']);
         $ret = new TipoUsuario( $id,
-                                $assoc['tipo'] );
+                                $assoc['tipo'],
+                                new Sector($sector) );
         return $ret;
     }
     
