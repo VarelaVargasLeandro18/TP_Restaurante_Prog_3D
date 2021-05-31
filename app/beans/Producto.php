@@ -155,7 +155,7 @@ class Producto implements SerializeWithJSON
     }
 
     private static function asssocToObj( array $assoc ) : ?self {
-        $keysHasToHave = array_keys( (new TipoUsuario())->jsonSerialize() );
+        $keysHasToHave = array_keys( (new Producto())->jsonSerialize() );
         $keysHasHave = array_keys( $assoc );
         
         if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;

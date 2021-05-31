@@ -11,10 +11,10 @@ class PermisosEmpleadoSector implements JsonSerializable
     private ?Sector $sector;
     private string $permisos;
 
-    public function __construct(    int $id, 
-                                    ?TipoUsuario $tipo, 
-                                    ?Sector $sector,
-                                    string $permisos)
+    public function __construct(    int $id = -1, 
+                                    ?TipoUsuario $tipo = NULL, 
+                                    ?Sector $sector = NULL,
+                                    string $permisos = '')
     {
         $this->id = $id;
         $this->tipo = $tipo;
@@ -128,7 +128,7 @@ class PermisosEmpleadoSector implements JsonSerializable
     }
 
     private static function asssocToObj( array $assoc ) : ?self {
-        $keysHasToHave = array_keys( (new TipoUsuario())->jsonSerialize() );
+        $keysHasToHave = array_keys( (new PermisosEmpleadoSector())->jsonSerialize() );
         $keysHasHave = array_keys( $assoc );
         
         if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
