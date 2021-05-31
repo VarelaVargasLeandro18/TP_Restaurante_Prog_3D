@@ -9,7 +9,8 @@ class EstadoMesa implements JsonSerializable
     private int $id;
     private string $estado;
 
-    public function __construct(int $id, string $estado)
+    public function __construct(int $id = -1, 
+                                string $estado = '')
     {
         $this->id = $id;
         $this->estado = $estado;
@@ -60,6 +61,35 @@ class EstadoMesa implements JsonSerializable
         $ret = array();
         $ret["id"] = $this->id;
         $ret["estado"] = $this->estado;
+        return $ret;
+    }
+
+    /**
+     * Convierte de json a EstadoMesa.
+     */
+    public static function decode ( string $serialized ) : mixed {
+        
+        try {
+            $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
+            return self::asssocToObj($assoc);
+        }
+        catch ( JsonException ) {
+            return NULL;
+        }
+        
+    }
+
+    private static function asssocToObj( array $assoc ) : ?self {
+        $keysHasToHave = array_keys( (new Mesa())->jsonSerialize() );
+        $keysHasHave = array_keys( $assoc );
+        
+        if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
+
+        $id = intval($assoc["id"]);
+        $ret = new EstadoMesa(  $id,
+                                $assoc["estado"]
+        );
+
         return $ret;
     }
 

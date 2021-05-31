@@ -67,7 +67,7 @@ class PedidoEstado implements SerializeWithJSON
     }
 
     /**
-     * Convierte de json a PedidoHistoral.
+     * Convierte de json a PedidoEstado.
      */
     public static function decode ( string $serialized ) : mixed {
         

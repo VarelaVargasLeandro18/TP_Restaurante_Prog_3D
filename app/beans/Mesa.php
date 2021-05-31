@@ -1,15 +1,19 @@
 <?php
 
+require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
+
 /**
  * Representa una Mesa del local.
  */
-class Mesa implements JsonSerializable
+class Mesa implements SerializeWithJSON
 {
 
     private string $id;
-    private EstadoMesa $estado;
+    private ?EstadoMesa $estado;
 
-    public function __construct(string $id, EstadoMesa $estado )
+    public function __construct(
+                                string $id = '', 
+                                ?EstadoMesa $estado = NULL )
     {
         $this->id = $id;
         $this->estado = $estado;
@@ -38,7 +42,7 @@ class Mesa implements JsonSerializable
     /**
      * Get the value of estado
      */
-    public function getEstado(): EstadoMesa
+    public function getEstado(): ?EstadoMesa
     {
         return $this->estado;
     }
@@ -48,7 +52,7 @@ class Mesa implements JsonSerializable
      *
      * @return  self
      */
-    public function setEstado(EstadoMesa $estado): self
+    public function setEstado(?EstadoMesa $estado): self
     {
         $this->estado = $estado;
 
@@ -59,7 +63,37 @@ class Mesa implements JsonSerializable
     {
         $ret = array();
         $ret["id"] = $this->id;
-        $ret["estado"] = $this->estado->jsonSerialize();
+        $ret["estadoId"] = ( $this->estado !== NULL ) ? $this->estado->getId() : -1;
+        return $ret;
+    }
+
+    /**
+     * Convierte de json a Mesa.
+     */
+    public static function decode ( string $serialized ) : mixed {
+        
+        try {
+            $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
+            return self::asssocToObj($assoc);
+        }
+        catch ( JsonException ) {
+            return NULL;
+        }
+        
+    }
+
+    private static function asssocToObj( array $assoc ) : ?self {
+        $keysHasToHave = array_keys( (new Mesa())->jsonSerialize() );
+        $keysHasHave = array_keys( $assoc );
+        
+        if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
+
+        $id = intval($assoc["id"]);
+        $estado = intval($assoc["estadoId"]);
+        $ret = new Mesa($id,
+                        new EstadoMesa($estado)
+        );
+
         return $ret;
     }
 
