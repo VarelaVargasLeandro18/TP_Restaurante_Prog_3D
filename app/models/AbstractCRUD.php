@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../interfaces/ICRUD.php';
 require_once __DIR__ . '/../db/AccesoDatos.php';
 
-abstract class AbstractCRUD //implements ICRUD 
+abstract class AbstractCRUD 
 {
 
     /**
