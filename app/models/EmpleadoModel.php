@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../beans/Empleado.php';
+require_once __DIR__ . '/../beans/Usuario.php';
 require_once __DIR__ . '/../interfaces/ICRUD.php';
 require_once __DIR__ . '/../db/AccesoDatos.php';
 require_once __DIR__ . '/SectorModel.php';

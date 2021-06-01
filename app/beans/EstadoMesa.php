@@ -80,7 +80,7 @@ class EstadoMesa implements JsonSerializable
     }
 
     private static function asssocToObj( array $assoc ) : ?self {
-        $keysHasToHave = array_keys( (new Mesa())->jsonSerialize() );
+        $keysHasToHave = array_keys( (new EstadoMesa())->jsonSerialize() );
         $keysHasHave = array_keys( $assoc );
         
         if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
