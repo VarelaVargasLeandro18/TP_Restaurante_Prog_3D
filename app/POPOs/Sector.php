@@ -1,14 +1,28 @@
 <?php
 
+namespace POPOs;
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
+
+use interfaces\SerializeWithJSON as SWJ;
+use Doctrine\ORM\Mapping;
 
 /**
  * Representa un Sector del local
+ * @Entity
+ * @Table(name="Sector")
  */
-class Sector implements SerializeWithJSON
+class Sector implements SWJ
 {
 
+    /**
+     * @Id
+     * @Column(type="integer")
+     */
     private int $id;
+
+    /**
+     * @Column(length=45)
+     */
     private string $nombre;
 
     public function __construct(
@@ -73,7 +87,7 @@ class Sector implements SerializeWithJSON
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::assocToObj($assoc);
         }
-        catch ( JsonException $ex ) {
+        catch ( \JsonException $ex ) {
             return NULL;
         }
 
@@ -90,6 +104,11 @@ class Sector implements SerializeWithJSON
                                 $assoc['nombre'] );
         return $ret;
 
+    }
+
+    public function __toString()
+    {
+        return json_encode( $this->jsonSerialize() );
     }
 
 }

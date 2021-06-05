@@ -1,13 +1,16 @@
 <?php
 
-require_once __DIR__ . '/Pojos/TipoComentario.php';
+require_once __DIR__ . '/POPOs/TipoComentario.php';
 require_once __DIR__ . '/db/DoctrineEntityManagerFactory.php';
-require_once __DIR__ . '/Pojos/EstadoMesa.php';
-require_once __DIR__ . '/Pojos/PedidoEstado.php';
+require_once __DIR__ . '/POPOs/EstadoMesa.php';
+require_once __DIR__ . '/POPOs/PedidoEstado.php';
+require_once __DIR__ . '/POPOs/Sector.php';
 
-use Pojos\TipoComentario as TC;
-use Pojos\EstadoMesa as EM;
-use Pojos\PedidoEstado as PE;
+use POPOs\TipoComentario as TC;
+use POPOs\EstadoMesa as EM;
+use POPOs\PedidoEstado as PE;
+use POPOs\Sector as S;
+
 use db\DoctrineEntityManagerFactory as DEMF;
 use GuzzleHttp\Psr7\Response;
 
@@ -26,6 +29,12 @@ $app->get ( '/pruebaEM', function() {
 
 $app->get ( '/pruebaPE', function() {
     $TCRep = DEMF::getEntityManager()->getRepository(PE::class);
+
+    return new Response(200, [], $TCRep->find(1));
+} );
+
+$app->get( '/pruebaS', function () {
+    $TCRep = DEMF::getEntityManager()->getRepository(S::class);
 
     return new Response(200, [], $TCRep->find(1));
 } );

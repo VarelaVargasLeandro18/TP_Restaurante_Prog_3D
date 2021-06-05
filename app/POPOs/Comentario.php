@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
-namespace Pojos;
+namespace POPOs;
 use interfaces\SerializeWithJSON as SWJ;
 
 class Comentario implements SWJ {

@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
-namespace Pojos;
+namespace POPOs;
 use interfaces\SerializeWithJSON as SWJ;
 /**
  * Representa una Mesa del local.

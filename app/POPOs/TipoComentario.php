@@ -1,6 +1,6 @@
 <?php
 
-namespace Pojos;
+namespace POPOs;
 
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
