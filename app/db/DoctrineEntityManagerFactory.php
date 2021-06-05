@@ -15,7 +15,7 @@ class DoctrineEntityManagerFactory
     private static function createEntityManager() : void {
         
         try {
-            $paths = array ( __DIR__ . "/../Pojos/" );
+            $paths = array ( __DIR__ . '/../POPOs/' );
             self::$em = EntityManager::create(
                 array(
                     'driver' => "pdo_mysql",
@@ -25,7 +25,7 @@ class DoctrineEntityManagerFactory
                     'host' => $_ENV['MYSQL_HOST'],
                     'port' => $_ENV['MYSQL_PORT']
                 ),
-                Setup::createAnnotationMetadataConfiguration($paths)
+                Setup::createAnnotationMetadataConfiguration($paths, false)
             );
         }
         catch ( ORMException $ex ) {

@@ -1,16 +1,29 @@
 <?php
 
+namespace POPOs;
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
-namespace POPOs;
 use interfaces\SerializeWithJSON as SWJ;
+use Doctrine\ORM\Mapping;
+
 /**
  * Representa una Mesa del local.
+ * @Entity
+ * @Table(name="Mesa")
  */
 class Mesa implements SWJ
 {
 
+    /**
+     * @Id
+     * @Column(type="string")
+     */
     private string $id;
+
+    /**
+     * @ManyToOne(targetEntity="EstadoMesa")
+     * @JoinColumn(name="estado_id", referencedColumnName="id", nullable=false)
+     */
     private ?EstadoMesa $estado;
 
     public function __construct(
@@ -65,7 +78,7 @@ class Mesa implements SWJ
     {
         $ret = array();
         $ret["id"] = $this->id;
-        $ret["estadoId"] = ( $this->estado !== NULL ) ? $this->estado->getId() : -1;
+        $ret["estado"] = $this->estado;
         return $ret;
     }
 
@@ -78,7 +91,7 @@ class Mesa implements SWJ
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::asssocToObj($assoc);
         }
-        catch ( JsonException ) {
+        catch ( \JsonException ) {
             return NULL;
         }
         
@@ -91,12 +104,17 @@ class Mesa implements SWJ
         if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
 
         $id = intval($assoc["id"]);
-        $estado = intval($assoc["estadoId"]);
+        $estado = $assoc["estado"];
         $ret = new Mesa($id,
                         new EstadoMesa($estado)
         );
 
         return $ret;
+    }
+
+    public function __toString()
+    {
+        return json_encode( $this->jsonSerialize() );
     }
 
 }
