@@ -1,21 +1,64 @@
 <?php
+namespace POPOs;
 
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
+use Doctrine\ORM\Mapping;
+use interfaces\SerializeWithJSON as SWJ;
+
 /**
  * Representa un usuario.
+ * @Entity
+ * @Table(name="Usuario")
  */
-class Usuario implements SerializeWithJSON
+class Usuario implements SWJ
 {
 
+    /**
+     * @Id
+     * @Column(type="integer")
+     */
     private int $id;
+
+    /**
+     * @Column(length=45)
+     */
     private string $nombre;
+
+    /**
+     * @Column(length=45)
+     */
     private string $apellido;
+
+    /**
+     * @ManyToOne(targetEntity="TipoUsuario")
+     * @JoinColumn(name="tipoUsuarioId", referencedColumnName="id")
+     */
     private ?TipoUsuario $tipo;
+
+    /**
+     * @Column(length=45)
+     */
     private string $usuario;
+
+    /**
+     * @Column(name="contraseniaHash", length=60)
+     */
     private string $contrasenia;
+
+    /**
+     * @Column
+     */
     private string $fechaIngreso;
+
+    /**
+     * @Column(name="cantidadOperaciones", type="integer")
+     */
     private int $cantOperaciones;
+
+    /**
+     * @Column(type="boolean")
+     */
     private bool $suspendido;
 
     public function __construct(int $id = -1, 
@@ -223,7 +266,7 @@ class Usuario implements SerializeWithJSON
         $ret['id'] = $this->id;
         $ret['nombre'] = $this->nombre;
         $ret['apellido'] = $this->apellido;
-        $ret['tipoId'] = ( $this->tipo !== NULL ) ? $this->tipo->getId() : -1;
+        $ret['tipoId'] = $this->tipo;
         $ret['usuario'] = $this->usuario;
         $ret['contrasenia'] = $this->contrasenia;
         $ret['fechaIngreso'] = $this->fechaIngreso;
@@ -244,7 +287,7 @@ class Usuario implements SerializeWithJSON
             $assoc = json_decode($serialized, true);
             return self::assocToObj($assoc);
         }
-        catch ( JsonException ) {
+        catch ( \JsonException ) {
             return NULL;
         }
 
@@ -276,4 +319,8 @@ class Usuario implements SerializeWithJSON
         return $ret;
     }
 
+    public function __toString()
+    {
+        return json_encode( $this->jsonSerialize() );
+    }
 }

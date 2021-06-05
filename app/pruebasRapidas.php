@@ -7,6 +7,7 @@ require_once __DIR__ . '/POPOs/PedidoEstado.php';
 require_once __DIR__ . '/POPOs/Sector.php';
 require_once __DIR__ . '/POPOs/Mesa.php';
 require_once __DIR__ . '/POPOs/TipoUsuario.php';
+require_once __DIR__ . '/POPOs/Usuario.php';
 
 use POPOs\TipoComentario as TC;
 use POPOs\EstadoMesa as EM;
@@ -14,6 +15,7 @@ use POPOs\PedidoEstado as PE;
 use POPOs\Sector as S;
 use POPOs\Mesa;
 use POPOs\TipoUsuario as TU;
+use POPOs\Usuario as U;
 
 use db\DoctrineEntityManagerFactory as DEMF;
 use GuzzleHttp\Psr7\Response;
@@ -52,4 +54,10 @@ $app->get( '/pruebaTU', function () {
     $TURep = DEMF::getEntityManager()->getRepository(TU::class);
 
     return new Response(200, [], $TURep->find(2));
+} );
+
+$app->get( '/pruebaU', function () {
+    $URep = DEMF::getEntityManager()->getRepository(U::class);
+
+    return new Response(200, array( 'Content-type' => 'application/json' ), $URep->find(8));
 } );
