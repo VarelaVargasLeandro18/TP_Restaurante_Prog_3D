@@ -87,7 +87,7 @@ class Sector implements SWJ
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::assocToObj($assoc);
         }
-        catch ( \JsonException $ex ) {
+        catch ( \Exception ) {
             return NULL;
         }
 

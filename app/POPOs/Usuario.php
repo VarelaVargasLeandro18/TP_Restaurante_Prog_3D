@@ -287,7 +287,7 @@ class Usuario implements SWJ
             $assoc = json_decode($serialized, true);
             return self::assocToObj($assoc);
         }
-        catch ( \JsonException ) {
+        catch ( \Exception ) {
             return NULL;
         }
 

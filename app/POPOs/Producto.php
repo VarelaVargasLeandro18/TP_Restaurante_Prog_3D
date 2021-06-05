@@ -1,17 +1,43 @@
 <?php
-
+namespace POPOs;
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
+
+use interfaces\SerializeWithJSON as SWJ;
+use Doctrine\ORM\Mapping;
 
 /**
  * Representa un Producto que brinda un Sector determinado del local.
+ * @Entity
+ * @Table(name="Producto")
  */
-class Producto implements SerializeWithJSON
+class Producto implements SWJ
 {
 
+    /**
+     * @Id
+     * @Column(type="integer")
+     */
     private int $id;
+
+    /**
+     * @Column(length=45)
+     */
     private string $nombre;
+
+    /**
+     * @Column(length=45)
+     */
     private string $tipo;
+
+    /**
+     * @ManyToOne(targetEntity="Sector")
+     * @JoinColumn(name="sectorId", referencedColumnName="id")
+     */
     private ?Sector $sector;
+
+    /**
+     * @Column(type="decimal", scale=2, precision=2)
+     */
     private float $valor;
 
     public function __construct(
@@ -134,8 +160,8 @@ class Producto implements SerializeWithJSON
         $ret["id"] = $this->id;
         $ret["nombre"] = $this->nombre;
         $ret["tipo"] = $this->tipo;
-        $ret["sectorId"] = ( $this->sector !== NULL ) ? $this->sector->getId() : -1;
-        $ret["valor"] = $this->valor;
+        $ret["sector"] = $this->sector;
+        $ret["valor"] = number_format($this->valor, 2, ',', '.');
         return $ret;
     }
 
@@ -148,7 +174,7 @@ class Producto implements SerializeWithJSON
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::asssocToObj($assoc);
         }
-        catch ( JsonException ) {
+        catch ( \Exception ) {
             return NULL;
         }
         
@@ -173,4 +199,8 @@ class Producto implements SerializeWithJSON
         return $ret;
     }
 
+    public function __toString()
+    {
+        return json_encode($this->jsonSerialize());
+    }
 }
