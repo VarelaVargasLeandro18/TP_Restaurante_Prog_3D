@@ -2,16 +2,18 @@
 
 namespace Pojos;
 
-use Doctrine\ORM\Mapping;
-
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
+
+use Doctrine\ORM\Mapping;
+use interfaces\SerializeWithJSON as SWJ;
+
 
 /** 
     * Representa un tipo de comentario que puede realizar un cliente.
     * @Entity
     * @Table (name="TipoComentario")
 */
-class TipoComentario {
+class TipoComentario implements SWJ {
 
     /**
      * @Id

@@ -1,14 +1,28 @@
 <?php
+namespace Pojos;
 
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
+use interfaces\SerializeWithJSON as SWJ;
+use Doctrine\ORM\Mapping;
+
 /**
  * Representa el estado de un pedido.
+ * @Entity
+ * @Table(name="PedidoEstado")
  */
-class PedidoEstado implements SerializeWithJSON
+class PedidoEstado implements SWJ
 {
 
+    /**
+     * @Id
+     * @Column(type="integer")
+     */
     private int $id;
+
+    /**
+     * @Column
+     */
     private string $estado;
 
     public function __construct(int $id = -1, 
@@ -75,7 +89,7 @@ class PedidoEstado implements SerializeWithJSON
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::asssocToObj($assoc);
         }
-        catch ( JsonException ) {
+        catch ( \JsonException ) {
             return NULL;
         }
         
@@ -95,4 +109,8 @@ class PedidoEstado implements SerializeWithJSON
         return $ret;
     }
 
+    public function __toString()
+    {
+        return json_encode($this->jsonSerialize());
+    }
 }
