@@ -1,12 +1,27 @@
 <?php
 
+namespace Pojos;
+require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
+
+use interfaces\SerializeWithJSON as SWJ;
+use Doctrine\ORM\Mapping;
+
 /**
  * Representa el Estado de una Mesa del local.
+ * @Entity
+ * @Table(name="EstadoMesa")
  */
-class EstadoMesa implements JsonSerializable
+class EstadoMesa implements SWJ
 {
-
+    /**
+     * @Id
+     * @Column(type="integer")
+     */
     private int $id;
+
+    /**
+     * @Column(length=45)
+     */
     private string $estado;
 
     public function __construct(int $id = -1, 
@@ -73,7 +88,7 @@ class EstadoMesa implements JsonSerializable
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::asssocToObj($assoc);
         }
-        catch ( JsonException ) {
+        catch ( \JsonException ) {
             return NULL;
         }
         
@@ -91,6 +106,11 @@ class EstadoMesa implements JsonSerializable
         );
 
         return $ret;
+    }
+
+    public function __toString()
+    {
+        return json_encode( $this->jsonSerialize() );
     }
 
 }

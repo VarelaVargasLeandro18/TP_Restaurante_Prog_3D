@@ -1,5 +1,7 @@
 <?php
 
+namespace interfaces;
+
 /**
  * Define las operaciones CRUD a realizar en la BBDD.
  */

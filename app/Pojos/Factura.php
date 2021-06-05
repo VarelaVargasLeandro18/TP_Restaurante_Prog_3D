@@ -2,17 +2,19 @@
 
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
+namespace Pojos;
+use interfaces\SerializeWithJSON as SWJ;
 
-class Factura implements SerializeWithJSON {
+class Factura implements SWJ {
 
     private int $id;
-    private ?DateTime $fechaExpedicion;
+    private ?\DateTime $fechaExpedicion;
     private ?Usuario $cliente;
     private string $codigoPedido;
 
     public function __construct(
                                 int $id = -1,
-                                ?DateTime $fechaExpedicion = NULL,
+                                ?\DateTime $fechaExpedicion = NULL,
                                 ?Usuario $cliente = NULL,
                                 string $codigoPedido = ''
     )

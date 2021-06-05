@@ -2,10 +2,13 @@
 
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
+namespace Pojos;
+use interfaces\SerializeWithJSON as SWJ;
+
 /**
  * Representa un pedido realizado por un cliente
  */
-class Pedido implements SerializeWithJSON
+class Pedido implements SWJ
 {
 
     private int $id;

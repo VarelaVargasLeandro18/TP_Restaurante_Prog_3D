@@ -2,7 +2,10 @@
 
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
-class OperacionHistorial implements SerializeWithJSON {
+namespace Pojos;
+use interfaces\SerializeWithJSON as SWJ;
+
+class OperacionHistorial implements SWJ {
 
     private int $id;
     private string $operacion;

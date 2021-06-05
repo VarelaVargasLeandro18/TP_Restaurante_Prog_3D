@@ -2,10 +2,12 @@
 
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
+namespace Pojos;
+use interfaces\SerializeWithJSON as SWJ;
 /**
  * Representa una Mesa del local.
  */
-class Mesa implements SerializeWithJSON
+class Mesa implements SWJ
 {
 
     private string $id;

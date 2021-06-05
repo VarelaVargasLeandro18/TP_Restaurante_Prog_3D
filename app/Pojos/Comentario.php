@@ -1,8 +1,10 @@
 <?php
-
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
-class Comentario implements SerializeWithJSON {
+namespace Pojos;
+use interfaces\SerializeWithJSON as SWJ;
+
+class Comentario implements SWJ {
 
     private int $id;
     private ?TipoComentario $tipo;
