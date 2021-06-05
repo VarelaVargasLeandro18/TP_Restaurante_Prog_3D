@@ -1,5 +1,7 @@
 <?php
 
+namespace Model;
+
 use Doctrine\ORM\Mapping;
 
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
@@ -18,7 +20,7 @@ class TipoComentario {
     private int $id;
 
     /**
-     * @Column
+     * @Column(length=45)
      */
     private string $tipo;
 
@@ -87,7 +89,7 @@ class TipoComentario {
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::asssocToObj($assoc);
         }
-        catch ( JsonException ) {
+        catch ( \JsonException ) {
             return NULL;
         }
         

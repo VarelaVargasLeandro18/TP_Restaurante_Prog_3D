@@ -1,5 +1,7 @@
 <?php
 
+namespace db;
+
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\Setup;
@@ -27,7 +29,7 @@ class DoctrineEntityManagerFactory
             );
         }
         catch ( ORMException $ex ) {
-            throw new RuntimeException( $ex );
+            throw new \RuntimeException( $ex );
         }
 
     }
