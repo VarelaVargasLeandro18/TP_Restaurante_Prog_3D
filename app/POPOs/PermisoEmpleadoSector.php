@@ -1,14 +1,40 @@
 <?php
 
+namespace POPOs;
+require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
+
+use interfaces\SerializeWithJSON as SWJ;
+use Doctrine\ORM\Mapping;
+
 /**
- * Representa el permiso que tiene un Empleado para cambiar estado de un Pedido según el Sector en el que esté. 
+ * Representa el permiso que tiene un Empleado para cambiar estado de un Pedido según el Sector en el que esté.
+ * @Entity
+ * @Table(name="PermisosEmpleadoSector") 
  */
-class PermisoEmpleadoSector implements JsonSerializable
+class PermisoEmpleadoSector implements SWJ
 {
 
+    /**
+     * @Id
+     * @Column(type="integer")
+     */
     private int $id;
+
+    /**
+     * @ManyToOne(targetEntity="TipoUsuario")
+     * @JoinColumn(name="tipoEmpleadoId", referencedColumnName="id", nullable=false)
+     */
     private ?TipoUsuario $tipo;
+
+    /**
+     * @ManyToOne(targetEntity="Sector")
+     * @JoinColumn(name="sectorId", referencedColumnName="id")
+     */
     private ?Sector $sector;
+
+    /**
+     * @Column(length=45)
+     */
     private string $permisos;
 
     public function __construct(    int $id = -1, 
@@ -107,7 +133,7 @@ class PermisoEmpleadoSector implements JsonSerializable
         $ret = array();
         $ret["id"] = $this->id;
         $ret["tipoId"] = ( $this->tipo !== NULL ) ? $this->tipo->getId() : -1; 
-        $ret["sectorId"] = ( $this->sector !== NULL ) ? $this->sector->getId() : -1;
+        $ret["sector"] = $this->sector;
         $ret["permisos"] = $this->permisos;
         return $ret;
     }
@@ -121,7 +147,7 @@ class PermisoEmpleadoSector implements JsonSerializable
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::asssocToObj($assoc);
         }
-        catch ( JsonException ) {
+        catch ( \Exception ) {
             return NULL;
         }
         
