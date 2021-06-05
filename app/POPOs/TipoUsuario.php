@@ -1,15 +1,33 @@
 <?php
+namespace POPOs;
 
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
+use Doctrine\ORM\Mapping;
+use interfaces\SerializeWithJSON as SWJ;
 /**
  * Representa un Tipo de Usuario.
+ * @Entity
+ * @Table(name="TipoUsuario")
  */
-class TipoUsuario implements SerializeWithJSON
+class TipoUsuario implements SWJ
 {
 
+    /**
+     * @Id
+     * @Column(type="integer")
+     */
     private int $id;
+
+    /**
+     * @Column(length=45)
+     */
     private string $tipo;
+
+    /**
+     * @OneToOne(targetEntity="Sector")
+     * @JoinColumn(name="sectorId", referencedColumnName="id", nullable=true)
+     */
     private ?Sector $sector;
 
     public function __construct(
@@ -87,7 +105,7 @@ class TipoUsuario implements SerializeWithJSON
         $ret = array();
         $ret["id"] = $this->id;
         $ret["tipo"] = $this->tipo;
-        $ret["sectorId"] = ( $this->sector !== NULL ) ? $this->sector->getId() : -1;
+        $ret["sector"] = $this->sector;
         return $ret;
     }
 
@@ -100,7 +118,7 @@ class TipoUsuario implements SerializeWithJSON
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::asssocToObj($assoc);
         }
-        catch ( JsonException ) {
+        catch ( \JsonException ) {
             return NULL;
         }
         
@@ -113,11 +131,16 @@ class TipoUsuario implements SerializeWithJSON
         if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
 
         $id = intval($assoc['id']);
-        $sector = intval($assoc['sectorId']);
+        $sector = $assoc['sector'];
         $ret = new TipoUsuario( $id,
                                 $assoc['tipo'],
                                 new Sector($sector) );
         return $ret;
     }
     
+    public function __toString()
+    {
+        return json_encode( $this->jsonSerialize() );
+    }
+
 }

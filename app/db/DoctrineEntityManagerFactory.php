@@ -25,7 +25,7 @@ class DoctrineEntityManagerFactory
                     'host' => $_ENV['MYSQL_HOST'],
                     'port' => $_ENV['MYSQL_PORT']
                 ),
-                Setup::createAnnotationMetadataConfiguration($paths, false)
+                Setup::createAnnotationMetadataConfiguration($paths, true)
             );
         }
         catch ( ORMException $ex ) {

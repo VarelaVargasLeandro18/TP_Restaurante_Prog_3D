@@ -6,12 +6,14 @@ require_once __DIR__ . '/POPOs/EstadoMesa.php';
 require_once __DIR__ . '/POPOs/PedidoEstado.php';
 require_once __DIR__ . '/POPOs/Sector.php';
 require_once __DIR__ . '/POPOs/Mesa.php';
+require_once __DIR__ . '/POPOs/TipoUsuario.php';
 
 use POPOs\TipoComentario as TC;
 use POPOs\EstadoMesa as EM;
 use POPOs\PedidoEstado as PE;
 use POPOs\Sector as S;
 use POPOs\Mesa;
+use POPOs\TipoUsuario as TU;
 
 use db\DoctrineEntityManagerFactory as DEMF;
 use GuzzleHttp\Psr7\Response;
@@ -44,4 +46,10 @@ $app->get( '/pruebaM', function() {
     $MRep = DEMF::getEntityManager()->getRepository(Mesa::class);
 
     return new Response(200, [], $MRep->find("aaaa1"));
+} );
+
+$app->get( '/pruebaTU', function () {
+    $TURep = DEMF::getEntityManager()->getRepository(TU::class);
+
+    return new Response(200, [], $TURep->find(2));
 } );
