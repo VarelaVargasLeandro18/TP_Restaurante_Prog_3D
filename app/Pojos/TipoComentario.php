@@ -1,10 +1,25 @@
 <?php
 
+use Doctrine\ORM\Mapping;
+
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
+/** 
+    * @Entity
+    * @Table (name="TipoComentario")
+*/
 class TipoComentario {
 
+    /**
+     * @Id
+     * @GeneratedValue
+     * @Column(type="integer")
+     */
     private int $id;
+
+    /**
+     * @Column
+     */
     private string $tipo;
 
     public function __construct(    
@@ -90,6 +105,11 @@ class TipoComentario {
         );
 
         return $ret;
+    }
+
+    public function __toString()
+    {
+        return json_encode( $this->jsonSerialize() );
     }
 
 }

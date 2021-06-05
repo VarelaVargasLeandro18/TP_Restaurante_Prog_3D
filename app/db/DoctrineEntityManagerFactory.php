@@ -1,4 +1,5 @@
 <?php
+
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\Setup;
@@ -10,8 +11,9 @@ class DoctrineEntityManagerFactory
     private function __construct(){}
 
     private static function createEntityManager() : void {
+        
         try {
-            $paths = array ( __DIR__ . "/../beans/" );
+            $paths = array ( __DIR__ . "/../Pojos/" );
             self::$em = EntityManager::create(
                 array(
                     'driver' => "pdo_mysql",
@@ -27,11 +29,12 @@ class DoctrineEntityManagerFactory
         catch ( ORMException $ex ) {
             throw new RuntimeException( $ex );
         }
+
     }
 
-    public static function getEntityManager() : EntityManager {
-        if ( !self::$em )
-            self::$em = self::createEntityManager();
+    public static function getEntityManager() : ?EntityManager {
+        if ( self::$em === NULL )
+            self::createEntityManager();
         
         return self::$em;
     }
