@@ -12,6 +12,7 @@ require_once __DIR__ . '/POPOs/Producto.php';
 require_once __DIR__ . '/POPOs/PermisoEmpleadoSector.php';
 require_once __DIR__ . '/POPOs/PedidoHistorial.php';
 require_once __DIR__ . '/POPOs/OperacionHistorial.php';
+require_once __DIR__ . '/POPOs/Factura.php';
 
 use POPOs\TipoComentario as TC;
 use POPOs\EstadoMesa as EM;
@@ -24,6 +25,7 @@ use POPOs\Producto as P;
 use POPOs\PermisoEmpleadoSector as PES;
 use POPOs\PedidoHistorial as PH;
 use POPOs\OperacionHistorial as OH;
+use POPOs\Factura as F;
 
 use db\DoctrineEntityManagerFactory as DEMF;
 use GuzzleHttp\Psr7\Response;
@@ -101,6 +103,13 @@ $app->get( '/pruebaPH', function () {
 $app->get( '/pruebaOH', function () {
     $OHRep = DEMF::getEntityManager()->getRepository(OH::class);
     $ret = json_encode($OHRep->findAll());
+
+    return new Response(200, array('Content-type' => 'application/json'), $ret);
+} );
+
+$app->get( '/pruebaF', function () {
+    $FRep = DEMF::getEntityManager()->getRepository(F::class);
+    $ret = json_encode($FRep->findAll());
 
     return new Response(200, array('Content-type' => 'application/json'), $ret);
 } );
