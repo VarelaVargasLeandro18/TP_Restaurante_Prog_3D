@@ -7,21 +7,79 @@ use interfaces\SerializeWithJSON as SWJ;
 
 /**
  * Representa un pedido realizado por un cliente
+ * @Entity
+ * @Table(name="Pedido")
  */
 class Pedido implements SWJ
 {
 
+    /**
+     * @Id
+     * @Column(type="integer")
+     */
     private int $id;
+
+    /**
+     * @Column(length=5)
+     */
     private string $codigo;
+
+    /**
+     * @Column
+     */
     private int $cantidad;
+
+    /**
+     * @ManyToOne(targetEntity="Usuario")
+     * @JoinColumn(name="clienteId", referencedColumnName="id")
+     */
     private ?Usuario $cliente;
+
+    /**
+     * @ManyToOne(targetEntity="Usuario")
+     * @JoinColumn(name="empleadoTomaPedidoId", referencedColumnName="id")
+     */
     private ?Usuario $empleadoTomaPedido;
+
+    /**
+     * @ManyToOne(targetEntity="Producto")
+     * @JoinColumn(name="productoId", referencedColumnName="id")
+     */
     private ?Producto $producto;
+
+    /**
+     * @ManyToOne(targetEntity="Mesa")
+     * @JoinColumn(name="mesaId", referencedColumnName="id")
+     */
     private ?Mesa $mesa;
+
+    /**
+     * @ManyToOne(targetEntity="PedidoEstado")
+     * @JoinColumn(name="pedidoEstadoId", referencdColumnName="id")
+     */
     private ?PedidoEstado $estado;
+
+    /**
+     * @Column(length=255)
+     */
     private string $imgPath;
+
+    /**
+     * Fecha-Hora de inicio de realización de pedido.
+     * @Column(length=45)
+     */
     private string $fechaHoraInicioPedido;
+
+    /**
+     * Fecha-Hora estipulada de finalización de pedido.
+     * @Column(length=45)
+     */
     private string $fechaHoraFinPedidoEstipulada;
+
+    /**
+     * Fecha-Hora en la que se terminó el pedido.
+     * @column(length=45)
+     */
     private string $fechaHoraFinPedido;
 
     public function __construct(
@@ -320,7 +378,7 @@ class Pedido implements SWJ
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::asssocToObj($assoc);
         }
-        catch ( JsonException ) {
+        catch ( \JsonException ) {
             return NULL;
         }
         
