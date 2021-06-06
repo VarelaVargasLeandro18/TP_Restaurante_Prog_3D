@@ -12,32 +12,32 @@ interface ICRUD
 	 * 
 	 * @return mixed Objeto pedido.
 	 */
-	public static function readById (mixed $id) : mixed;
+	public function readById (mixed $id) : mixed;
 
 	/**
 	 * Lee todos los  objetos.
 	 * 
 	 * @return Array Objetos.
 	 */
-	public static function readAllObjects () : Array;
+	public function readAllObjects () : Array;
 
 	/**
 	 * Inserta un objeto.
 	 */
-	public static function insertObject (mixed $obj) : bool;
+	public function insertObject (mixed $obj) : bool;
 
 	/**
 	 * Borra un objeto basado en su ID.
 	 * 
 	 * @return mixed Objeto Borrado.
 	 */
-	public static function deleteById (mixed $id) : mixed;
+	public function deleteById (mixed $id) : mixed;
 
 	/**
 	 * Actualiza el objeto.
 	 * 
 	 * @return bool True si se actualizó correctamente. False caso contrario.
 	 */
-	public static function updateObject (mixed $obj) : bool;
+	public function updateObject (mixed $obj) : bool;
 
 }
