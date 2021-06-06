@@ -1,15 +1,43 @@
 <?php
+namespace POPOs;
+
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
-namespace POPOs;
 use interfaces\SerializeWithJSON as SWJ;
 
+/**
+ * Representa un comentario realizado por un cliente al restaurante.
+ * @Entity
+ * @Table(name="Comentario")
+ */
 class Comentario implements SWJ {
 
+    /**
+     * @Id
+     * @Column(type="integer")
+     */
     private int $id;
+
+    /**
+     * @ManyToOne(targetEntity="TipoComentario")
+     * @JoinColumn(name="tipoComentarioId", referencedColumnName="id")
+     */
     private ?TipoComentario $tipo;
+
+    /**
+     * @ManyToOne(targetEntity="Usuario")
+     * @JoinColumn(name="clienteId", referencedColumnName="id")
+     */
     private ?Usuario $cliente;
+    
+    /**
+     * @Column(type="integer")
+     */
     private int $puntuacion;
+
+    /**
+     * @Column(type="string")
+     */
     private string $comentario;
 
     public function __construct(
@@ -131,8 +159,8 @@ class Comentario implements SWJ {
     {
         $ret = array();
         $ret["id"] = $this->id;
-        $ret["tipoId"] = ( $this->tipo !== NULL ) ? $this->tipo->getId() : -1;
-        $ret["clienteId"] = ( $this->cliente !== NULL ) ? $this->cliente->getId() : -1;
+        $ret["tipo"] = $this->tipo;
+        $ret["cliente"] = $this->cliente !== NULL;
         $ret["puntuacion"] = $this->puntuacion;
         $ret["comentario"] = $this->comentario;
         return $ret;
@@ -147,7 +175,7 @@ class Comentario implements SWJ {
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::asssocToObj($assoc);
         }
-        catch ( JsonException ) {
+        catch ( \Exception ) {
             return NULL;
         }
         
