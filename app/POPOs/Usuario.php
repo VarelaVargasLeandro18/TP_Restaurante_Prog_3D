@@ -1,17 +1,13 @@
 <?php
+
 namespace POPOs;
-
-require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
-
-use Doctrine\ORM\Mapping;
-use interfaces\SerializeWithJSON as SWJ;
 
 /**
  * Representa un usuario.
  * @Entity
  * @Table(name="Usuario")
  */
-class Usuario implements SWJ
+class Usuario implements \JsonSerializable
 {
 
     /**
@@ -274,53 +270,5 @@ class Usuario implements SWJ
         $ret['suspendido'] = $this->suspendido;
 
         return $ret;
-    }
-
-    /**
-     * Convierte de un json a Usuario.
-     * @param string $serialized JSON de Empleado.
-     * @return mixed Usuario.
-     */
-    public static function decode( string $serialized ) : mixed {
-        
-        try {
-            $assoc = json_decode($serialized, true);
-            return self::assocToObj($assoc);
-        }
-        catch ( \Exception ) {
-            return NULL;
-        }
-
-    }
-
-    /**
-     * Convierte un array asociativo de un json_decode a un objeto de tipo Usuario.
-     */
-    private static function assocToObj( array $assoc ) : ?self {
-        $keysHasToHave = array_keys( (new Usuario())->jsonSerialize() );
-        $keysHasHave = array_keys( $assoc );
-        
-        if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
-
-        $id = intval($assoc['id']);
-        $tipoId = intval($assoc['tipoId']);
-        $cantOp = intval($assoc['cantOperaciones']);
-        $suspendido = boolval($assoc['suspendido']);
-
-        $ret = new Usuario( $id,
-                            $assoc['nombre'],
-                            $assoc['apellido'],
-                            new TipoUsuario( $tipoId ),
-                            $assoc['usuario'],
-                            $assoc['contrasenia'],
-                            $cantOp,
-                            $suspendido );
-
-        return $ret;
-    }
-
-    public function __toString()
-    {
-        return json_encode( $this->jsonSerialize() );
     }
 }

@@ -1,17 +1,13 @@
 <?php
+
 namespace POPOs;
-
-require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
-
-use interfaces\SerializeWithJSON as SWJ;
-use Doctrine\ORM\Mapping;
 
 /**
  * Representa el estado de un pedido.
  * @Entity
  * @Table(name="PedidoEstado")
  */
-class PedidoEstado implements SWJ
+class PedidoEstado implements \JsonSerializable
 {
 
     /**
@@ -78,39 +74,5 @@ class PedidoEstado implements SWJ
         $ret["id"] = $this->id;
         $ret["estado"] = $this->estado;
         return $ret;
-    }
-
-    /**
-     * Convierte de json a PedidoEstado.
-     */
-    public static function decode ( string $serialized ) : mixed {
-        
-        try {
-            $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
-            return self::asssocToObj($assoc);
-        }
-        catch ( \Exception ) {
-            return NULL;
-        }
-        
-    }
-
-    private static function asssocToObj( array $assoc ) : ?self {
-        $keysHasToHave = array_keys( (new PedidoEstado())->jsonSerialize() );
-        $keysHasHave = array_keys( $assoc );
-        
-        if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
-
-        $id = intval($assoc["id"]);
-        $ret = new PedidoEstado( $id,
-                                 $assoc["estado"]
-        );
-
-        return $ret;
-    }
-
-    public function __toString()
-    {
-        return json_encode($this->jsonSerialize());
     }
 }

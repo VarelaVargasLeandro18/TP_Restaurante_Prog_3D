@@ -1,16 +1,13 @@
 <?php
+
 namespace POPOs;
-
-require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
-
-use interfaces\SerializeWithJSON as SWJ;
 
 /**
  * Representa un comentario realizado por un cliente al restaurante.
  * @Entity
  * @Table(name="Comentario")
  */
-class Comentario implements SWJ {
+class Comentario implements \JsonSerializable {
 
     /**
      * @Id
@@ -163,43 +160,6 @@ class Comentario implements SWJ {
         $ret["cliente"] = $this->cliente !== NULL;
         $ret["puntuacion"] = $this->puntuacion;
         $ret["comentario"] = $this->comentario;
-        return $ret;
-    }
-
-    /**
-     * Convierte de json a Pedido.
-     */
-    public static function decode ( string $serialized ) : mixed {
-        
-        try {
-            $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
-            return self::asssocToObj($assoc);
-        }
-        catch ( \Exception ) {
-            return NULL;
-        }
-        
-    }
-
-    private static function asssocToObj( array $assoc ) : ?self {
-        $keysHasToHave = array_keys( (new Comentario())->jsonSerialize() );
-        $keysHasHave = array_keys( $assoc );
-        
-        if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
-
-        $id = intval($assoc["id"]);
-        $tipo = intval($assoc["tipoId"]);
-        $cliente = intval($assoc["clienteId"]);
-        $puntuacion = intval($assoc["puntuacion"]);
-
-        $ret = new Comentario(  
-                                $id,
-                                new TipoComentario($tipo),
-                                new Usuario($cliente),
-                                $puntuacion,
-                                $assoc["comentario"] 
-        );
-
         return $ret;
     }
 }

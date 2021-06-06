@@ -1,17 +1,13 @@
 <?php
 
 namespace POPOs;
-require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
-
-use interfaces\SerializeWithJSON as SWJ;
-use Doctrine\ORM\Mapping;
 
 /**
  * Representa el permiso que tiene un Empleado para cambiar estado de un Pedido según el Sector en el que esté.
  * @Entity
  * @Table(name="PermisosEmpleadoSector") 
  */
-class PermisoEmpleadoSector implements SWJ
+class PermisoEmpleadoSector implements \JsonSerializable
 {
 
     /**
@@ -137,44 +133,4 @@ class PermisoEmpleadoSector implements SWJ
         $ret["permisos"] = $this->permisos;
         return $ret;
     }
-
-    /**
-     * Convierte de json a PermisoEmpleadoSector.
-     */
-    public static function decode ( string $serialized ) : mixed {
-        
-        try {
-            $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
-            return self::asssocToObj($assoc);
-        }
-        catch ( \Exception ) {
-            return NULL;
-        }
-        
-    }
-
-    private static function asssocToObj( array $assoc ) : ?self {
-        $keysHasToHave = array_keys( (new PermisoEmpleadoSector())->jsonSerialize() );
-        $keysHasHave = array_keys( $assoc );
-        
-        if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
-
-        $id = intval($assoc['id']);
-        $sector = intval($assoc['sectorId']);
-        $tipo = intval($assoc["tipoId"]);
-        $ret = new PermisoEmpleadoSector(
-                                            $id,
-                                            new TipoUsuario($tipo),
-                                            new Sector($sector),
-                                            $assoc['permisos']
-        );
-
-        return $ret;
-    }
-
-    public function __toString()
-    {
-        return json_encode($this->jsonSerialize());
-    }
-
 }

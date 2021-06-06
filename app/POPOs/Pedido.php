@@ -1,16 +1,13 @@
 <?php
 
-require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
-
 namespace POPOs;
-use interfaces\SerializeWithJSON as SWJ;
 
 /**
  * Representa un pedido realizado por un cliente
  * @Entity
  * @Table(name="Pedido")
  */
-class Pedido implements SWJ
+class Pedido implements \JsonSerializable
 {
 
     /**
@@ -368,49 +365,4 @@ class Pedido implements SWJ
         $ret["fechaHoraFinPedido"] = $this->fechaHoraFinPedido;
         return $ret;
     }
-
-    /**
-     * Convierte de json a Pedido.
-     */
-    public static function decode ( string $serialized ) : mixed {
-        
-        try {
-            $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
-            return self::asssocToObj($assoc);
-        }
-        catch ( \Exception ) {
-            return NULL;
-        }
-        
-    }
-
-    private static function asssocToObj( array $assoc ) : ?self {
-        $keysHasToHave = array_keys( (new Pedido())->jsonSerialize() );
-        $keysHasHave = array_keys( $assoc );
-        
-        if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
-
-        $id = intval($assoc["id"]);
-        $cantidad = intval($assoc["cantidad"]);
-        $cliente = intval($assoc["clienteId"]);
-        $empleado = intval($assoc["empleadoTomaPedidoId"]);
-        $producto = intval($assoc["productoId"]);
-        $estado = intval($assoc["estadoId"]);
-        $ret = new Pedido(  $id,
-                            $assoc["codigo"],
-                            $cantidad,
-                            new Usuario($cliente),
-                            new Usuario($empleado),
-                            new Producto($producto),
-                            new Mesa($assoc["mesaId"]),
-                            new PedidoEstado($estado),
-                            $assoc["imgPath"],
-                            $assoc["fechaHoraInicioPedido"],
-                            $assoc["fechaHoraFinPedidoEstipulada"],
-                            $assoc["fechaHoraFinPedido"]
-        );
-
-        return $ret;
-    }
-
 }

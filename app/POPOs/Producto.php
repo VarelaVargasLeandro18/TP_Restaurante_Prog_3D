@@ -1,16 +1,12 @@
 <?php
 namespace POPOs;
-require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
-
-use interfaces\SerializeWithJSON as SWJ;
-use Doctrine\ORM\Mapping;
 
 /**
  * Representa un Producto que brinda un Sector determinado del local.
  * @Entity
  * @Table(name="Producto")
  */
-class Producto implements SWJ
+class Producto implements \JsonSerializable
 {
 
     /**
@@ -163,44 +159,5 @@ class Producto implements SWJ
         $ret["sector"] = $this->sector;
         $ret["valor"] = number_format($this->valor, 2, ',', '.');
         return $ret;
-    }
-
-    /**
-     * Convierte de json a Producto.
-     */
-    public static function decode ( string $serialized ) : mixed {
-        
-        try {
-            $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
-            return self::asssocToObj($assoc);
-        }
-        catch ( \Exception ) {
-            return NULL;
-        }
-        
-    }
-
-    private static function asssocToObj( array $assoc ) : ?self {
-        $keysHasToHave = array_keys( (new Producto())->jsonSerialize() );
-        $keysHasHave = array_keys( $assoc );
-        
-        if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
-
-        $id = intval($assoc['id']);
-        $sector = intval($assoc['sectorId']);
-        $valor = floatval( $assoc['valor'] );
-        $ret = new Producto( 
-                            $id,
-                            $assoc['nombre'],
-                            $assoc['tipo'],
-                            new Sector( $sector ),
-                            $valor );
-
-        return $ret;
-    }
-
-    public function __toString()
-    {
-        return json_encode($this->jsonSerialize());
     }
 }

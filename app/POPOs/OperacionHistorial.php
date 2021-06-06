@@ -2,16 +2,12 @@
 
 namespace POPOs;
 
-require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
-
-use interfaces\SerializeWithJSON as SWJ;
-
 /**
  * Representa una Operación de LABM.
  * @Entity
  * @Table(name="OperacionHistorial") 
  */
-class OperacionHistorial implements SWJ {
+class OperacionHistorial implements \JsonSerializable {
 
     /**
      * @Id
@@ -136,38 +132,4 @@ class OperacionHistorial implements SWJ {
         $ret["fechaHora"] = $this->fechaHora;
         return $ret;
     }
-
-    /**
-     * Convierte de json a Pedido.
-     */
-    public static function decode ( string $serialized ) : mixed {
-        
-        try {
-            $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
-            return self::asssocToObj($assoc);
-        }
-        catch ( \Exception ) {
-            return NULL;
-        }
-        
-    }
-
-    private static function asssocToObj( array $assoc ) : ?self {
-        $keysHasToHave = array_keys( (new OperacionHistorial())->jsonSerialize() );
-        $keysHasHave = array_keys( $assoc );
-        
-        if ( count( array_diff( $keysHasToHave, $keysHasHave ) ) > 0 ) return NULL;
-
-        $id = intval($assoc["id"]);
-        $responsable = intval($assoc["responsableId"]);
-        $ret = new OperacionHistorial(
-                                        $id,
-                                        $assoc["operacion"],
-                                        new Usuario($responsable),
-                                        $assoc["fechaHora"]
-        );
-
-        return $ret;
-    }
-
 }
