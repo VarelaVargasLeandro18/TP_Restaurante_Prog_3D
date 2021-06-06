@@ -1,14 +1,48 @@
 <?php
-
+namespace POPOs;
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
-class PedidoHistorial implements SerializeWithJSON {
+use interfaces\SerializeWithJSON as SWJ;
+use Doctrine\ORM\Mapping;
 
+/**
+ * Representa un pedido cuyo estado ya ha cambiado y quieren guardarse sus estados anteriores.
+ * @Entity
+ * @Table(name="PedidoHistorial")
+ */
+class PedidoHistorial implements SWJ {
+
+    /**
+     * @Id
+     * @Column(type="integer")
+     */
     private int $id;
+
+    /**
+     * @Column(length=5)
+     */
     private string $codigo;
+    
+    /**
+     * @ManyToOne(targetEntity="Producto")
+     * @JoinColumn(name="productoId", referencedColumnName="id")
+     */
     private ?Producto $producto;
+
+    /**
+     * @ManyToOne(targetEntity="Usuario")
+     * @JoinColumn(name="responsableId", referencedColumnName="id")
+     */
     private ?Usuario $responsable;
+
+    /**
+     * @Column(length=45)
+     */
     private string $operacion;
+
+    /**
+     * @Column
+     */
     private string $fechaCambio;
 
     public function __construct(
@@ -153,8 +187,8 @@ class PedidoHistorial implements SerializeWithJSON {
         $ret = array();
         $ret["id"] = $this->id;
         $ret["codigo"] = $this->codigo;
-        $ret["productoId"] = ( $this->producto === NULL ) ? $this->producto->getId() : -1;
-        $ret["responsableId"] = ( $this->responsable === NULL ) ? $this->responsable->getId() : -1;
+        $ret["producto"] = $this->producto;
+        $ret["responsable"] = $this->responsable;
         $ret["operacion"] = $this->operacion;
         $ret["fechaCambio"] = $this->fechaCambio;
         return $ret;
@@ -169,7 +203,7 @@ class PedidoHistorial implements SerializeWithJSON {
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::asssocToObj($assoc);
         }
-        catch ( JsonException ) {
+        catch ( \JsonException ) {
             return NULL;
         }
         
@@ -193,6 +227,11 @@ class PedidoHistorial implements SerializeWithJSON {
         );
 
         return $ret;
+    }
+
+    public function __toString()
+    {
+        return json_encode( $this->jsonSerialize() );
     }
 
 }

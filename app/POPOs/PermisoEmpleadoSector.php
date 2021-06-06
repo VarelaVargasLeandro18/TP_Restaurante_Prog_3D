@@ -172,4 +172,9 @@ class PermisoEmpleadoSector implements SWJ
         return $ret;
     }
 
+    public function __toString()
+    {
+        return json_encode($this->jsonSerialize());
+    }
+
 }
