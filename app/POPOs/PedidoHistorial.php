@@ -203,7 +203,7 @@ class PedidoHistorial implements SWJ {
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::asssocToObj($assoc);
         }
-        catch ( \JsonException ) {
+        catch ( \Exception ) {
             return NULL;
         }
         

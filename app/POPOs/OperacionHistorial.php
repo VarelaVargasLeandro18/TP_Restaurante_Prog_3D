@@ -1,15 +1,38 @@
 <?php
 
+namespace POPOs;
+
 require_once __DIR__ . '/../interfaces/SerializeWithJSON.php';
 
-namespace POPOs;
 use interfaces\SerializeWithJSON as SWJ;
 
+/**
+ * Representa una Operación de LABM.
+ * @Entity
+ * @Table(name="OperacionHistorial") 
+ */
 class OperacionHistorial implements SWJ {
 
+    /**
+     * @Id
+     * @Column(type="integer")
+     */
     private int $id;
+
+    /**
+     * @Column(length=45)
+     */
     private string $operacion;
+
+    /**
+     * @ManyToOne(targetEntity="Usuario")
+     * @JoinColumn(name="responsableId", referencedColumnName="id")
+     */
     private ?Usuario $responsable;
+
+    /**
+     * @Column
+     */
     private string $fechaHora;
 
     public function __construct(
@@ -109,7 +132,7 @@ class OperacionHistorial implements SWJ {
         $ret = array();
         $ret["id"] = $this->id;
         $ret["operacion"] = $this->operacion;
-        $ret["responsableId"] = ( $this->responsable !== NULL ) ? $this->responsable->getId() : -1;
+        $ret["responsable"] = $this->responsable;
         $ret["fechaHora"] = $this->fechaHora;
         return $ret;
     }
@@ -123,7 +146,7 @@ class OperacionHistorial implements SWJ {
             $assoc = json_decode($serialized, true, 512, JSON_THROW_ON_ERROR);
             return self::asssocToObj($assoc);
         }
-        catch ( JsonException ) {
+        catch ( \Exception ) {
             return NULL;
         }
         
