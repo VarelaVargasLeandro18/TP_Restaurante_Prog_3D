@@ -5,9 +5,9 @@ namespace Models;
 use POPOs\Mesa;
 
 require_once __DIR__ . '/../POPOs/Mesa.php';
-require_once __DIR__ . '/CRUDAbstractImplementation.php';
+require_once __DIR__ . '/CRUDAbstractModel.php';
 
-class MesaModel extends CRUDAbstractImplementation {
+class MesaModel extends CRUDAbstractModel {
 
     public function __construct()
     {

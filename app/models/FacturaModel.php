@@ -3,12 +3,12 @@
 namespace Models;
 
 require_once __DIR__ . '/../POPOs/Factura.php';
-require_once __DIR__ . '/CRUDAbstractImplementation.php';
+require_once __DIR__ . '/CRUDAbstractModel.php';
 
-use Models\CRUDAbstractImplementation;
+use Models\CRUDAbstractModel;
 use POPOs\Factura;
 
-class FacturaModel extends CRUDAbstractImplementation {
+class FacturaModel extends CRUDAbstractModel {
 
     public function __construct()
     {

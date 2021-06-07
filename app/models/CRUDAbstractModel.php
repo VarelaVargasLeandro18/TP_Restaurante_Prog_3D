@@ -9,7 +9,7 @@ use db\DoctrineEntityManagerFactory as DEMF;
 use Doctrine\ORM\EntityRepository;
 use interfaces\ICRUD;
 
-abstract class CRUDAbstractImplementation implements ICRUD {
+abstract class CRUDAbstractModel implements ICRUD {
 
     private EntityRepository $er;
     private string $className;

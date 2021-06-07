@@ -3,12 +3,12 @@
 namespace Models;
 
 require_once __DIR__ . '/../POPOs/TipoUsuario.php';
-require_once __DIR__ . '/CRUDAbstractImplementation.php';
+require_once __DIR__ . '/CRUDAbstractModel.php';
 
-use Models\CRUDAbstractImplementation;
+use Models\CRUDAbstractModel;
 use POPOs\TipoUsuario;
 
-class TipoUsuarioModel extends CRUDAbstractImplementation {
+class TipoUsuarioModel extends CRUDAbstractModel {
 
     public function __construct()
     {
