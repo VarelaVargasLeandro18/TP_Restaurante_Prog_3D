@@ -1,5 +1,9 @@
 <?php
+
 namespace POPOs;
+
+require_once __DIR__ . '/Producto.php';
+require_once __DIR__ . '/Usuario.php';
 
 /**
  * Representa un pedido cuyo estado ya ha cambiado y quieren guardarse sus estados anteriores.

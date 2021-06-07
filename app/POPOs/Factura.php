@@ -2,6 +2,8 @@
 
 namespace POPOs;
 
+require_once __DIR__ . '/Usuario.php';
+
 /**
  * Representa un pago realizado por un cliente.
  * @Entity

@@ -2,6 +2,8 @@
 
 namespace POPOs;
 
+require_once __DIR__ . '/TipoUsuario.php';
+
 /**
  * Representa un usuario.
  * @Entity

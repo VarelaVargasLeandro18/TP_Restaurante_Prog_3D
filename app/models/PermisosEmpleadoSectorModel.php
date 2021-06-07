@@ -1,151 +1,22 @@
 <?php
 
-require_once __DIR__ . '/../beans/PermisosEmpleadoSector.php';
-require_once __DIR__ . '/../interfaces/ICRUD.php';
-require_once __DIR__ . '/../db/AccesoDatos.php';
-require_once __DIR__ . '/TipoEmpleadoModel.php';
-require_once __DIR__ . '/SectorModel.php';
+namespace Models;
 
-class PermisosEmpleadoSectorModel implements ICRUD {
+require_once __DIR__ . '/../POPOs/PermisoEmpleadoSector.php';
+require_once __DIR__ . '/CRUDAbstractImplementation.php';
 
-    private static string $columnaId = 'Id';
-    private static string $columnaTipoE = 'TipoEmpleadoId';
-    private static string $columnaSector = 'SectorId';
+use Models\CRUDAbstractImplementation;
+use POPOs\PermisoEmpleadoSector;
 
-    private static function crearPermisosEmpleadosSector ( array $allAssoc ) : array {
-        $ret = array();
-        
-        foreach ( $allAssoc as $key => $assoc ) {
-            $ret [$key] = self::crearPermisoEmpleadoSector($assoc);
-        }
 
-        return $ret;
-    }
-    
-    private static function crearPermisoEmpleadoSector(array $assoc) : PermisosEmpleadoSector {
-        $Id = intval($assoc[self::$columnaId]);
-        $idTipoE = intval($assoc[self::$columnaTipoE]);
-        $idSector = intval($assoc[self::$columnaSector]);
+class PermisosEmpleadoSectorModel extends CRUDAbstractImplementation {
 
-        $Sector = SectorModel::readById($idSector);
-        $Tipo = TipoEmpleadoModel::readById($idTipoE);
-
-        return new PermisosEmpleadoSector($Id, $Tipo, $Sector);
-    }
-
-    public static function readById(mixed $id): mixed
+    public function __construct()
     {
-        $ret = NULL;
-        $access = AccesoDatos::obtenerInstancia();
-        $statement = $access->prepararConsulta(
-            'SELECT 	PermisosEmpleadoSector.Id, PermisosEmpleadoSector.TipoEmpleadoId, PermisosEmpleadoSector.SectorId
-            FROM PermisosEmpleadoSector
-            WHERE PermisosEmpleadoSector.Id = :id;'
-        );
-        $statement->bindValue(':id', $id, PDO::PARAM_INT);
-        $executed = $statement->execute();
-
-        if ( $executed ) {
-            $assoc = $statement->fetch(PDO::FETCH_ASSOC);
-            $ret = ($assoc !== false) ? self::crearPermisoEmpleadoSector($assoc) : $ret;
-        }
-
-        return $ret;
+        parent::__construct( PermisoEmpleadoSector::class );
     }
 
-    public static function readAllObjects(): array
-    {
-        $ret = array();
-        $access = AccesoDatos::obtenerInstancia();
-        $statement = $access->prepararConsulta(
-            'SELECT 	PermisosEmpleadoSector.Id, PermisosEmpleadoSector.TipoEmpleadoId, PermisosEmpleadoSector.SectorId
-            FROM PermisosEmpleadoSector;'
-        );
-        $executed = $statement->execute();
-        if ( $executed ) {
-            $allAssoc = $statement->fetchAll(PDO::FETCH_ASSOC);
-            $ret = ($allAssoc !== false) ? self::crearPermisosEmpleadosSector($allAssoc) : $ret;
-        }
-
-        return $ret;
-    }
-
-    public static function insertObject(mixed $obj): bool
-    {
-        $ret = false;
-        $access = AccesoDatos::obtenerInstancia();
-        $statement = $access->prepararConsulta(
-            '
-            INSERT INTO PermisosEmpleadoSector (PermisosEmpleadoSector.TipoEmpleadoId, PermisosEmpleadoSector.SectorId)
-                    VALUES (:idTipoE, :idSector);'
-        );
-        $statement->bindValue(':idTipoE', $obj->getTipo()->getId());
-        $statement->bindValue(':idSector', $obj->getSector()->getId());
-        $ret = $statement->execute();
-
-        return $ret;  
-    }
-
-    public static function deleteById(mixed $id): mixed
-    {
-        $ret = self::readById($id);
-        
-        if ( $ret !== NULL ) {
-            $access = AccesoDatos::obtenerInstancia();
-            $statement = $access->prepararConsulta(
-                '
-                DELETE 
-                FROM PermisosEmpleadoSector
-                wHERE PermisosEmpleadoSector.Id = :id;'
-            );
-
-            $statement->bindValue(':id', $id, PDO::PARAM_INT);
-            $statement->execute();
-        }
-        return $ret;
-    }
-
-    public static function updateObject(mixed $obj): bool
-    {
-        $ret = false;
-        $access = AccesoDatos::obtenerInstancia();
-        $statement = $access->prepararConsulta(
-            '
-            UPDATE PermisosEmpleadoSector
-            SET PermisosEmpleadoSector.TipoEmpleadoId = :idTipoE, PermisosEmpleadoSector.SectorId = :idSector
-            WHERE PermisosEmpleadoSector.Id = :id;'
-        );
-        $statement->bindValue(':id', $obj->getId(), PDO::PARAM_INT);
-        $statement->bindValue(':idTipoE', $obj->getTipo()->getId());
-        $statement->bindValue(':idSector', $obj->getSector()->getId());
-        $ret = $statement->execute();
-
-        return $ret;
-    }
-
-    // FUNCIONES PROPIAS
-
-    public static function comprobarTipoSector(int $sectorId, int $tipoId) : bool {
-        $ret = false;
-        $access = AccesoDatos::obtenerInstancia();
-        $statement = $access->prepararConsulta(
-            '
-            SELECT 	PermisosEmpleadoSector.Id
-            FROM PermisosEmpleadoSector
-            WHERE 
-            PermisosEmpleadoSector.TipoempleadoId = :tipoId AND
-            PermisosEmpleadoSector.SectorId = :sectorId ;
-            '
-        );
-        $statement->bindValue(':tipoId', $tipoId, PDO::PARAM_INT);
-        $statement->bindValue(':sectorId', $sectorId, PDO::PARAM_INT);
-        $executed = $statement->execute();
-
-        if ( $executed ) {
-            $ret = $statement->rowCount() >= 1;
-        }
-        
-        return $ret;
-    }
+    private function __clone()
+    {}
 
 }

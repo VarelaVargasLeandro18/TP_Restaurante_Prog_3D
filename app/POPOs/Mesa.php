@@ -2,6 +2,7 @@
 
 namespace POPOs;
 
+require_once __DIR__ . '/EstadoMesa.php';
 
 /**
  * Representa una Mesa del local.

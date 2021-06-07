@@ -2,6 +2,9 @@
 
 namespace POPOs;
 
+require_once __DIR__ . '/TipoComentario.php';
+require_once __DIR__ . '/Usuario.php';
+
 /**
  * Representa un comentario realizado por un cliente al restaurante.
  * @Entity

@@ -2,6 +2,11 @@
 
 namespace POPOs;
 
+require_once __DIR__ . '/Usuario.php';
+require_once __DIR__ . '/Producto.php';
+require_once __DIR__ . '/Mesa.php';
+require_once __DIR__ . '/PedidoEstado.php';
+
 /**
  * Representa un pedido realizado por un cliente
  * @Entity
@@ -52,7 +57,7 @@ class Pedido implements \JsonSerializable
 
     /**
      * @ManyToOne(targetEntity="PedidoEstado")
-     * @JoinColumn(name="pedidoEstadoId", referencdColumnName="id")
+     * @JoinColumn(name="pedidoEstadoId", referencedColumnName="id")
      */
     private ?PedidoEstado $estado;
 

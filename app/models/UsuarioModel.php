@@ -2,17 +2,17 @@
 
 namespace Models;
 
-require_once __DIR__ . '/../POPOs/Pedido.php';
+require_once __DIR__ . '/../POPOs/Usuario.php';
 require_once __DIR__ . '/CRUDAbstractImplementation.php';
 
 use Models\CRUDAbstractImplementation;
-use POPOs\Pedido;
+use POPOs\Usuario;
 
-class PedidoModel extends CRUDAbstractImplementation {
+class UsuarioModel extends CRUDAbstractImplementation {
 
     public function __construct()
     {
-        parent::__construct( Pedido::class );
+        parent::__construct( Usuario::class );
     }
 
     private function __clone()

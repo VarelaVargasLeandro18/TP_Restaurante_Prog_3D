@@ -2,6 +2,7 @@
 
 namespace POPOs;
 
+require_once __DIR__ . '/Sector.php';
 /**
  * Representa un Tipo de Usuario.
  * @Entity

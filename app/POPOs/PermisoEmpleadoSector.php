@@ -2,6 +2,9 @@
 
 namespace POPOs;
 
+require_once __DIR__ . '/TipoUsuario.php';
+require_once __DIR__ . '/Sector.php';
+
 /**
  * Representa el permiso que tiene un Empleado para cambiar estado de un Pedido según el Sector en el que esté.
  * @Entity
