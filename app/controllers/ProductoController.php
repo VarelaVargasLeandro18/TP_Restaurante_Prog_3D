@@ -34,7 +34,7 @@ class ProductoController extends CRUDAbstractController {
     private function __clone()
     {}
     
-    protected static function validarObjeto(array $decodedAssoc): mixed
+    protected static function validarObjeto(array $decodedAssoc): Producto
     {
         if ( !empty( array_diff_key( $decodedAssoc, self::$assocArrayExample ) ) ) return false;
         $sm = new SM();
@@ -53,6 +53,27 @@ class ProductoController extends CRUDAbstractController {
             $sector,
             $valor
         );
+    }
+
+    protected static function updateObjeto(array $decodedAssoc, mixed $objBD): bool
+    {
+        $productoNuevo = self::validarObjeto( $decodedAssoc );
+
+        if ( !$productoNuevo ) return false;
+
+        $sector = $productoNuevo->getSector();
+        $nombre = $productoNuevo->getNombre();
+        $tipo = $productoNuevo->getTipo();
+        $valor = $productoNuevo->getValor();
+
+        $objBD->setSector($sector);
+        $objBD->setNombre($nombre);
+        $objBD->setTipo($tipo);
+        $objBD->setValor($valor);
+
+        $sm = new SM();
+        
+        return $sm->updateObject( $objBD );
     }
 
 }

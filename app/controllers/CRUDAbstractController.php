@@ -51,6 +51,8 @@ abstract class CRUDAbstractController implements ICRUDApi {
      */
     protected static abstract function validarObjeto ( array $decodedAssoc ) : mixed; 
 
+    protected static abstract function updateObjeto ( array $decodedAssoc, mixed $objBD ) : bool;
+
     public static function read ( Request $request, Response $response, array $args ): Response
     {
         try {
@@ -146,7 +148,29 @@ abstract class CRUDAbstractController implements ICRUDApi {
 
     public static function update(Request $request, Response $response, array $args): Response
     {
-        return $response;
+        try {
+            self::createICRUD();
+        } catch ( \Throwable ) {
+            return new $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );
+        }
+
+        $id = -1;
+
+        if ( static::$PK_type == 0 ) 
+            $id = intval( $args['id'] );
+        else if ( static::$PK_type !== 0 ) 
+            $id = $args['id'];
+
+        $jsonObject = $request->getBody()->getContents();
+        $decodedAssoc = json_decode ( $jsonObject, true, 512, JSON_INVALID_UTF8_SUBSTITUTE );
+        
+        $bdObject = self::$cai->readById($id);
+
+        if ( !$bdObject ) return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No se encontró el ' . static::$nombreClase . ' con el id ' . $id );
+
+        if ( !static::updateObjeto( $decodedAssoc, $bdObject ) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );        
+
+        return $response->withStatus( SCI::STATUS_OK );
     }
 
 }

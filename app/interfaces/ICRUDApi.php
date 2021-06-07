@@ -29,5 +29,9 @@ interface ICRUDApi
 	 * Borra un objeto según el 'id' en $args.
 	 */
 	public static function delete (Request $request, Response $response, Array $args) : Response;
+	
+	/**
+	 * Actualiza un objeto con el 'id' pasado en $args 
+	 */
 	public static function update (Request $request, Response $response, Array $args) : Response;
 }
