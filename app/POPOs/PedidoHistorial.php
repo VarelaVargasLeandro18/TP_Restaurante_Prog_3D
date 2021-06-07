@@ -15,6 +15,7 @@ class PedidoHistorial implements \JsonSerializable {
     /**
      * @Id
      * @Column(type="integer")
+     * @GeneratedValue(strategy="AUTO")
      */
     private int $id;
 
@@ -185,7 +186,8 @@ class PedidoHistorial implements \JsonSerializable {
     public function jsonSerialize() : mixed
     {
         $ret = array();
-        $ret["id"] = $this->id;
+        if( isset($this->id) )
+            $ret["id"] = $this->id;
         $ret["codigo"] = $this->codigo;
         $ret["producto"] = $this->producto;
         $ret["responsable"] = $this->responsable;

@@ -75,7 +75,8 @@ class Mesa implements \JsonSerializable
     public function jsonSerialize() : mixed
     {
         $ret = array();
-        $ret["id"] = $this->id;
+        if ( isset($this->id) )
+            $ret["id"] = $this->id;
         $ret["estado"] = $this->estado;
         return $ret;
     }

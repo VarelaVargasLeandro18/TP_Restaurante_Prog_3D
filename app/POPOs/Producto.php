@@ -14,6 +14,7 @@ class Producto implements \JsonSerializable
     /**
      * @Id
      * @Column(type="integer")
+     * @GeneratedValue(strategy="AUTO")
      */
     private int $id;
 
@@ -155,11 +156,20 @@ class Producto implements \JsonSerializable
     public function jsonSerialize(): mixed
     {
         $ret = array();
-        $ret["id"] = $this->id;
+        
+        if ( isset($this->id) )
+            $ret["id"] = $this->id;
+
         $ret["nombre"] = $this->nombre;
         $ret["tipo"] = $this->tipo;
         $ret["sector"] = $this->sector;
         $ret["valor"] = number_format($this->valor, 2, ',', '.');
         return $ret;
     }
+
+    public function __toString()
+    {
+        return json_encode( $this->jsonSerialize(), JSON_INVALID_UTF8_SUBSTITUTE );
+    }
+
 }

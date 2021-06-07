@@ -18,6 +18,7 @@ class Pedido implements \JsonSerializable
     /**
      * @Id
      * @Column(type="integer")
+     * @GeneratedValue(strategy="AUTO")
      */
     private int $id;
 
@@ -356,7 +357,8 @@ class Pedido implements \JsonSerializable
     public function jsonSerialize() : mixed
     {
         $ret = array();
-        $ret["id"] = $this->id;
+        if ( isset($this->id) )
+            $ret["id"] = $this->id;
         $ret["codigo"] = $this->codigo;
         $ret["cantidad"] = $this->cantidad;
         $ret["clienteId"] = ( $this->cliente !== NULL ) ? $this->cliente->getId() : -1;

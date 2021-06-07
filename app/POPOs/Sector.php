@@ -13,6 +13,7 @@ class Sector implements \JsonSerializable
     /**
      * @Id
      * @Column(type="integer")
+     * @GeneratedValue(strategy="AUTO")
      */
     private int $id;
 
@@ -72,7 +73,8 @@ class Sector implements \JsonSerializable
     public function jsonSerialize()
     {
         $ret = array();
-        $ret["id"] = $this->id;
+        if( isset($this->id) )
+            $ret["id"] = $this->id;
         $ret["nombre"] = $this->nombre;
         return $ret;
     }

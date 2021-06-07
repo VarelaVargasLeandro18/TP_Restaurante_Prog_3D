@@ -62,7 +62,7 @@ abstract class CRUDAbstractImplementation implements ICRUD {
             if ( $entity === NULL ) throw new \Exception();
 
             DEMF::getEntityManager()->remove($entity);
-            DEMF::getEntityManager()->flush($entity);
+            DEMF::getEntityManager()->flush();
             return $entity;
         } catch ( \Throwable ) {
             return NULL;

@@ -44,6 +44,13 @@ abstract class CRUDAbstractController implements ICRUDApi {
         return $response->withStatus( $okayCode )->withAddedHeader( 'Content-Type', 'application/json' );
     }
 
+    /**
+     * Función que validará si un objeto json de una Request fue correctamente escrito como requiere el Controller.
+     * @param array JSON decodificado como un array Asociativo.
+     * @return mixed|bool El objeto decodificado. 'false' en caso de fallo.
+     */
+    protected static abstract function validarObjeto ( array $decodedAssoc ) : mixed; 
+
     public static function read ( Request $request, Response $response, array $args ): Response
     {
         try {
@@ -96,12 +103,45 @@ abstract class CRUDAbstractController implements ICRUDApi {
 
     public static function insert(Request $request, Response $response, array $args): Response
     {
-        return $response;
+        try {
+            self::createICRUD();
+        } catch ( \Throwable ) {
+            return new $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );
+        }
+
+        $jsonObject = $request->getBody()->getContents();
+        $decodedAssoc = json_decode ( $jsonObject, true, 512, JSON_INVALID_UTF8_SUBSTITUTE );
+        $obj = static::validarObjeto( $decodedAssoc );
+
+        if ( !static::$cai->insertObject( $obj ) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No pudo guardarse el ' . static::$nombreClase );
+
+        return $response->withStatus( SCI::STATUS_CREATED );
     }
 
     public static function delete(Request $request, Response $response, array $args): Response
     {
-        return $response;
+        try {
+            self::createICRUD();
+        } catch ( \Throwable ) {
+            return new $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );
+        }
+
+        $id = -1;
+
+        if ( static::$PK_type == 0 ) 
+            $id = intval( $args['id'] );
+        else if ( static::$PK_type !== 0 ) 
+            $id = $args['id'];
+        
+        $deleted = static::$cai->deleteById($id);
+
+        if ( $deleted === NULL ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No pudo borrarse el ' . static::$nombreClase );
+
+        return self::procesarRespuesta(
+            $response,
+            $deleted,
+            SCI::STATUS_OK
+        );
     }
 
     public static function update(Request $request, Response $response, array $args): Response

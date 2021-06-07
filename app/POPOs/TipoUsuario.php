@@ -14,6 +14,7 @@ class TipoUsuario implements \JsonSerializable
     /**
      * @Id
      * @Column(type="integer")
+     * @GeneratedValue(strategy="AUTO")
      */
     private int $id;
 
@@ -101,7 +102,8 @@ class TipoUsuario implements \JsonSerializable
     public function jsonSerialize(): mixed
     {
         $ret = array();
-        $ret["id"] = $this->id;
+        if ( isset($this->id) )
+            $ret["id"] = $this->id;
         $ret["tipo"] = $this->tipo;
         $ret["sector"] = $this->sector;
         return $ret;

@@ -14,6 +14,7 @@ class OperacionHistorial implements \JsonSerializable {
     /**
      * @Id
      * @Column(type="integer")
+     * @GeneratedValue(strategy="AUTO")
      */
     private int $id;
 
@@ -128,7 +129,8 @@ class OperacionHistorial implements \JsonSerializable {
     public function jsonSerialize() : mixed
     {
         $ret = array();
-        $ret["id"] = $this->id;
+        if ( isset($this->id) )
+            $ret["id"] = $this->id;
         $ret["operacion"] = $this->operacion;
         $ret["responsable"] = $this->responsable;
         $ret["fechaHora"] = $this->fechaHora;

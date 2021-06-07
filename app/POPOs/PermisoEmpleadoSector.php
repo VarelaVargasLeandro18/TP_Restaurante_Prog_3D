@@ -16,6 +16,7 @@ class PermisoEmpleadoSector implements \JsonSerializable
     /**
      * @Id
      * @Column(type="integer")
+     * @GeneratedValue(strategy="AUTO")
      */
     private int $id;
 
@@ -130,7 +131,8 @@ class PermisoEmpleadoSector implements \JsonSerializable
     public function jsonSerialize() : mixed
     {
         $ret = array();
-        $ret["id"] = $this->id;
+        if ( isset($this->id) )
+            $ret["id"] = $this->id;
         $ret["tipoId"] = ( $this->tipo !== NULL ) ? $this->tipo->getId() : -1; 
         $ret["sector"] = $this->sector;
         $ret["permisos"] = $this->permisos;

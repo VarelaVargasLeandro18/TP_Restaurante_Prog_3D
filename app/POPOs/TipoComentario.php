@@ -11,8 +11,8 @@ class TipoComentario implements \JsonSerializable {
 
     /**
      * @Id
-     * @GeneratedValue
      * @Column(type="integer")
+     * @GeneratedValue(strategy="AUTO")
      */
     private int $id;
 
@@ -72,7 +72,8 @@ class TipoComentario implements \JsonSerializable {
     public function jsonSerialize() : mixed
     {
         $ret = array();
-        $ret["id"] = $this->id;
+        if( isset($this->id) )
+            $ret["id"] = $this->id;
         $ret["tipo"] = $this->tipo;
         return $ret;
     }

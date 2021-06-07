@@ -10,3 +10,5 @@ use Controllers\ProductoController;
 
 $app->get ( '/prueba/{id}', ProductoController::class . '::read' );
 $app->get( '/prueba', ProductoController::class . '::readAll' );
+$app->post( '/prueba', ProductoController::class . '::insert' );
+$app->delete( '/prueba/{id}', ProductoController::class . '::delete' );

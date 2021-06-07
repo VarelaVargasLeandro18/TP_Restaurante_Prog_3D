@@ -11,7 +11,7 @@ use Psr\Http\Message\RequestInterface as Request;
 interface ICRUDApi
 {
 	/**
-     * Lee un objeto según el 'id' en $args;
+     * Lee un objeto según el 'id' en $args.
      */
 	public static function read (Request $request, Response $response, Array $args) : Response;
 	
@@ -19,7 +19,15 @@ interface ICRUDApi
 	 * Lee todos los objetos.
 	 */
 	public static function readAll (Request $request, Response $response, Array $args) : Response;
+	
+	/**
+	 * Inserta un objeto pasado por POST como JSON.
+	 */
 	public static function insert (Request $request, Response $response, Array $args) : Response;
+	
+	/**
+	 * Borra un objeto según el 'id' en $args.
+	 */
 	public static function delete (Request $request, Response $response, Array $args) : Response;
 	public static function update (Request $request, Response $response, Array $args) : Response;
 }

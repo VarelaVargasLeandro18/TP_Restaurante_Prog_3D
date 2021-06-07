@@ -14,6 +14,7 @@ class Factura implements \JsonSerializable {
     /**
      * @Id
      * @Column(type="integer")
+     * @GeneratedValue(strategy="AUTO")
      */
     private int $id;
 
@@ -69,7 +70,8 @@ class Factura implements \JsonSerializable {
     public function jsonSerialize() : mixed
     {
         $ret = array();
-        $ret["id"] = $this->id;
+        if ( isset($this->id) )
+            $ret["id"] = $this->id;
         $ret["fechaExpedicion"] = $this->fechaExpedicion;
         $ret["cliente"] = $this->cliente;
         $ret["codigoPedido"] = $this->codigoPedido;
