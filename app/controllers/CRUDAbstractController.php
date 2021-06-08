@@ -14,9 +14,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 abstract class CRUDAbstractController implements ICRUDApi {
 
     protected static string $modelName = '';
-    private static ?ICRUD $cai = NULL;
     protected static string $nombreClase = '';
-
     /**
      * Define el tipo de 'primary key', siendo:
      * 0: int
@@ -24,9 +22,39 @@ abstract class CRUDAbstractController implements ICRUDApi {
      * Por defecto su valor es 0.
      */
     protected static int $PK_type = 0;
+    /**
+     * Define cómo debe ser el JSON que se va a recibir. Deberá ser un array asociativo que tendrá el 'callable' de cómo se convertirá el valor que se encuentre en esa posición.
+     * Ej: 'id' => intval
+     * @var array key => callable
+     */
+    protected static ?array $jsonConfig = NULL;
+
+    private static ?ICRUD $cai = NULL;
 
     private function __construct() {}
     private function __clone() {}
+
+   protected static abstract function createObject( array $array ) : mixed;
+    protected static abstract function updateObject ( array $array, mixed $objBD ) : mixed;
+
+    /**
+     * Retorna el Array decodificado de formato JSON con sus valores ya convertidos.
+     */
+    private static function createAssocFromJsonRequest ( array $decodedJson ) : array|NULL {
+        if ( !empty( array_diff_key( $decodedJson, static::$jsonConfig ) ) ) return NULL;
+        
+        $jsonConfig = static::$jsonConfig;
+
+        foreach ( $jsonConfig as $key => $value ) {
+
+            if ( !is_callable( $value ) ) continue;
+
+            $decodedJson[$key] = call_user_func( $value, array($decodedJson[$key]) );
+
+        }
+
+        return $decodedJson;
+    }
 
     private static function createICRUD () {
         if ( self::$cai === NULL ){
@@ -47,15 +75,6 @@ abstract class CRUDAbstractController implements ICRUDApi {
 
         return $response->withStatus( $okayCode )->withAddedHeader( 'Content-Type', 'application/json' );
     }
-
-    /**
-     * Función que validará si un objeto json de una Request fue correctamente escrito como requiere el Controller.
-     * @param array JSON decodificado como un array Asociativo.
-     * @return mixed|bool El objeto decodificado. 'false' en caso de fallo.
-     */
-    protected static abstract function validarObjeto ( array $decodedAssoc ) : mixed; 
-
-    protected static abstract function updateObjeto ( array $decodedAssoc, mixed $objBD ) : bool;
 
     public static function read ( Request $request, Response $response, array $args ): Response
     {
@@ -113,7 +132,9 @@ abstract class CRUDAbstractController implements ICRUDApi {
 
         $jsonObject = $request->getBody()->getContents();
         $decodedAssoc = json_decode ( $jsonObject, true, 512, JSON_INVALID_UTF8_SUBSTITUTE );
-        $obj = static::validarObjeto( $decodedAssoc );
+        $decodedAssoc = static::createAssocFromJsonRequest( $decodedAssoc );
+
+        $obj = static::createObject( $decodedAssoc );
 
         if ( !static::$cai->insertObject( $obj ) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No pudo guardarse el ' . static::$nombreClase );
 
@@ -168,7 +189,9 @@ abstract class CRUDAbstractController implements ICRUDApi {
 
         if ( !$bdObject ) return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No se encontró el ' . static::$nombreClase . ' con el id ' . $id );
 
-        if ( !static::updateObjeto( $decodedAssoc, $bdObject ) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo realizar un update del ' . static::$nombreClase . ' con id ' . $id );        
+        if ( $bdObject = static::updateObjeto( $decodedAssoc, $bdObject ) === NULL ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo realizar un update del ' . static::$nombreClase . ' con id ' . $id );        
+
+        if ( !self::$cai->updateObject($bdObject) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo realizar un update del ' . static::$nombreClase . ' con id ' . $id );
 
         return $response->withStatus( SCI::STATUS_OK );
     }

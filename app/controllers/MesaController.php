@@ -1,106 +1,39 @@
 <?php
 
-use Fig\Http\Message\StatusCodeInterface;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
-use Slim\Http\StatusCode;
+namespace Controllers;
 
+require_once __DIR__ . '/CRUDAbstractController.php';
 require_once __DIR__ . '/../models/MesaModel.php';
+require_once __DIR__ . '/../POPOs/Mesa.php';
+require_once __DIR__ . '/../POPOs/EstadoMesa.php';
 
-class MesaController implements ICRUDApi {
+use Models\MesaModel as MM;
+use POPOs\Mesa as M;
 
-    public static function read(Request $request, Response $response, array $args): Response
+/*
+    "id": "aaaaa"
+*/
+
+class MesaController extends CRUDAbstractController {
+
+    protected static string $modelName = MM::class;
+    protected static string $nombreClase = M::class;
+    protected static int $PK_type = 1;
+    protected static ?array $jsonConfig = array (
+        'id' => NULL
+    );
+
+    protected static function createObject(array $array): mixed
     {
-        $id = $args['id'];
-        $mesa = MesaModel::readById($id);
-        $jsonMesa = json_encode($mesa);
-
-        if ( $mesa === NULL ) return $response->withStatus( StatusCodeInterface::STATUS_NOT_FOUND );
-
-        $response->getBody()->write($jsonMesa);
-
-        return $response->withAddedHeader('Content-Type', 'json/application');
+        return new M (
+            $array['id'],
+            NULL
+        );
     }
 
-    public static function readAll(Request $request, Response $response, array $args): Response
+    protected static function updateObject(array $array, mixed $objBD): mixed
     {
-        $mesas = MesaModel::readAllObjects();
-        $jsonMesas = json_encode($mesas);
-        $response->getBody()->write($jsonMesas);
-
-        return $response->withAddedHeader('Content-Type', 'application/json');
-    }
-
-    public static function insert(Request $request, Response $response, array $args): Response
-    {
-        $json = $request->getBody();
-        $assoc = json_decode($json, true);
-        
-        if ( empty($assoc['Id']) ) $assoc['Id'] = self::generarCodigoChequeado();
-
-        $assoc['EstadoMesaId'] = 1;
-        
-        if ( $assoc === NULL ) return $response->withStatus( StatusCodeInterface::STATUS_BAD_REQUEST );
-
-        $mesa = MesaModel::crearmesa($assoc);
-        $inserted = MesaModel::insertObject($mesa);
-        
-        if ( !$inserted ) return $response->withStatus( StatusCodeInterface::STATUS_CONFLICT );
-        // NO SE INSERTA SÍ, MAL TIPO O MAL SECTOR O USUARIO Y PASS USADOS.
-
-        return $response->withStatus( StatusCodeInterface::STATUS_CREATED );
-    }
-
-    public static function delete(Request $request, Response $response, array $args): Response
-    {
-        $id = $args['id'];
-        $deleted = MesaModel::deleteById($id);
-        $jsonDeleted = json_encode($deleted);
-
-        if ( $deleted === NULL ) return $response->withStatus( StatusCodeInterface::STATUS_NOT_FOUND );
-        
-        $response->getBody()->write($jsonDeleted);
-
-        return $response->withAddedHeader('Content-Type', 'application/json');
-    }
-
-    public static function update(Request $request, Response $response, array $args): Response
-    {
-        $json = $request->getBody();
-        $assoc = json_decode($json, true);
-
-        $mesa = MesaModel::crearMesa($assoc);
-        $updated = MesaModel::updateObject($mesa);
-
-        if ( !$updated ) return $response->withStatus( StatusCodeInterface::STATUS_CONFLICT );
-        // NO SE INSERTA SÍ, MAL TIPO O MAL SECTOR O USUARIO Y PASS USADOS.
-
-        return $response->withStatus( StatusCodeInterface::STATUS_NO_CONTENT );
-    }
-
-    private static function generarCodigo ( int $length ) : string {
-        $numeros = '0123456789';
-        $letras = 'abcdefghijklmnopqrstuvwxyz';
-        $chars = $numeros . $letras;
-        $charsArr = str_split($chars);
-        $ret = '';
-
-        for ( $cantLetrasAgregadas = 0; $cantLetrasAgregadas < $length; $cantLetrasAgregadas++ ) {
-            $indexNrs = random_int( 0, count($charsArr) );
-            $ret .= $charsArr[$indexNrs];            
-        }
-
-        return $ret;
-    }
-
-    private static function generarCodigoChequeado( int $length = 5 ) : string {
-        $cod = '';
-
-        do {
-            $cod = self::generarCodigo($length);
-        } while ( MesaModel::readById( $cod ) !== NULL );
-
-        return $cod;
+        $objBD->setId( $array['id'] );
     }
 
 }
