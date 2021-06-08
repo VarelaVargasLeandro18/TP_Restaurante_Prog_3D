@@ -38,22 +38,10 @@ abstract class CRUDAbstractController implements ICRUDApi {
     protected static abstract function updateObject ( array $array, mixed $objBD ) : mixed;
 
     /**
-     * Retorna el Array decodificado de formato JSON con sus valores ya convertidos.
+     * Chequea que el JSON proporcionado en el request sea correcto.
      */
-    private static function createAssocFromJsonRequest ( array $decodedJson ) : array|NULL {
-        if ( !empty( array_diff_key( $decodedJson, static::$jsonConfig ) ) ) return NULL;
-        
-        $jsonConfig = static::$jsonConfig;
-
-        foreach ( $jsonConfig as $key => $value ) {
-
-            if ( !is_callable( $value ) ) continue;
-
-            $decodedJson[$key] = call_user_func( $value, array($decodedJson[$key]) );
-
-        }
-
-        return $decodedJson;
+    private static function checkJson ( array $decodedJson ) : bool {
+        return empty( array_diff_key( $decodedJson, static::$jsonConfig ) );
     }
 
     private static function createICRUD () {
@@ -132,10 +120,11 @@ abstract class CRUDAbstractController implements ICRUDApi {
 
         $jsonObject = $request->getBody()->getContents();
         $decodedAssoc = json_decode ( $jsonObject, true, 512, JSON_INVALID_UTF8_SUBSTITUTE );
-        $decodedAssoc = static::createAssocFromJsonRequest( $decodedAssoc );
+       
+        if ( !self::checkJson($decodedAssoc) ) return $response->withStatus( SCI::STATUS_BAD_REQUEST, 'El JSON proporcionado no es válido.' );
 
         $obj = static::createObject( $decodedAssoc );
-
+        
         if ( !static::$cai->insertObject( $obj ) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No pudo guardarse el ' . static::$nombreClase );
 
         return $response->withStatus( SCI::STATUS_CREATED );
@@ -185,12 +174,14 @@ abstract class CRUDAbstractController implements ICRUDApi {
         $jsonObject = $request->getBody()->getContents();
         $decodedAssoc = json_decode ( $jsonObject, true, 512, JSON_INVALID_UTF8_SUBSTITUTE );
         
+        if ( !self::checkJson($decodedAssoc) ) return $response->withStatus( SCI::STATUS_BAD_REQUEST, 'El JSON proporcionado no es válido.' );
+
         $bdObject = self::$cai->readById($id);
 
         if ( !$bdObject ) return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No se encontró el ' . static::$nombreClase . ' con el id ' . $id );
-
-        if ( $bdObject = static::updateObjeto( $decodedAssoc, $bdObject ) === NULL ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo realizar un update del ' . static::$nombreClase . ' con id ' . $id );        
-
+        
+        if ( ($bdObject = static::updateObject( $decodedAssoc, $bdObject )) === false ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo realizar un update del ' . static::$nombreClase . ' con id ' . $id );        
+        
         if ( !self::$cai->updateObject($bdObject) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo realizar un update del ' . static::$nombreClase . ' con id ' . $id );
 
         return $response->withStatus( SCI::STATUS_OK );

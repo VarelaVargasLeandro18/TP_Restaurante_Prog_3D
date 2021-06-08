@@ -15,12 +15,12 @@ use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
 use Models\PedidoModel as PM;
-use Models\UsuarioModel;
-use Models\ProductoModel;
-use Models\MesaModel;
-use Models\PedidoEstadoModel;
+use Models\UsuarioModel as UM;
+use Models\ProductoModel as ProdM;
+use Models\MesaModel as MM;
+use Models\PedidoEstadoModel as PEM;
 
-use POPOs\Pedido;
+use POPOs\Pedido as P;
 
 use db\DoctrineEntityManagerFactory as DEMF;
 use Models\PedidoModel;
@@ -40,7 +40,7 @@ class PedidoController extends CRUDAbstractController {
     protected static string $nombreClase = 'Pedido';
     protected static int $PK_type = 0;
 
-    private static array $assocArrayExample = array( 
+    protected static ?array $jsonConfig = array( 
         'cantidad' => '', 
         'IdCliente' => '',
         'IdProducto' => '',
@@ -76,80 +76,47 @@ class PedidoController extends CRUDAbstractController {
         return empty($obj);
     }
 
-    private static function crearObjeto( array $decodedAssoc ) : mixed {
+    private static function generarCodigo() : string {
+        do {
+            $codigo = self::generateRandomString();
+        } while ( !self::checkCodigo($codigo) );
+        return $codigo;
+    }
     
-        $usuariom = new UsuarioModel();
-        $productom = new ProductoModel();
-        $mesam = new MesaModel();
-        $pedidoestadom = new PedidoEstadoModel();
+    protected static function createObject(array $array): mixed
+    {
+        $codigo = self::generarCodigo();
+        $usuariom = new UM();
+        $produdctom = new ProdM();
+        $mesam = new MM();
+        $pedidoestadom = new PEM();
 
-        $cantidad = intval($decodedAssoc['cantidad']);
-        $idcliente = intval($decodedAssoc['IdCliente']);
-        $idProducto = intval($decodedAssoc['IdProducto']);
-        $idMesa = $decodedAssoc['IdMesa'];
+        $cliente = $usuariom->readById( $array['IdCliente'] );
+        $producto = $produdctom->readById( $array['IdProducto'] );
+        $mesa = $mesam->readById( $array['IdMesa'] );
+        $estado = $pedidoestadom->readById(1);
 
-        $cliente = $usuariom->readById($idcliente);
-        $producto = $productom->readById($idProducto);
-        $mesa = $mesam->readById($idMesa);
-        $estadoInicial = $pedidoestadom->readById(1);
-
-        if ( $cliente === NULL | $producto === NULL | $mesa === NULL ) return false;
-
-        if ( !key_exists( 'codigo', $decodedAssoc ) ) {
-            do {
-                $codigo = self::generateRandomString();
-            } while ( !self::checkCodigo($codigo) );
-        }
-        else
-            $codigo = $decodedAssoc['codigo'];
-        
-        return new Pedido( 
-            -1,
+        return new P(
+            0,
             $codigo,
-            $cantidad,
+            $array['cantidad'],
             $cliente,
             NULL,
             $producto,
             $mesa,
-            $estadoInicial
+            $estado
         );
     }
-    
-    protected static function validarObjeto(array $decodedAssoc): mixed
+
+    protected static function updateObject(array $array, mixed $objBD): mixed
     {
-        if ( !empty(array_diff_key($decodedAssoc, self::$assocArrayExample) ) ) return false;
-        return self::crearObjeto($decodedAssoc);
-    }   
-    
-    protected static function updateObjeto(array $decodedAssoc, mixed $objBD): bool
-    {
-        $decodedAssoc['codigo'] = $objBD->getCodigo();
-        $obj = self::crearObjeto( $decodedAssoc );
-        
-        if ( !$obj ) return false;
-
-        $pedidom = new PM();
-
-        $codigo = $obj->getCodigo();
-        $cantidad = $obj->getCantidad();
-        $cliente = $obj->getCliente();
-        $producto = $obj->getProducto();
-        $mesa = $obj->getMesa();
-        $estado = $obj->getEstado();
-
-        $objBD->setCodigo( $codigo );
-        $objBD->setCantidad( $cantidad );
-        $objBD->setCliente( $cliente );
-        $objBD->setProducto( $producto );
-        $objBD->setMesa( $mesa );
-        $objBD->setEstado( $estado );
-
-        return $pedidom->updateObject( $objBD );
-    }
-
-    public static function insert(Request $request, Response $response, array $args): Response
-    {
-        return parent::insert( $request, $response, $args );
+        $objT = self::createObject($array);
+        $objBD->setCantidad($objT->getCantidad());
+        $objBD->setCliente($objT->getCliente());
+        $objBD->setProducto($objT->getProducto());
+        $objBD->setMesa($objT->getMesa());
+        $objBD->setEstado($objT->getEstado());
+        return $objBD;
     }
 
 }

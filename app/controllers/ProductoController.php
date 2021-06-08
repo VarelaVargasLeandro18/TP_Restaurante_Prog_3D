@@ -8,8 +8,8 @@ require_once __DIR__ . '/CRUDAbstractController.php';
 
 use Models\ProductoModel as PM;
 use Models\SectorModel as SM;
-use POPOs\Producto;
-use POPOs\Sector;
+use POPOs\Producto as P;
+use POPOs\Sector as S;
 
 /*
 {
@@ -26,7 +26,7 @@ class ProductoController extends CRUDAbstractController {
     protected static string $nombreClase = 'Producto';
     protected static int $PK_type = 0;
 
-    private static array $assocArrayExample = array( 
+    protected static ?array $jsonConfig = array( 
         'nombre' => '', 
         'tipo' => '', 
         'IdSector' => '', 
@@ -39,46 +39,35 @@ class ProductoController extends CRUDAbstractController {
     private function __clone()
     {}
     
-    protected static function validarObjeto(array $decodedAssoc): Producto
+    protected static function createObject(array $array): mixed
     {
-        if ( !empty( array_diff_key( $decodedAssoc, self::$assocArrayExample ) ) ) return false;
         $sm = new SM();
+        $s = $sm->readById($array['IdSector']);
 
-        $IdSector = intval($decodedAssoc['IdSector']);
-        $sector = $sm->readById($IdSector);
+        if ( $s === NULL ) return NULL;
 
-        if ( !$sector ) return false;
-
-        $valor = floatval($decodedAssoc['valor']);
-
-        return new Producto(
-            -1,
-            $decodedAssoc['nombre'],
-            $decodedAssoc['tipo'],
-            $sector,
-            $valor
+        return new P (
+            0,
+            $array['nombre'],
+            $array['tipo'],
+            $s,
+            $array['valor']
         );
     }
 
-    protected static function updateObjeto(array $decodedAssoc, mixed $objBD): bool
+    protected static function updateObject(array $array, mixed $objBD): mixed
     {
-        $productoNuevo = self::validarObjeto( $decodedAssoc );
-
-        if ( !$productoNuevo ) return false;
-
-        $sector = $productoNuevo->getSector();
-        $nombre = $productoNuevo->getNombre();
-        $tipo = $productoNuevo->getTipo();
-        $valor = $productoNuevo->getValor();
-
-        $objBD->setSector($sector);
-        $objBD->setNombre($nombre);
-        $objBD->setTipo($tipo);
-        $objBD->setValor($valor);
-
         $sm = new SM();
-        
-        return $sm->updateObject( $objBD );
+        $s = $sm->readById($array['IdSector']);
+
+        if ( $s === NULL ) return NULL;
+
+        $objBD->setNombre($array['nombre']);
+        $objBD->setTipo($array['tipo']);
+        $objBD->setSector($s);
+        $objBD->setValor($array['valor']);
+
+        return $objBD;
     }
 
 }
