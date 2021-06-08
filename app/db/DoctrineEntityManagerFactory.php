@@ -2,6 +2,7 @@
 
 namespace db;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\Setup;
@@ -39,6 +40,12 @@ class DoctrineEntityManagerFactory
             self::createEntityManager();
         
         return self::$em;
+    }
+
+    public static function getQueryBuilder() : ?QueryBuilder {
+        if ( self::getEntityManager() )
+            return self::getEntityManager()->createQueryBuilder();
+        return NULL;
     }
 
     public function __clone()

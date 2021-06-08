@@ -29,8 +29,12 @@ abstract class CRUDAbstractController implements ICRUDApi {
     private function __clone() {}
 
     private static function createICRUD () {
-        if ( self::$cai === NULL )
+        if ( self::$cai === NULL ){
+
+            if ( !class_exists(static::$modelName) ) throw new \Exception( "No existe la clase", -458 );
+        
             self::$cai = new static::$modelName;
+        }
     }
 
     private static function procesarRespuesta ( Response $response, mixed $object, int $okayCode ) : Response {
@@ -82,11 +86,7 @@ abstract class CRUDAbstractController implements ICRUDApi {
 
     public static function readAll(Request $request, Response $response, array $args): Response
     {
-        try {
-            self::createICRUD();
-        } catch ( \Throwable ) {
-            return new $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );
-        }
+        self::createICRUD();
 
         $arrayObjects = static::$cai->readAllObjects();
 
@@ -94,7 +94,7 @@ abstract class CRUDAbstractController implements ICRUDApi {
             return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );
 
         if ( empty( $arrayObjects ) )
-            return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No hay ningún ' . self::$nombreClase . '.' );
+            return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No hay ningún ' . static::$nombreClase . '.' );
         
         return self::procesarRespuesta(
             $response,

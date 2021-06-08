@@ -110,7 +110,7 @@ class Pedido implements \JsonSerializable
         $this->estado = $estado;
         $this->imgPath = $imgPath;
         $this->fechaHoraInicioPedido = $fechaHoraInicioPedido;
-        $this->fechaHoraInicioPedidoEstipulada = $fechaHoraFinPedidoEstipulada;
+        $this->fechaHoraFinPedidoEstipulada = $fechaHoraFinPedidoEstipulada;
         $this->fechaHoraFinPedido = $fechaHoraFinPedido;
     }   
 

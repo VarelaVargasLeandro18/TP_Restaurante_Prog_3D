@@ -26,7 +26,12 @@ class ProductoController extends CRUDAbstractController {
     protected static string $nombreClase = 'Producto';
     protected static int $PK_type = 0;
 
-    private static array $assocArrayExample = array( 'nombre' => '', 'tipo' => '', 'IdSector' => '', 'valor' => '' );
+    private static array $assocArrayExample = array( 
+        'nombre' => '', 
+        'tipo' => '', 
+        'IdSector' => '', 
+        'valor' => '' 
+    );
 
     private function __construct()
     {}
