@@ -168,7 +168,7 @@ abstract class CRUDAbstractController implements ICRUDApi {
 
         if ( !$bdObject ) return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No se encontró el ' . static::$nombreClase . ' con el id ' . $id );
 
-        if ( !static::updateObjeto( $decodedAssoc, $bdObject ) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );        
+        if ( !static::updateObjeto( $decodedAssoc, $bdObject ) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo realizar un update del ' . static::$nombreClase . ' con id ' . $id );        
 
         return $response->withStatus( SCI::STATUS_OK );
     }

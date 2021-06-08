@@ -77,6 +77,7 @@ class PedidoController extends CRUDAbstractController {
     }
 
     private static function crearObjeto( array $decodedAssoc ) : mixed {
+    
         $usuariom = new UsuarioModel();
         $productom = new ProductoModel();
         $mesam = new MesaModel();
@@ -94,10 +95,10 @@ class PedidoController extends CRUDAbstractController {
 
         if ( $cliente === NULL | $producto === NULL | $mesa === NULL ) return false;
 
-        if ( !$decodedAssoc['codigo'] ) {
+        if ( !key_exists( 'codigo', $decodedAssoc ) ) {
             do {
                 $codigo = self::generateRandomString();
-            } while ( self::checkCodigo($codigo) );
+            } while ( !self::checkCodigo($codigo) );
         }
         else
             $codigo = $decodedAssoc['codigo'];
@@ -122,7 +123,8 @@ class PedidoController extends CRUDAbstractController {
     
     protected static function updateObjeto(array $decodedAssoc, mixed $objBD): bool
     {
-        $obj = self::validarObjeto( $decodedAssoc );
+        $decodedAssoc['codigo'] = $objBD->getCodigo();
+        $obj = self::crearObjeto( $decodedAssoc );
         
         if ( !$obj ) return false;
 
