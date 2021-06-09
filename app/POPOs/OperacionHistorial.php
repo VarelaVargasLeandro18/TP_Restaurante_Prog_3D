@@ -3,6 +3,7 @@
 namespace POPOs;
 
 require_once __DIR__ . '/Usuario.php';
+require_once __DIR__ . '/TipoOperacion.php';
 
 /**
  * Representa una Operación de LABM.
@@ -19,9 +20,10 @@ class OperacionHistorial implements \JsonSerializable {
     private int $id;
 
     /**
-     * @Column(length=45)
+     * @ManyToOne(targetEntity="TipoOperacion")
+     * @JoinColumn(name="operacion", referencedColumnName="id")
      */
-    private string $operacion;
+    private ?TipoOperacion $operacion;
 
     /**
      * @ManyToOne(targetEntity="Usuario")
@@ -36,7 +38,7 @@ class OperacionHistorial implements \JsonSerializable {
 
     public function __construct(
                                 int $id = -1,
-                                string $operacion = '',
+                                ?TipoOperacion $operacion = NULL,
                                 ?Usuario $responsable = NULL,
                                 string $fechaHora = '')
     {
@@ -69,7 +71,7 @@ class OperacionHistorial implements \JsonSerializable {
     /**
      * Get the value of operacion
      */ 
-    public function getOperacion() : string
+    public function getOperacion() : ?TipoOperacion
     {
         return $this->operacion;
     }
@@ -79,7 +81,7 @@ class OperacionHistorial implements \JsonSerializable {
      *
      * @return  self
      */ 
-    public function setOperacion(string $operacion) : self
+    public function setOperacion(?TipoOperacion $operacion) : self
     {
         $this->operacion = $operacion;
 
@@ -89,7 +91,7 @@ class OperacionHistorial implements \JsonSerializable {
     /**
      * Get the value of responsable
      */ 
-    public function getResponsable() : Usuario
+    public function getResponsable() : ?Usuario
     {
         return $this->responsable;
     }
@@ -99,7 +101,7 @@ class OperacionHistorial implements \JsonSerializable {
      *
      * @return  self
      */ 
-    public function setResponsable(Usuario $responsable) : self
+    public function setResponsable(?Usuario $responsable) : self
     {
         $this->responsable = $responsable;
 
