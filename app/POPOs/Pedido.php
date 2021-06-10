@@ -2,10 +2,14 @@
 
 namespace POPOs;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 require_once __DIR__ . '/Usuario.php';
 require_once __DIR__ . '/Producto.php';
 require_once __DIR__ . '/Mesa.php';
 require_once __DIR__ . '/PedidoEstado.php';
+require_once __DIR__ . '/PedidoProducto.php';
 
 /**
  * Representa un pedido realizado por un cliente
@@ -17,20 +21,9 @@ class Pedido implements \JsonSerializable
 
     /**
      * @Id
-     * @Column(type="integer")
-     * @GeneratedValue(strategy="AUTO")
-     */
-    private int $id;
-
-    /**
      * @Column(length=5)
      */
     private string $codigo;
-
-    /**
-     * @Column
-     */
-    private int $cantidad;
 
     /**
      * @ManyToOne(targetEntity="Usuario")
@@ -43,12 +36,6 @@ class Pedido implements \JsonSerializable
      * @JoinColumn(name="empleadoTomaPedidoId", referencedColumnName="id")
      */
     private ?Usuario $empleadoTomaPedido;
-
-    /**
-     * @ManyToOne(targetEntity="Producto")
-     * @JoinColumn(name="productoId", referencedColumnName="id")
-     */
-    private ?Producto $producto;
 
     /**
      * @ManyToOne(targetEntity="Mesa")
@@ -85,54 +72,40 @@ class Pedido implements \JsonSerializable
      */
     private string $fechaHoraFinPedido;
 
+    //@JoinColumn(name="pedido", referencedColumnName="codigo")
+
+    /**
+     * @OneToMany(targetEntity="PedidoProducto", mappedBy="pedido")
+     * @JoinColumn(name="pedido", referencedColumnName="producto")
+     * @Groups({"pedidos"})
+    */
+    private Collection $productos;
+
     public function __construct(
-                                int $id = -1,
                                 string $codigo = '',
-                                int $cantidad = 0,
                                 ?Usuario $cliente = NULL,
                                 ?Usuario $empleadoTomaPedido = NULL,
-                                ?Producto $producto = NULL,
                                 ?Mesa $mesa = NULL,
                                 ?PedidoEstado $estado = NULL,
                                 string $imgPath = '',
                                 string $fechaHoraInicioPedido = '',
                                 string $fechaHoraFinPedidoEstipulada = '',
-                                string $fechaHoraFinPedido = ''
+                                string $fechaHoraFinPedido = '',
+                                Collection $productos = NULL
                                 )
     {
-        $this->id = $id;
         $this->codigo = $codigo;
-        $this->cantidad = $cantidad;
         $this->cliente = $cliente;
         $this->empleadoTomaPedido = $empleadoTomaPedido;
-        $this->producto = $producto;
         $this->mesa = $mesa;
         $this->estado = $estado;
         $this->imgPath = $imgPath;
         $this->fechaHoraInicioPedido = $fechaHoraInicioPedido;
         $this->fechaHoraFinPedidoEstipulada = $fechaHoraFinPedidoEstipulada;
         $this->fechaHoraFinPedido = $fechaHoraFinPedido;
+        if ( $productos === NULL ) $this->productos = new ArrayCollection();
+        else $this->productos = $productos;
     }   
-
-    /**
-     * Get the value of id
-     */ 
-    public function getId() : int
-    {
-        return $this->id;
-    }
-
-    /**
-     * Set the value of id
-     *
-     * @return  self
-     */ 
-    public function setId(int $id) : self
-    {
-        $this->id = $id;
-
-        return $this;
-    }
 
     /**
      * Get the value of codigo
@@ -150,26 +123,6 @@ class Pedido implements \JsonSerializable
     public function setCodigo(string $codigo) : self
     {
         $this->codigo = $codigo;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of cantidad
-     */ 
-    public function getCantidad() : int
-    {
-        return $this->cantidad;
-    }
-
-    /**
-     * Set the value of cantidad
-     *
-     * @return  self
-     */ 
-    public function setCantidad(int $cantidad) : self
-    {
-        $this->cantidad = $cantidad;
 
         return $this;
     }
@@ -210,26 +163,6 @@ class Pedido implements \JsonSerializable
     public function setEmpleadoTomaPedido(?Usuario $empleadoTomaPedido) : self
     {
         $this->empleadoTomaPedido = $empleadoTomaPedido;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of producto
-     */ 
-    public function getProducto()
-    {
-        return $this->producto;
-    }
-
-    /**
-     * Set the value of producto
-     *
-     * @return  self
-     */ 
-    public function setProducto($producto)
-    {
-        $this->producto = $producto;
 
         return $this;
     }
@@ -353,23 +286,63 @@ class Pedido implements \JsonSerializable
 
         return $this;
     }
+    
+    /**
+     * Get the value of productos
+     */ 
+    public function getProductos() : Collection
+    {
+        return $this->productos;
+    }
+
+    /**
+     * Set the value of productos
+     *
+     * @return  self
+     */ 
+    public function setProductos(Collection $productos)
+    {
+        $this->productos = $productos;
+
+        return $this;
+    }
+
+    /**
+     * Add a producto
+     * 
+     * @return self
+     */
+    public function addProducto(PedidoProducto $producto) : self {
+        $this->productos->add($producto);
+        $producto->setPedido($this);
+        return $this;
+    }
+
+    /**
+     * Removes a producto
+     * 
+     * @return self
+     */
+    public function removeProducto(PedidoProducto $producto) : self {
+        $this->productos->remove($producto);
+        $producto->setPedido(NULL);
+        return $this;
+    }
 
     public function jsonSerialize() : mixed
     {
         $ret = array();
-        if ( isset($this->id) )
-            $ret["id"] = $this->id;
-        $ret["codigo"] = $this->codigo;
-        $ret["cantidad"] = $this->cantidad;
-        $ret["clienteId"] = ( $this->cliente !== NULL ) ? $this->cliente->getId() : -1;
-        $ret["empleadoId"] = ( $this->empleadoTomaPedido !== NULL ) ? $this->empleadoTomaPedido->getId() : -1;
-        $ret["productoId"] = ( $this->producto !== NULL ) ? $this->producto->getId() : -1;
-        $ret["mesaId"] = ( $this->mesa !== NULL ) ? $this->mesa->getId() : -1;
-        $ret["estadoId"] = ( $this->estado !== NULL ) ? $this->estado->getId() : -1;
-        $ret["imgPath"] = $this->imgPath;
+        if ( isset($this->codigo) )
+            $ret["codigo"] = $this->codigo;
+        $ret["cliente"] = $this->cliente;
+        $ret["empleado"] = $this->empleadoTomaPedido;
+        $ret["mesa"] = $this->mesa;
+        $ret["estado"] = $this->estado;
         $ret["fechaHoraInicioPedido"] = $this->fechaHoraInicioPedido;
         $ret["fechaHoraFinPedidoEstipulada"] = $this->fechaHoraFinPedidoEstipulada;
         $ret["fechaHoraFinPedido"] = $this->fechaHoraFinPedido;
+        $ret["productos"] = $this->getProductos()->toArray();
         return $ret;
     }
+
 }

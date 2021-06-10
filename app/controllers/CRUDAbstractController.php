@@ -82,7 +82,7 @@ abstract class CRUDAbstractController implements ICRUDApi {
         $object = static::$cai->readById( $id );
 
         if ( $object === NULL ) 
-            return $response->withStatus( SCI::STATUS_NOT_FOUND );
+            return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No se encontró el ' . static::$nombreClase . ' con el id ' . $id );
 
         return self::procesarRespuesta(
             $response,

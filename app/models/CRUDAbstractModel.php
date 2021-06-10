@@ -30,7 +30,8 @@ abstract class CRUDAbstractModel implements ICRUD {
     {
         try {
             return $this->er->find($id);
-        } catch ( \Throwable ) {
+        } catch ( \Throwable $ex ) {
+            throw $ex;
             return NULL;
         }
     }

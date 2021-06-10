@@ -11,9 +11,6 @@ require_once __DIR__ . '/../db/DoctrineEntityManagerFactory.php';
 
 require_once __DIR__ . '/CRUDAbstractController.php';
 
-use Psr\Http\Message\RequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
-
 use Models\PedidoModel as PM;
 use Models\UsuarioModel as UM;
 use Models\ProductoModel as ProdM;
@@ -23,8 +20,6 @@ use Models\PedidoEstadoModel as PEM;
 use POPOs\Pedido as P;
 
 use db\DoctrineEntityManagerFactory as DEMF;
-use Models\PedidoModel;
-use POPOs\Mesa;
 
 /*  Id autogenerado, codigo autogenerado
     ?'codigo'
@@ -38,7 +33,7 @@ class PedidoController extends CRUDAbstractController {
 
     protected static string $modelName = PM::class;
     protected static string $nombreClase = 'Pedido';
-    protected static int $PK_type = 0;
+    protected static int $PK_type = 1;
 
     protected static ?array $jsonConfig = array( 
         'cantidad' => '', 
@@ -67,7 +62,7 @@ class PedidoController extends CRUDAbstractController {
 
         $queryBuilder = DEMF::getQueryBuilder();
 
-        $queryBuilder->select('p.id')
+        $queryBuilder->select('p.codigo')
                         ->from('POPOs\Pedido', 'p')
                         ->where('p.codigo = :codigo')
                         ->setParameter(':codigo', $codigo);
@@ -92,17 +87,13 @@ class PedidoController extends CRUDAbstractController {
         $pedidoestadom = new PEM();
 
         $cliente = $usuariom->readById( $array['IdCliente'] );
-        $producto = $produdctom->readById( $array['IdProducto'] );
         $mesa = $mesam->readById( $array['IdMesa'] );
         $estado = $pedidoestadom->readById(1);
 
         return new P(
-            0,
             $codigo,
-            $array['cantidad'],
             $cliente,
             NULL,
-            $producto,
             $mesa,
             $estado
         );
