@@ -20,6 +20,9 @@ use Models\PedidoEstadoModel as PEM;
 use POPOs\Pedido as P;
 
 use db\DoctrineEntityManagerFactory as DEMF;
+use Fig\Http\Message\StatusCodeInterface as SCI;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /*  Id autogenerado, codigo autogenerado
     ?'codigo'
@@ -38,9 +41,10 @@ class PedidoController extends CRUDAbstractController {
     protected static ?array $jsonConfig = array( 
         'cantidad' => '', 
         'IdCliente' => '',
-        'IdProducto' => '',
         'IdMesa' => ''
     );
+
+    private static string $lastGeneratedCode;
 
     private function __construct()
     {}
@@ -80,7 +84,7 @@ class PedidoController extends CRUDAbstractController {
     
     protected static function createObject(array $array): mixed
     {
-        $codigo = self::generarCodigo();
+        self::$lastGeneratedCode = self::generarCodigo();
         $usuariom = new UM();
         $produdctom = new ProdM();
         $mesam = new MM();
@@ -90,8 +94,10 @@ class PedidoController extends CRUDAbstractController {
         $mesa = $mesam->readById( $array['IdMesa'] );
         $estado = $pedidoestadom->readById(1);
 
+        
+
         return new P(
-            $codigo,
+            self::$lastGeneratedCode,
             $cliente,
             NULL,
             $mesa,
@@ -108,6 +114,16 @@ class PedidoController extends CRUDAbstractController {
         $objBD->setMesa($objT->getMesa());
         $objBD->setEstado($objT->getEstado());
         return $objBD;
+    }
+
+    public static function insert(RequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+    {
+        $response = parent::insert( $request, $response, $args );
+
+        if ( $response->getStatusCode() === SCI::STATUS_CREATED ) 
+            $response->getBody()->write( json_encode( array( 'codigo' => self::$lastGeneratedCode ) ) );
+
+        return $response;
     }
 
 }

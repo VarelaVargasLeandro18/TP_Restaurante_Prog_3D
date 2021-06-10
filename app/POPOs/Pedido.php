@@ -44,12 +44,6 @@ class Pedido implements \JsonSerializable
     private ?Mesa $mesa;
 
     /**
-     * @ManyToOne(targetEntity="PedidoEstado")
-     * @JoinColumn(name="pedidoEstadoId", referencedColumnName="id")
-     */
-    private ?PedidoEstado $estado;
-
-    /**
      * @Column(length=255)
      */
     private string $imgPath;
@@ -86,7 +80,6 @@ class Pedido implements \JsonSerializable
                                 ?Usuario $cliente = NULL,
                                 ?Usuario $empleadoTomaPedido = NULL,
                                 ?Mesa $mesa = NULL,
-                                ?PedidoEstado $estado = NULL,
                                 string $imgPath = '',
                                 string $fechaHoraInicioPedido = '',
                                 string $fechaHoraFinPedidoEstipulada = '',
@@ -98,7 +91,6 @@ class Pedido implements \JsonSerializable
         $this->cliente = $cliente;
         $this->empleadoTomaPedido = $empleadoTomaPedido;
         $this->mesa = $mesa;
-        $this->estado = $estado;
         $this->imgPath = $imgPath;
         $this->fechaHoraInicioPedido = $fechaHoraInicioPedido;
         $this->fechaHoraFinPedidoEstipulada = $fechaHoraFinPedidoEstipulada;
@@ -183,26 +175,6 @@ class Pedido implements \JsonSerializable
     public function setMesa(?Mesa $mesa) : self
     {
         $this->mesa = $mesa;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of estado
-     */ 
-    public function getEstado() : ?PedidoEstado
-    {
-        return $this->estado;
-    }
-
-    /**
-     * Set the value of estado
-     *
-     * @return  self
-     */ 
-    public function setEstado(?PedidoEstado $estado) : self
-    {
-        $this->estado = $estado;
 
         return $this;
     }
