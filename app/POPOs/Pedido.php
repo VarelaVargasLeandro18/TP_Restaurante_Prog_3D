@@ -32,12 +32,6 @@ class Pedido implements \JsonSerializable
     private ?Usuario $cliente;
 
     /**
-     * @ManyToOne(targetEntity="Usuario")
-     * @JoinColumn(name="empleadoTomaPedidoId", referencedColumnName="id")
-     */
-    private ?Usuario $empleadoTomaPedido;
-
-    /**
      * @ManyToOne(targetEntity="Mesa")
      * @JoinColumn(name="mesaId", referencedColumnName="id")
      */
@@ -49,26 +43,6 @@ class Pedido implements \JsonSerializable
     private string $imgPath;
 
     /**
-     * Fecha-Hora de inicio de realización de pedido.
-     * @Column(length=45)
-     */
-    private string $fechaHoraInicioPedido;
-
-    /**
-     * Fecha-Hora estipulada de finalización de pedido.
-     * @Column(length=45)
-     */
-    private string $fechaHoraFinPedidoEstipulada;
-
-    /**
-     * Fecha-Hora en la que se terminó el pedido.
-     * @column(length=45)
-     */
-    private string $fechaHoraFinPedido;
-
-    //@JoinColumn(name="pedido", referencedColumnName="codigo")
-
-    /**
      * @OneToMany(targetEntity="PedidoProducto", mappedBy="pedido")
      * @JoinColumn(name="pedido", referencedColumnName="producto")
      * @Groups({"pedidos"})
@@ -78,23 +52,16 @@ class Pedido implements \JsonSerializable
     public function __construct(
                                 string $codigo = '',
                                 ?Usuario $cliente = NULL,
-                                ?Usuario $empleadoTomaPedido = NULL,
                                 ?Mesa $mesa = NULL,
                                 string $imgPath = '',
-                                string $fechaHoraInicioPedido = '',
-                                string $fechaHoraFinPedidoEstipulada = '',
-                                string $fechaHoraFinPedido = '',
                                 Collection $productos = NULL
                                 )
     {
         $this->codigo = $codigo;
         $this->cliente = $cliente;
-        $this->empleadoTomaPedido = $empleadoTomaPedido;
         $this->mesa = $mesa;
         $this->imgPath = $imgPath;
-        $this->fechaHoraInicioPedido = $fechaHoraInicioPedido;
-        $this->fechaHoraFinPedidoEstipulada = $fechaHoraFinPedidoEstipulada;
-        $this->fechaHoraFinPedido = $fechaHoraFinPedido;
+        
         if ( $productos === NULL ) $this->productos = new ArrayCollection();
         else $this->productos = $productos;
     }   
@@ -140,26 +107,6 @@ class Pedido implements \JsonSerializable
     }
 
     /**
-     * Get the value of empleadoTomaPedido
-     */ 
-    public function getEmpleadoTomaPedido() : ?Usuario
-    {
-        return $this->empleadoTomaPedido;
-    }
-
-    /**
-     * Set the value of empleadoTomaPedido
-     *
-     * @return  self
-     */ 
-    public function setEmpleadoTomaPedido(?Usuario $empleadoTomaPedido) : self
-    {
-        $this->empleadoTomaPedido = $empleadoTomaPedido;
-
-        return $this;
-    }
-
-    /**
      * Get the value of mesa
      */ 
     public function getMesa() : ?Mesa
@@ -195,66 +142,6 @@ class Pedido implements \JsonSerializable
     public function setImgPath(string $imgPath) : self
     {
         $this->imgPath = $imgPath;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of fechaHoraInicioPedido
-     */ 
-    public function getFechaHoraInicioPedido() : string
-    {
-        return $this->fechaHoraInicioPedido;
-    }
-
-    /**
-     * Set the value of fechaHoraInicioPedido
-     *
-     * @return  self
-     */ 
-    public function setFechaHoraInicioPedido(string $fechaHoraInicioPedido) : self
-    {
-        $this->fechaHoraInicioPedido = $fechaHoraInicioPedido;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of fechaHoraFinPedidoEstipulada
-     */ 
-    public function getFechaHoraFinPedidoEstipulada() : string
-    {
-        return $this->fechaHoraFinPedidoEstipulada;
-    }
-
-    /**
-     * Set the value of fechaHoraFinPedidoEstipulada
-     *
-     * @return  self
-     */ 
-    public function setFechaHoraFinPedidoEstipulada(string $fechaHoraFinPedidoEstipulada) : self
-    {
-        $this->fechaHoraFinPedidoEstipulada = $fechaHoraFinPedidoEstipulada;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of fechaHoraFinPedido
-     */ 
-    public function getFechaHoraFinPedido() : string
-    {
-        return $this->fechaHoraFinPedido;
-    }
-
-    /**
-     * Set the value of fechaHoraFinPedido
-     *
-     * @return  self
-     */ 
-    public function setFechaHoraFinPedido(string $fechaHoraFinPedido) : self
-    {
-        $this->fechaHoraFinPedido = $fechaHoraFinPedido;
 
         return $this;
     }
@@ -307,12 +194,7 @@ class Pedido implements \JsonSerializable
         if ( isset($this->codigo) )
             $ret["codigo"] = $this->codigo;
         $ret["cliente"] = $this->cliente;
-        $ret["empleado"] = $this->empleadoTomaPedido;
         $ret["mesa"] = $this->mesa;
-        $ret["estado"] = $this->estado;
-        $ret["fechaHoraInicioPedido"] = $this->fechaHoraInicioPedido;
-        $ret["fechaHoraFinPedidoEstipulada"] = $this->fechaHoraFinPedidoEstipulada;
-        $ret["fechaHoraFinPedido"] = $this->fechaHoraFinPedido;
         $ret["productos"] = $this->getProductos()->toArray();
         return $ret;
     }

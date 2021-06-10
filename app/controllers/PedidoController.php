@@ -4,18 +4,14 @@ namespace Controllers;
 
 require_once __DIR__ . '/../models/PedidoModel.php';
 require_once __DIR__ . '/../models/UsuarioModel.php';
-require_once __DIR__ . '/../models/ProductoModel.php';
 require_once __DIR__ . '/../models/MesaModel.php';
-require_once __DIR__ . '/../models/PedidoEstadoModel.php';
 require_once __DIR__ . '/../db/DoctrineEntityManagerFactory.php';
 
 require_once __DIR__ . '/CRUDAbstractController.php';
 
 use Models\PedidoModel as PM;
 use Models\UsuarioModel as UM;
-use Models\ProductoModel as ProdM;
 use Models\MesaModel as MM;
-use Models\PedidoEstadoModel as PEM;
 
 use POPOs\Pedido as P;
 
@@ -28,7 +24,6 @@ use Psr\Http\Message\ResponseInterface;
     ?'codigo'
     'cantidad': -1,
     'IdCliente': -1,
-    'IdProducto': -1,
     'IdMesa': 'aaaa0'
 */
 
@@ -86,22 +81,15 @@ class PedidoController extends CRUDAbstractController {
     {
         self::$lastGeneratedCode = self::generarCodigo();
         $usuariom = new UM();
-        $produdctom = new ProdM();
         $mesam = new MM();
-        $pedidoestadom = new PEM();
 
         $cliente = $usuariom->readById( $array['IdCliente'] );
         $mesa = $mesam->readById( $array['IdMesa'] );
-        $estado = $pedidoestadom->readById(1);
-
         
-
         return new P(
             self::$lastGeneratedCode,
             $cliente,
-            NULL,
-            $mesa,
-            $estado
+            $mesa
         );
     }
 
