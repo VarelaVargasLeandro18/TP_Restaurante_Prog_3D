@@ -114,7 +114,9 @@ class PedidoController extends CRUDAbstractController {
 
     public static function agregarImagen(ServerRequest $request, Response $response, array $args) : Response {
         $pm = new PM();
-        if ( $pm->readById($args['codigoPedido']) === NULL ) return $response->withStatus(SCI::STATUS_NOT_FOUND, 'No existe el pedido con el id especificado.');
+        $pedido = $pm->readById($args['codigoPedido']);
+
+        if ( $pedido === NULL ) return $response->withStatus(SCI::STATUS_NOT_FOUND, 'No existe el pedido con el id especificado.');
         if ( !isset(self::$imgPath) || empty(self::$imgPath) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, "No se pudo guardar la imagen." );
         if ( !key_exists('imagenPedido', $_FILES) ) return $response->withStatus(SCI::STATUS_BAD_REQUEST, 'No se subió correctamente el archivo.');
         if ( !is_uploaded_file( $_FILES['imagenPedido']['tmp_name'] ) ) return $response->withStatus(SCI::STATUS_BAD_REQUEST, 'No se subió correctamente el archivo.');
@@ -127,6 +129,9 @@ class PedidoController extends CRUDAbstractController {
         $pathCompleto = $_SERVER['DOCUMENT_ROOT'] . '/' . self::$imgPath . $nuevonombre;
         
         if ( !move_uploaded_file( $tmppath, $pathCompleto ) ) return $response->withStatus(SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo guardar la imagen.');
+
+        $pedido->setImgPath($pathCompleto);
+        $pm->updateObject($pedido);
 
         return $response->withStatus(SCI::STATUS_CREATED, 'La imagen se guardó exitosamente.');
     }
