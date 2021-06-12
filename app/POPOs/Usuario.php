@@ -265,7 +265,7 @@ class Usuario implements \JsonSerializable
         
         $ret['nombre'] = $this->nombre;
         $ret['apellido'] = $this->apellido;
-        $ret['tipoId'] = $this->tipo;
+        $ret['tipo'] = $this->tipo;
         $ret['usuario'] = $this->usuario;
         $ret['fechaIngreso'] = $this->fechaIngreso->format( 'd-m-Y H:i:s' );
         $ret['cantOperaciones'] = $this->cantOperaciones;
