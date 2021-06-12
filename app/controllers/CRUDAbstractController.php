@@ -68,7 +68,7 @@ abstract class CRUDAbstractController implements ICRUDApi {
     {
         try {
             self::createICRUD();
-        } catch ( \Throwable ) {
+        } catch ( \Throwable $ex ) {
             return new $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );
         }
 
@@ -97,11 +97,9 @@ abstract class CRUDAbstractController implements ICRUDApi {
 
         $arrayObjects = static::$cai->readAllObjects();
 
-        if ( $arrayObjects === NULL )
-            return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );
+        if ( $arrayObjects === NULL ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );
 
-        if ( empty( $arrayObjects ) )
-            return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No hay ningún ' . static::$nombreClase . '.' );
+        if ( empty( $arrayObjects ) ) return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No hay ningún ' . static::$nombreClase . '.' );
         
         return self::procesarRespuesta(
             $response,
@@ -114,7 +112,7 @@ abstract class CRUDAbstractController implements ICRUDApi {
     {
         try {
             self::createICRUD();
-        } catch ( \Throwable ) {
+        } catch ( \Throwable $ex ) {
             return new $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );
         }
 
@@ -134,7 +132,7 @@ abstract class CRUDAbstractController implements ICRUDApi {
     {
         try {
             self::createICRUD();
-        } catch ( \Throwable ) {
+        } catch ( \Throwable $ex ) {
             return new $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );
         }
 
@@ -160,7 +158,7 @@ abstract class CRUDAbstractController implements ICRUDApi {
     {
         try {
             self::createICRUD();
-        } catch ( \Throwable ) {
+        } catch ( \Throwable $ex ) {
             return new $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );
         }
 

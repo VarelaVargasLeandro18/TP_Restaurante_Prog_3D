@@ -14,7 +14,7 @@ class Auth {
 
         $token = array (
             'iat' => $inicioHora,
-            'exp' => ( $inicioHora + (7*24*60*60) ),
+            /*'exp' => ( $inicioHora + (7*24*60*60) ),*/
             'data' => $datos,
             'aud' => self::Aud()
         );

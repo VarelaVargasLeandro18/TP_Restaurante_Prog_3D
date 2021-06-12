@@ -21,7 +21,7 @@ class Factura implements \JsonSerializable {
     /**
      * @Column(type="datetime")
      */
-    private ?\DateTime $fechaExpedicion;
+    private ?\DateTimeInterface $fechaExpedicion;
 
     /**
      * @ManyToOne(targetEntity="Usuario")
@@ -30,21 +30,21 @@ class Factura implements \JsonSerializable {
     private ?Usuario $cliente;
 
     /**
-     * @Column(length=5)
+     * @ManyToOne(targetEntity="Pedido")
      */
-    private string $codigoPedido;
+    private ?Pedido $pedido;
 
     public function __construct(
                                 int $id = -1,
                                 ?\DateTime $fechaExpedicion = NULL,
                                 ?Usuario $cliente = NULL,
-                                string $codigoPedido = ''
+                                ?Pedido $pedido = NULL
     )
     {
         $this->id = $id;
         $this->fechaExpedicion = $fechaExpedicion;
         $this->cliente = $cliente;
-        $this->codigoPedido = $codigoPedido;
+        $this->pedido = $pedido;
     }
 
     /**
@@ -63,6 +63,66 @@ class Factura implements \JsonSerializable {
     public function setId(int $id)
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of fechaExpedicion
+     */ 
+    public function getFechaExpedicion() : \DateTimeInterface
+    {
+        return $this->fechaExpedicion;
+    }
+
+    /**
+     * Set the value of fechaExpedicion
+     *
+     * @return  self
+     */ 
+    public function setFechaExpedicion(\DateTimeInterface $fechaExpedicion)
+    {
+        $this->fechaExpedicion = $fechaExpedicion;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of cliente
+     */ 
+    public function getCliente() : ?Usuario
+    {
+        return $this->cliente;
+    }
+
+    /**
+     * Set the value of cliente
+     *
+     * @return  self
+     */ 
+    public function setCliente(?Usuario $cliente)
+    {
+        $this->cliente = $cliente;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of pedido
+     */ 
+    public function getPedido() : ?Pedido
+    {
+        return $this->pedido;
+    }
+
+    /**
+     * Set the value of pedido
+     *
+     * @return  self
+     */ 
+    public function setPedido(?Pedido $pedido)
+    {
+        $this->pedido = $pedido;
 
         return $this;
     }

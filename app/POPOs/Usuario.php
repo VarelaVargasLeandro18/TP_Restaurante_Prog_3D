@@ -46,9 +46,9 @@ class Usuario implements \JsonSerializable
     private string $contrasenia;
 
     /**
-     * @Column
+     * @Column(type="datetime")
      */
-    private string $fechaIngreso;
+    private \DateTimeInterface $fechaIngreso;
 
     /**
      * @Column(name="cantidadOperaciones", type="integer")
@@ -65,7 +65,6 @@ class Usuario implements \JsonSerializable
                                 string $apellido = '',
                                 ?TipoUsuario $tipo = NULL,
                                 string $usuario = '',
-                                string $contrasenia = '',
                                 int $cantOperaciones = 0,
                                 bool $suspendido = false)
     {
@@ -74,7 +73,6 @@ class Usuario implements \JsonSerializable
         $this->apellido = $apellido;
         $this->tipo = $tipo;
         $this->usuario = $usuario;
-        $this->contrasenia = $contrasenia;
         $this->cantOperaciones = $cantOperaciones;
         $this->suspendido = $suspendido;
     }
@@ -194,7 +192,7 @@ class Usuario implements \JsonSerializable
      */ 
     public function setContrasenia(string $contrasenia)
     {
-        $this->contrasenia = $contrasenia;
+        $this->contrasenia = password_hash($contrasenia, PASSWORD_BCRYPT);
 
         return $this;
     }
@@ -202,7 +200,7 @@ class Usuario implements \JsonSerializable
     /**
      * Get the value of fechaIngreso
      */ 
-    public function getFechaIngreso() : string
+    public function getFechaIngreso() : \DateTimeInterface
     {
         return $this->fechaIngreso;
     }
@@ -212,7 +210,7 @@ class Usuario implements \JsonSerializable
      *
      * @return  self
      */ 
-    public function setFechaIngreso(string $fechaIngreso) : self
+    public function setFechaIngreso(\DateTimeInterface $fechaIngreso) : self
     {
         $this->fechaIngreso = $fechaIngreso;
 
@@ -269,8 +267,7 @@ class Usuario implements \JsonSerializable
         $ret['apellido'] = $this->apellido;
         $ret['tipoId'] = $this->tipo;
         $ret['usuario'] = $this->usuario;
-        $ret['contrasenia'] = $this->contrasenia;
-        $ret['fechaIngreso'] = $this->fechaIngreso;
+        $ret['fechaIngreso'] = $this->fechaIngreso->format( 'd-m-Y H:i:s' );
         $ret['cantOperaciones'] = $this->cantOperaciones;
         $ret['suspendido'] = $this->suspendido;
 

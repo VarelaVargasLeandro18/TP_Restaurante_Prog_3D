@@ -18,4 +18,16 @@ class UsuarioModel extends CRUDAbstractModel {
     private function __clone()
     {}
 
+    public static function obtenerMedianteUsuarioYContrasenia( string $userName, string $password ) {
+
+        $all = parent::readAllObjects();
+
+        foreach ( $all as $key => $usr ) {
+
+            $encryptedPass = $usr->getContrasenia();
+
+        }
+
+    }
+
 }
