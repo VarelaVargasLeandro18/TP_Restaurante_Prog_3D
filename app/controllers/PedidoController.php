@@ -20,11 +20,9 @@ use Fig\Http\Message\StatusCodeInterface as SCI;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-/*  Id autogenerado, codigo autogenerado
-    ?'codigo'
+/*  Id(código) autogenerado
     'cantidad': -1,
     'IdCliente': -1,
-    'IdMesa': 'aaaa0'
 */
 
 class PedidoController extends CRUDAbstractController {
@@ -34,7 +32,6 @@ class PedidoController extends CRUDAbstractController {
     protected static int $PK_type = 1;
 
     protected static ?array $jsonConfig = array( 
-        'cantidad' => '', 
         'IdCliente' => '',
         'IdMesa' => ''
     );
@@ -96,11 +93,8 @@ class PedidoController extends CRUDAbstractController {
     protected static function updateObject(array $array, mixed $objBD): mixed
     {
         $objT = self::createObject($array);
-        $objBD->setCantidad($objT->getCantidad());
         $objBD->setCliente($objT->getCliente());
-        $objBD->setProducto($objT->getProducto());
         $objBD->setMesa($objT->getMesa());
-        $objBD->setEstado($objT->getEstado());
         return $objBD;
     }
 
