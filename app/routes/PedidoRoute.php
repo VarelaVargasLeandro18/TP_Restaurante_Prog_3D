@@ -9,7 +9,7 @@ use Slim\Routing\RouteCollectorProxy as RCP;
 
 $app->group( '/pedido', function ( RCP $group ) {
 
-    PedidoController::$imgPath = 'app/img/Pedidos/';
+    PedidoController::$imgPath = '/img/Pedidos/';
 
     $group->get( '/', PedidoController::class . '::readAll' );
     $group->get('/{id}', PedidoController::class . '::read' );
