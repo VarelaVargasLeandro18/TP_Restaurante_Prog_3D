@@ -13,31 +13,32 @@ use Psr\Http\Server\RequestHandlerInterface as Handler;
 
 class LogIn {
 
-    public static ?int $sector = NULL;
+    public static array $permitidos = array(NULL);
 
-    private static function obtenerSector ( string $jwt ) : ?int {
+    private static function obtenerTipo ( string $jwt ) : ?int {
         $jsonUsr = Auth::ObtenerDatos( $jwt );
         
         if ( $jsonUsr === NULL ) return -100;
 
         $parsedUsr = json_decode( $jsonUsr, true );
-        return $parsedUsr['tipo']['sector'];
+        return $parsedUsr['tipo']['id'];
     }
 
-    public static function permitirAccesoPorSector( Request $request, Handler $handler ) : ResponseInterface {
+    public static function permitirAccesoPorTipo( Request $request, Handler $handler ) : ResponseInterface {
 
         $jwt = $request->getHeader('Authorization');
 
         if ( empty($jwt) ) return (new Response())->withStatus( SCI::STATUS_BAD_REQUEST, 'No se especificó un JWT' );
         
         try {
-            $sector = self::obtenerSector($jwt[0]);
+            $sector = self::obtenerTipo($jwt[0]);
         } catch ( \Throwable $ex ) {
             return (new Response())->withStatus( SCI::STATUS_BAD_REQUEST, 'El JWT es equivocado.' );
         }
 
-        if ( $sector === -100 || self::$sector !== $sector ) return (new Response())->withStatus(SCI::STATUS_FORBIDDEN, 'El usuario y/o contraseña no son correctos.');
-
+        if ( $sector === -100 ) return (new Response())->withStatus(SCI::STATUS_FORBIDDEN, 'El usuario y/o contraseña no son correctos.');
+        if ( !in_array( $sector, self::$permitidos ) ) return (new Response())->withStatus(SCI::STATUS_UNAUTHORIZED, 'No está autorizado para acceder a este recurso.');
+        
         $realResponse = $handler->handle( $request );
         return $realResponse;
     }

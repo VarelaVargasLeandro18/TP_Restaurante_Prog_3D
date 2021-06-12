@@ -7,7 +7,12 @@ use Controllers\PedidoController;
 use Controllers\PedidoProductoController;
 use Slim\Routing\RouteCollectorProxy as RCP;
 
+require_once __DIR__ . '/../middlewares/LogIn.php';
+use Middleware\LogIn as LI;
+
 $app->group( '/pedido', function ( RCP $group ) {
+
+    LI::$permitidos = array( 'socio' => 1 );
 
     PedidoController::$imgPath = '/img/Pedidos/';
 
@@ -27,4 +32,4 @@ $app->group( '/pedido', function ( RCP $group ) {
 
     } );
 
-} );
+} )->add( LI::class . '::permitirAccesoPorTipo' );

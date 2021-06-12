@@ -11,7 +11,7 @@ use Middleware\LogIn as LI;
 
 $app->group ( '/mesa', function ( RCP $group ) {
 
-    LI::$sector = NULL;
+    LI::$permitidos = array( 'socio' => 1 );
 
     $group->get('/', MC::class . '::readAll' );
     $group->get( '/{id}', MC::class . '::read' );
@@ -19,4 +19,5 @@ $app->group ( '/mesa', function ( RCP $group ) {
     $group->delete ( '/{id}', MC::class . '::delete' );
     $group->put ( '/{id}', MC::class . '::update' );
 
-} );
+} )->add( LI::class . '::permitirAccesoPorTipo' );
+
