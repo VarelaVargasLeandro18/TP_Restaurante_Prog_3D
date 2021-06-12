@@ -31,7 +31,6 @@ abstract class CRUDAbstractModel implements ICRUD {
         try {
             return $this->er->find($id);
         } catch ( \Throwable $ex ) {
-            throw $ex;
             return NULL;
         }
     }
@@ -41,7 +40,6 @@ abstract class CRUDAbstractModel implements ICRUD {
         try {
             return $this->er->findAll();
         } catch ( \Throwable $ex ) {
-            throw $ex;
             return array();
         }
     }
@@ -52,7 +50,7 @@ abstract class CRUDAbstractModel implements ICRUD {
             DEMF::getEntityManager()->persist($obj);
             DEMF::getEntityManager()->flush();
             return true;
-        } catch ( \Throwable ) {
+        } catch ( \Throwable $ex ) {
             return false;   
         }
     }
@@ -66,7 +64,7 @@ abstract class CRUDAbstractModel implements ICRUD {
             DEMF::getEntityManager()->remove($entity);
             DEMF::getEntityManager()->flush();
             return $entity;
-        } catch ( \Throwable ) {
+        } catch ( \Throwable $ex ) {
             return NULL;
         }
     }
@@ -76,7 +74,7 @@ abstract class CRUDAbstractModel implements ICRUD {
         try {
             DEMF::getEntityManager()->flush($obj);
             return true;
-        } catch ( \Throwable ) {
+        } catch ( \Throwable $ex ) {
             return false;
         }
     }

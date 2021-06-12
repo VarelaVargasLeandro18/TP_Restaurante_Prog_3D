@@ -17,8 +17,11 @@ use POPOs\Pedido as P;
 
 use db\DoctrineEntityManagerFactory as DEMF;
 use Fig\Http\Message\StatusCodeInterface as SCI;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\RequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
+
+use Psr\Http\Message\ServerRequestInterface as ServerRequest;
+use Psr\Http\Message\UploadedFileInterface;
 
 /*  Id(código) autogenerado
     'cantidad': -1,
@@ -37,6 +40,7 @@ class PedidoController extends CRUDAbstractController {
     );
 
     private static string $lastGeneratedCode;
+    public static string $imgPath = '';
 
     private function __construct()
     {}
@@ -98,7 +102,7 @@ class PedidoController extends CRUDAbstractController {
         return $objBD;
     }
 
-    public static function insert(RequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+    public static function insert(Request $request, Response $response, array $args): Response
     {
         $response = parent::insert( $request, $response, $args );
 
@@ -106,6 +110,25 @@ class PedidoController extends CRUDAbstractController {
             $response->getBody()->write( json_encode( array( 'codigo' => self::$lastGeneratedCode ) ) );
 
         return $response;
+    }
+
+    public static function agregarImagen(ServerRequest $request, Response $response, array $args) : Response {
+        $pm = new PM();
+        if ( $pm->readById($args['codigoPedido']) === NULL ) return $response->withStatus(SCI::STATUS_NOT_FOUND, 'No existe el pedido con el id especificado.');
+        if ( !isset(self::$imgPath) || empty(self::$imgPath) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, "No se pudo guardar la imagen." );
+        if ( !key_exists('imagenPedido', $_FILES) ) return $response->withStatus(SCI::STATUS_BAD_REQUEST, 'No se subió correctamente el archivo.');
+        if ( !is_uploaded_file( $_FILES['imagenPedido']['tmp_name'] ) ) return $response->withStatus(SCI::STATUS_BAD_REQUEST, 'No se subió correctamente el archivo.');
+        
+        $tmppath = $_FILES['imagenPedido']['tmp_name'];
+        
+        if ( getimagesize($tmppath) === false ) return $response->withStatus(SCI::STATUS_BAD_REQUEST, 'El archivo subido no es una imagen');
+        
+        $nuevonombre = $args['codigoPedido'] . '.' . pathinfo($_FILES['imagenPedido']['name'], PATHINFO_EXTENSION);
+        $pathCompleto = $_SERVER['DOCUMENT_ROOT'] . '/' . self::$imgPath . $nuevonombre;
+        
+        if ( !move_uploaded_file( $tmppath, $pathCompleto ) ) return $response->withStatus(SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo guardar la imagen.');
+
+        return $response->withStatus(SCI::STATUS_CREATED, 'La imagen se guardó exitosamente.');
     }
 
 }
