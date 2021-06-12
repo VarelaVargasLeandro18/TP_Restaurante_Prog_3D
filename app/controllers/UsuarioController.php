@@ -7,6 +7,9 @@ require_once __DIR__ . '/../models/UsuarioModel.php';
 require_once __DIR__ . '/../models/TipoUsuarioModel.php';
 require_once __DIR__ . '/../POPOs/Usuario.php';
 
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
+
 use Models\UsuarioModel as UM;
 use Models\TipoUsuarioModel as TUM;
 use POPOs\Usuario as U;

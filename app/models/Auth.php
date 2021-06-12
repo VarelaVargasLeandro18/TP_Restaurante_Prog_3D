@@ -1,5 +1,7 @@
 <?php
 
+namespace Models;
+
 use Firebase\JWT\JWT;
 
 class Auth {
@@ -31,13 +33,8 @@ class Auth {
 
         if ( empty($token) ) return false;
 
-        try {
-            $payload = self::ObtenerPayload( $token );
-        }
-        catch (Exception $ex) {
-            throw $ex;
-        }
-
+        $payload = self::ObtenerPayload( $token );
+        
         return $payload->aud === self::Aud();
     }
 
