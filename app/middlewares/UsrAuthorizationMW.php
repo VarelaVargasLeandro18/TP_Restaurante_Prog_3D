@@ -28,7 +28,7 @@ class UsrAuthorizationMW extends MWUsrDecode {
             return (new Response())->withStatus( SCI::STATUS_BAD_REQUEST, 'El JWT es equivocado, o el usuario y/o contraseña en el lo son.' );
         }
 
-        if ( !in_array( $usr['id'], $permitidos ) ) return (new Response())->withStatus(SCI::STATUS_UNAUTHORIZED, 'No autorizado.');
+        if ( !in_array( $usr['tipo']['id'], $permitidos ) ) return (new Response())->withStatus(SCI::STATUS_UNAUTHORIZED, 'No autorizado.');
 
         return $handler->handle($request);
     }

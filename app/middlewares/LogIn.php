@@ -6,6 +6,7 @@ require_once __DIR__ . '/MWUsrDecode.php';
 
 use Fig\Http\Message\StatusCodeInterface as SCI;
 use Nyholm\Psr7\ServerRequest;
+use Psr\Http\Message\ResponseInterface as IResponse;
 use Slim\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as Handler;
@@ -14,7 +15,7 @@ use Psr\Http\Server\RequestHandlerInterface as Handler;
 class LogIn extends MWUsrDecode {
 
 
-    public static function obtenerUsuario( Request $request, Handler $handler ) : Response {
+    public static function obtenerUsuario( Request $request, Handler $handler ) : IResponse {
 
         $jwt = $request->getHeader('Authorization');
 

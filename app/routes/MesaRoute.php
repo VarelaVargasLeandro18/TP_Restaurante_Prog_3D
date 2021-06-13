@@ -20,3 +20,14 @@ $app->group ( '/mesa', function ( RCP $group ) {
     $group->put ( '/{id}', MC::class . '::update' );
 
 } )->add ( UAMW::class . '::permitirSocio' );
+
+$app->group ( '/mesas/cambiarEstado/{codigo}/', function( RCP $group ) { 
+
+    $group->put( 'cerrada', MC::class . '::cambiarACerrada' );
+    $group->put( 'en-espera', MC::class . '::cambiarAEspera' );
+    $group->put( 'comiendo', MC::class . '::cambiarAComiendo');
+    $group->put( 'pagando', MC::class . '::cambiarAPagando');
+
+} )
+    ->add ( UAMW::class . '::permitirSocioYMozo' )
+    ->add ( LI::class . '::obtenerUsuario' );
