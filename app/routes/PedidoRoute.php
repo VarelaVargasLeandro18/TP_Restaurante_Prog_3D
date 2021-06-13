@@ -19,9 +19,10 @@ $app->group( '/pedido', function ( RCP $group ) {
     $group->get( '/', PedidoController::class . '::readAll' );
     $group->get('/{id}', PedidoController::class . '::read' );
     $group->post( '/', PedidoController::class . '::insert' );
-    $group->post( '/imagen/{codigoPedido}', PedidoController::class . '::agregarImagen' );
     $group->delete( '/{id}', PedidoController::class . '::delete' );
     $group->put( '/{id}', PedidoController::class . '::update' );
+
+    $group->post( '/imagen/{codigoPedido}', PedidoController::class . '::agregarImagen' );
 
 } )->add( UAMW::class . '::permitirSocio' );
 
@@ -40,5 +41,6 @@ $app->group( '/pedidos', function ( RCP $group ) {
     $group->get( '/listar', PedidoProductoController::class . '::obtenerProductosDePedido' );
     /* Toma un pedido con un código determinado siempre que se pueda. */
     $group->get( '/tomarUno/{id}', PedidoProductoController::class . '::tomarPedido' );
+    /* Establece un pedido como finalizado. */
 
 } )->add(UAMW::class . '::restringirCliente')->add ( LI::class . '::obtenerUsuario' );
