@@ -44,6 +44,12 @@ class PedidoProducto implements \JsonSerializable{
     private ?PedidoEstado $estado;
 
     /**
+     * @ManyToOne(targetEntity="Usuario")
+     * @JoinColumn(name="responsable", referencedColumnName="id")
+     */
+    private ?Usuario $responsable;
+
+    /**
      * @Column(type="datetime")
      */
     private ?\DateTimeInterface $horaInicio;
@@ -233,6 +239,26 @@ class PedidoProducto implements \JsonSerializable{
     public function setHoraFin(?\DateTimeInterface $horaFin)
     {
         $this->horaFin = $horaFin;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of responsable
+     */ 
+    public function getResponsable() : ?Usuario
+    {
+        return $this->responsable;
+    }
+
+    /**
+     * Set the value of responsable
+     *
+     * @return  self
+     */ 
+    public function setResponsable(?Usuario $responsable)
+    {
+        $this->responsable = $responsable;
 
         return $this;
     }
