@@ -40,7 +40,8 @@ $app->group( '/pedidos', function ( RCP $group ) {
     /* Lista pedidos disponibles para un usuario determinado. */
     $group->get( '/listar', PedidoProductoController::class . '::obtenerProductosDePedido' );
     /* Toma un pedido con un código determinado siempre que se pueda. */
-    $group->get( '/tomarUno/{id}', PedidoProductoController::class . '::tomarPedido' );
+    $group->put( '/tomar/{id}', PedidoProductoController::class . '::tomarPedido' );
     /* Establece un pedido como finalizado. */
+    $group->put( '/terminar/{id}', PedidoProductoController::class . '::terminarPedido' );
 
 } )->add(UAMW::class . '::restringirCliente')->add ( LI::class . '::obtenerUsuario' );

@@ -75,6 +75,7 @@ abstract class CRUDAbstractModel implements ICRUD {
             DEMF::getEntityManager()->flush($obj);
             return true;
         } catch ( \Throwable $ex ) {
+            throw $ex;
             return false;
         }
     }

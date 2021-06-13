@@ -44,6 +44,10 @@ class PedidoProductoController extends CRUDAbstractController {
         'cantidad' => ''
     );
 
+    private static int $pedidoPendiente = 1;
+    private static int $pedidoEnPreparacion = 2;
+    private static int $pedidoListo = 3;
+
     private function __construct()
     {}
 
@@ -141,7 +145,7 @@ class PedidoProductoController extends CRUDAbstractController {
                 );
     }
 
-    public static function tomarPedido ( Request $request, Response $response, array $args ) {
+    public static function tomarPedido ( Request $request, Response $response, array $args ) : Response {
         $ppm = new PPM(); //PedidoProductoModel
         $um = new UM(); //UsuarioModel
         $pem = new PEstadoM();// PedidoEstadoModel
@@ -149,7 +153,7 @@ class PedidoProductoController extends CRUDAbstractController {
         $productoPedido = $ppm->readById( intval($args['id']) );
 
         if ( $productoPedido === NULL ) return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No se encontró el ' . self::$nombreClase );
-
+        
         $bodyDecoded = json_decode($request->getBody()->__toString(), true);
         
         if ( !key_exists('agregarMinutos', $bodyDecoded) ) return $response->withStatus( SCI::STATUS_BAD_REQUEST, 'No se aclaran los minutos que se estima que tardará en realizarse el pedido.' );
@@ -164,6 +168,9 @@ class PedidoProductoController extends CRUDAbstractController {
         $usrDecoded = $bodyDecoded['usuario'];
         
         $responsable = $um->readById( $usrDecoded['id'] );
+
+        if ( $productoPedido->getProducto()->getSector()->getId() !== $usrDecoded['tipo']['sector']['id'] ) return $response->withStatus( SCI::STATUS_UNAUTHORIZED, 'Este pedido no pertenece a su sector.' );
+
         $pe = $pem->readById(2);
         
         $productoPedido->setEstado($pe);
@@ -174,6 +181,29 @@ class PedidoProductoController extends CRUDAbstractController {
         if ( !$ppm->updateObject( $productoPedido ) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'Error al actualizar el estado del pedido.' );
 
         return $response->withStatus( SCI::STATUS_OK, 'Se actualizó correctamente el pedido, el responsable es: ' . $responsable->getNombre() );
+    }
+
+    public static function terminarPedido ( Request $request, Response $response, array $args ) : Response {
+        $ppm = new PPM(); //PedidoProductoModel
+        $pem = new PEstadoM();// PedidoEstadoModel
+        
+        $productoPedido = $ppm->readById( intval($args['id']) );
+        
+        $bodyDecoded = json_decode($request->getBody()->__toString(), true);
+        $usr = $bodyDecoded['usuario'];
+
+        if ( $productoPedido === NULL ) return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No se encontró el ' . self::$nombreClase );
+        if ( $productoPedido->getEstado()->getId() !== self::$pedidoEnPreparacion ) return $response->withStatus( SCI::STATUS_UNAUTHORIZED, 'El pedido no está registrado como en preparación.' );
+        if ( $productoPedido->getResponsable()->getId() !== $usr['id'] ) return $response->withStatus( SCI::STATUS_UNAUTHORIZED, 'No eres el responsable de este pedido.' );
+
+        $horaFinalizacion = new \DateTime();
+        $pelisto = $pem->readById( self::$pedidoListo );
+        $productoPedido->setHoraFin($horaFinalizacion);
+        $productoPedido->setEstado($pelisto);
+
+        if ( !$ppm->updateObject( $productoPedido ) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo realizar un update del ' . self::$nombreClase );
+        
+        return $response->withStatus( SCI::STATUS_NO_CONTENT, 'Se ha actualizado el estado del ' . self::$nombreClase . ' a ' . $pelisto->getEstado() );
     }
 
 }
