@@ -2,23 +2,35 @@
 
 namespace Controllers;
 
-require_once __DIR__ . '/CRUDAbstractController.php';
-require_once __DIR__ . '/../models/PedidoProductoModel.php';
-require_once __DIR__ . '/../models/PedidoModel.php';
-require_once __DIR__ . '/../models/ProductoModel.php';
+# POPOs
+require_once __DIR__ . '/../POPOs/Usuario.php';
 require_once __DIR__ . '/../POPOs/PedidoProducto.php';
-require_once __DIR__ . '/../db/DoctrineEntityManagerFactory.php';
 require_once __DIR__ . '/../POPOs/Producto.php';
-
-use Models\PedidoProductoModel as PPM;
-use Models\ProductoModel as PM;
-use Models\PedidoModel as PeM;
 use POPOs\Producto as Prod;
 use POPOs\PedidoProducto as PP;
 use POPOs\Pedido as P;
+
+
+# Models
+require_once __DIR__ . '/../models/PedidoProductoModel.php';
+require_once __DIR__ . '/../models/PedidoModel.php';
+require_once __DIR__ . '/../models/ProductoModel.php';
+require_once __DIR__ . '/../models/UsuarioModel.php';
+require_once __DIR__ . '/../models/PedidoEstadoModel.php';
+use Models\PedidoProductoModel as PPM;
+use Models\ProductoModel as PM;
+use Models\PedidoModel as PeM;
+use Models\UsuarioModel as UM;
+use Models\PedidoEstadoModel as PEstadoM;
+
+# OTROS
+require_once __DIR__ . '/CRUDAbstractController.php';
+require_once __DIR__ . '/../db/DoctrineEntityManagerFactory.php';
 use db\DoctrineEntityManagerFactory as DEMF;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Fig\Http\Message\StatusCodeInterface as SCI;
+
 
 class PedidoProductoController extends CRUDAbstractController {
 
@@ -84,7 +96,6 @@ class PedidoProductoController extends CRUDAbstractController {
             
             if ( empty($objs) ) {
                 $objs = self::queryNoTomadaSector()
-                        ->setParameter( ':codigo', $args['codigoPedido'] )
                         ->setParameter( ':sector', $tipo['sector']['id'] )
                         ->getQuery()->execute();
             }
@@ -124,11 +135,45 @@ class PedidoProductoController extends CRUDAbstractController {
                 ->innerJoin(P::class, 'p', 'WITH', $qb->expr()->eq( 'pp.pedido', 'p.codigo' ))
                 ->where(
                     $qb->expr()->andX(
-                        $qb->expr()->eq( 'p.codigo', ':codigo' ),
                         $qb->expr()->eq( 'prod.sector', ':sector' ),
                         $qb->expr()->eq( 'pp.estado', 1 )
                     )
                 );
+    }
+
+    public static function tomarPedido ( Request $request, Response $response, array $args ) {
+        $ppm = new PPM(); //PedidoProductoModel
+        $um = new UM(); //UsuarioModel
+        $pem = new PEstadoM();// PedidoEstadoModel
+        
+        $productoPedido = $ppm->readById( intval($args['id']) );
+
+        if ( $productoPedido === NULL ) return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No se encontró el ' . self::$nombreClase );
+
+        $bodyDecoded = json_decode($request->getBody()->__toString(), true);
+        
+        if ( !key_exists('agregarMinutos', $bodyDecoded) ) return $response->withStatus( SCI::STATUS_BAD_REQUEST, 'No se aclaran los minutos que se estima que tardará en realizarse el pedido.' );
+        if ( $productoPedido->getResponsable() !== NULL ) return $response->withStatus( SCI::STATUS_UNAUTHORIZED, 'Este pedido está tomado.' );
+        
+        $horaInicio = new \DateTime();
+        $minutosAgregar = $bodyDecoded['agregarMinutos'];
+        $horaFinEstimada = (new \DateTime())->modify( "+{$minutosAgregar} minutes" );
+
+        if ( $horaFinEstimada === false ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'Error al procesar el timepo estimado de finalización.' );
+
+        $usrDecoded = $bodyDecoded['usuario'];
+        
+        $responsable = $um->readById( $usrDecoded['id'] );
+        $pe = $pem->readById(2);
+        
+        $productoPedido->setEstado($pe);
+        $productoPedido->setResponsable( $responsable );
+        $productoPedido->setHoraInicio( $horaInicio );
+        $productoPedido->setHoraFinEstipulada( $horaFinEstimada );
+
+        if ( !$ppm->updateObject( $productoPedido ) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'Error al actualizar el estado del pedido.' );
+
+        return $response->withStatus( SCI::STATUS_OK, 'Se actualizó correctamente el pedido, el responsable es: ' . $responsable->getNombre() );
     }
 
 }

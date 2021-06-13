@@ -2,8 +2,8 @@
 
 namespace POPOs;
 
-require_once __DIR__ . '/Producto.php';
 require_once __DIR__ . '/Usuario.php';
+require_once __DIR__ . '/PedidoProducto.php';
 
 /**
  * Representa un pedido cuyo estado ya ha cambiado y quieren guardarse sus estados anteriores.
@@ -20,15 +20,10 @@ class PedidoHistorial implements \JsonSerializable {
     private int $id;
 
     /**
-     * @Column(length=5)
+     * @ManyToOne(targetEntity="PedidoProducto")
+     * @JoinColumn(name="pedidoproducto", referencedColumnName="id")
      */
-    private string $codigo;
-    
-    /**
-     * @ManyToOne(targetEntity="Producto")
-     * @JoinColumn(name="productoId", referencedColumnName="id")
-     */
-    private ?Producto $producto;
+    private ?PedidoProducto $pedidoProducto;
 
     /**
      * @ManyToOne(targetEntity="Usuario")
@@ -37,28 +32,27 @@ class PedidoHistorial implements \JsonSerializable {
     private ?Usuario $responsable;
 
     /**
-     * @Column(length=45)
+     * @ManyToOne(targetEntity="TipoOperacionPedido")
+     * @JoinColumn(name="operacion", referencedColumnName="id")
      */
-    private string $operacion;
+    private ?TipoOperacionPedido $operacion;
 
     /**
-     * @Column
+     * @Column(name="fechaHora" type="datetime")
      */
-    private string $fechaCambio;
+    private ?\DateTimeInterface $fechaCambio;
 
     public function __construct(
                                 int $id = -1,
-                                string $codigo = '',
-                                ?Producto $producto = NULL,
                                 ?Usuario $responsable = NULL,
-                                string $operacion = '',
-                                string $fechaCambio = ''
+                                ?PedidoProducto $pedidoProducto,
+                                ?TipoOperacionPedido $operacion = NULL,
+                                ?\DateTimeInterface $fechaCambio = NULL
     )
     {
         $this->id = $id;
-        $this->codigo = $codigo;
-        $this->producto = $producto;
         $this->responsable = $responsable;
+        $this->pedidoProducto = $pedidoProducto;
         $this->operacion = $operacion;
         $this->fechaCambio = $fechaCambio;
     }
@@ -82,43 +76,23 @@ class PedidoHistorial implements \JsonSerializable {
 
         return $this;
     }
-    
+
     /**
-     * Get the value of codigo
+     * Get the value of pedidoProducto
      */ 
-    public function getCodigo() : string
+    public function getPedidoProducto() : ?PedidoProducto
     {
-        return $this->codigo;
+        return $this->pedidoProducto;
     }
 
     /**
-     * Set the value of codigo
+     * Set the value of pedidoProducto
      *
      * @return  self
      */ 
-    public function setCodigo(string $codigo) : self
+    public function setPedidoProducto(?PedidoProducto $pedidoProducto)
     {
-        $this->codigo = $codigo;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of producto
-     */ 
-    public function getProducto() : ?Producto
-    {
-        return $this->producto;
-    }
-
-    /**
-     * Set the value of producto
-     *
-     * @return  self
-     */ 
-    public function setProducto(?Producto $producto) : self
-    {
-        $this->producto = $producto;
+        $this->pedidoProducto = $pedidoProducto;
 
         return $this;
     }
@@ -143,10 +117,22 @@ class PedidoHistorial implements \JsonSerializable {
         return $this;
     }
 
+    public function jsonSerialize() : mixed
+    {
+        $ret = array();
+        if( isset($this->id) )
+            $ret["id"] = $this->id;
+        $ret["pedidoProducto"] = $this->pedidoProducto;
+        $ret["responsable"] = $this->responsable;
+        $ret["operacion"] = $this->operacion;
+        $ret["fechaCambio"] = $this->fechaCambio;
+        return $ret;
+    }
+
     /**
      * Get the value of operacion
      */ 
-    public function getOperacion() : string
+    public function getOperacion()
     {
         return $this->operacion;
     }
@@ -156,43 +142,10 @@ class PedidoHistorial implements \JsonSerializable {
      *
      * @return  self
      */ 
-    public function setOperacion(string $operacion) : self
+    public function setOperacion($operacion)
     {
         $this->operacion = $operacion;
 
         return $this;
-    }
-
-    /**
-     * Get the value of fechaCambio
-     */ 
-    public function getFechaCambio() : string
-    {
-        return $this->fechaCambio;
-    }
-
-    /**
-     * Set the value of fechaCambio
-     *
-     * @return  self
-     */ 
-    public function setFechaCambio(string $fechaCambio) : self
-    {
-        $this->fechaCambio = $fechaCambio;
-
-        return $this;
-    }
-
-    public function jsonSerialize() : mixed
-    {
-        $ret = array();
-        if( isset($this->id) )
-            $ret["id"] = $this->id;
-        $ret["codigo"] = $this->codigo;
-        $ret["producto"] = $this->producto;
-        $ret["responsable"] = $this->responsable;
-        $ret["operacion"] = $this->operacion;
-        $ret["fechaCambio"] = $this->fechaCambio;
-        return $ret;
     }
 }

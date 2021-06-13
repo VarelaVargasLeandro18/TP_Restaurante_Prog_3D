@@ -38,13 +38,7 @@ $app->group( '/pedidos', function ( RCP $group ) {
 
     /* Lista pedidos disponibles para un usuario determinado. */
     $group->get( '/listar', PedidoProductoController::class . '::obtenerProductosDePedido' );
-    
+    /* Toma un pedido con un código determinado siempre que se pueda. */
+    $group->get( '/tomarUno/{id}', PedidoProductoController::class . '::tomarPedido' );
 
-} )->add ( LI::class . '::obtenerUsuario' );
-
-/*
- * 
-    $groupPP->get( '/{codigoPedido}', PedidoProductoController::class . '::obtenerProductosDePedido' );
-    $groupPP->post( '/{codigoPedido}', PedidoProductoController::class . '::agregarImagen' );
-    ->add( LI::class . '::obtenerUsuario' );
- */
+} )->add(UAMW::class . '::restringirCliente')->add ( LI::class . '::obtenerUsuario' );
