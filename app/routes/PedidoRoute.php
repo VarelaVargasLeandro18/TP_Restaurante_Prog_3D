@@ -59,9 +59,9 @@ $app->group( '/pedidos', function ( RCP $group ) {
     $group->get('/descarga/CSV', PedidoProductoController::class . '::descargarTodosCSV');
 
     /* Calcular Pago Pedido */
-    $group->get( '/calcularPago/{id}', PedidoProductoController::class . '::calcularPagoPedido' );
+    $group->get( '/calcularPago/{codigo}', PedidoProductoController::class . '::calcularPagoPedido' );
     /* Realizar Pago Pedido */
-    $group->post('/pagar/{id}', PedidoProductoController::class . '::pagarPedido');
+    $group->post('/realizarPago/{codigo}', PedidoProductoController::class . '::pagarPedido');
 
 } )
     ->add(UAMW::class . '::restringirCliente')

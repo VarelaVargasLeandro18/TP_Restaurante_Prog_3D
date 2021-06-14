@@ -31,6 +31,7 @@ class Factura implements \JsonSerializable {
 
     /**
      * @ManyToOne(targetEntity="Pedido")
+     * @JoinColumn(name="codigoPedido", referencedColumnName="codigo")
      */
     private ?Pedido $pedido;
 

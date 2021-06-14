@@ -7,10 +7,12 @@ require_once __DIR__ . '/../POPOs/Usuario.php';
 require_once __DIR__ . '/../POPOs/PedidoProducto.php';
 require_once __DIR__ . '/../POPOs/Producto.php';
 require_once __DIR__ . '/../POPOs/PedidoHistorial.php';
+require_once __DIR__ . '/../POPOs/Factura.php';
 use POPOs\Producto as Prod;
 use POPOs\PedidoProducto as PP;
 use POPOs\Pedido as P;
 use POPOs\PedidoHistorial as PH;
+use POPOs\Factura as F;
 
 
 # Models
@@ -18,12 +20,14 @@ require_once __DIR__ . '/../models/PedidoProductoModel.php';
 require_once __DIR__ . '/../models/PedidoModel.php';
 require_once __DIR__ . '/../models/ProductoModel.php';
 require_once __DIR__ . '/../models/UsuarioModel.php';
+require_once __DIR__ . '/../models/FacturaModel.php';
 require_once __DIR__ . '/../models/PedidoEstadoModel.php';
 use Models\PedidoProductoModel as PPM;
 use Models\ProductoModel as PM;
 use Models\PedidoModel as PeM;
 use Models\UsuarioModel as UM;
 use Models\PedidoEstadoModel as PEstadoM;
+use Models\FacturaModel as FM;
 
 # Files
 require_once __DIR__ . '/../files/PDFDownload.php';
@@ -293,10 +297,10 @@ class PedidoProductoController extends CRUDAbstractController {
                 ->withBody( $csv->crearArchivo($arrayDatos) );
     }
 
-    public static function calcularPagoPedido ( Request $request, Response $response, array $args ) : Response {
+    private static function calcularPago (array $args) : mixed {
         $qb = DEMF::getQueryBuilder();
         $pago = $qb 
-                    ->select( 'p.valor' )
+                    ->select( 'SUM(p.valor)' )
                     ->from( PP::class, 'pp' )
                     ->innerJoin( 
                         Prod::class,
@@ -304,11 +308,22 @@ class PedidoProductoController extends CRUDAbstractController {
                         'WITH',
                         'pp.producto = p.id'
                     )
-                    ->where(
-                        $qb->expr()->eq( 'pp.id', ':id' )
+                    ->innerJoin(
+                        P::class,
+                        'ped',
+                        'WITH',
+                        'ped.codigo = pp.pedido'
                     )
-                    ->setParameter( ':id', $args['id'] )
+                    ->where(
+                        $qb->expr()->eq( 'ped.codigo', ':id' )
+                    )
+                    ->setParameter( ':id', $args['codigo'] )
                     ->getQuery() ->execute();
+        return $pago;
+    }
+
+    public static function calcularPagoPedido ( Request $request, Response $response, array $args ) : Response {
+        $pago = self::calcularPago($args);
         
         $ret = json_encode($pago, JSON_INVALID_UTF8_SUBSTITUTE);
 
@@ -316,6 +331,35 @@ class PedidoProductoController extends CRUDAbstractController {
         
         $response->getBody()->write($ret);
         return $response->withStatus(SCI::STATUS_OK, 'Se pudo calcular la suma de su pago.');
+    }
+
+    public static function pagarPedido ( Request $request, Response $response, array $args ) : Response {
+        $pago = self::calcularPago($args);
+        $total = intval($pago[0]);
+        $usuarioId = json_decode( $request->getBody()->__toString(), true )['IdCliente'];
+        
+        $fm = new FM();
+        
+        $um = new UM();
+        $cliente = $um->readById($usuarioId);
+
+        if ( $cliente === NULL ) return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No se encontró el usuario.' );
+
+        $pm = new PeM();
+        $p = $pm->readById($args['codigo']);
+
+        if ( $p === NULL ) return $response->withStatus(SCI::STATUS_NOT_FOUND, 'No se encontró el pedido.');
+
+        $f = new F(
+            0,
+            new \DateTime(),
+            $cliente,
+            $p
+        );
+
+        if ( !$fm->insertObject($f) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo guardar los datos de la factura.' );
+
+        return $response->withStatus(SCI::STATUS_OK, 'Factura guardada.');
     }
 
 }
