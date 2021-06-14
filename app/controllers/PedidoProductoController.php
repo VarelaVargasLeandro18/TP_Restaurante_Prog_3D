@@ -293,4 +293,29 @@ class PedidoProductoController extends CRUDAbstractController {
                 ->withBody( $csv->crearArchivo($arrayDatos) );
     }
 
+    public static function calcularPagoPedido ( Request $request, Response $response, array $args ) : Response {
+        $qb = DEMF::getQueryBuilder();
+        $pago = $qb 
+                    ->select( 'p.valor' )
+                    ->from( PP::class, 'pp' )
+                    ->innerJoin( 
+                        Prod::class,
+                        'p',
+                        'WITH',
+                        'pp.producto = p.id'
+                    )
+                    ->where(
+                        $qb->expr()->eq( 'pp.id', ':id' )
+                    )
+                    ->setParameter( ':id', $args['id'] )
+                    ->getQuery() ->execute();
+        
+        $ret = json_encode($pago, JSON_INVALID_UTF8_SUBSTITUTE);
+
+        if ( $ret === NULL ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'Error al calcular.' );
+        
+        $response->getBody()->write($ret);
+        return $response->withStatus(SCI::STATUS_OK, 'Se pudo calcular la suma de su pago.');
+    }
+
 }

@@ -58,6 +58,11 @@ $app->group( '/pedidos', function ( RCP $group ) {
     /* Descargar CSV*/
     $group->get('/descarga/CSV', PedidoProductoController::class . '::descargarTodosCSV');
 
+    /* Calcular Pago Pedido */
+    $group->get( '/calcularPago/{id}', PedidoProductoController::class . '::calcularPagoPedido' );
+    /* Realizar Pago Pedido */
+    $group->post('/pagar/{id}', PedidoProductoController::class . '::pagarPedido');
+
 } )
     ->add(UAMW::class . '::restringirCliente')
     ->add ( L::class . '::loggerOperacionPedidos' )
