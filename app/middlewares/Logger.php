@@ -95,4 +95,15 @@ class Logger extends MWUsrDecode
         return self::loggerOperacion( $request, $handler, self::$sectorUsuarios );
     }
 
+    public static function loggerOperacionMesa ( IRequest $request, IHandler $handler ) : IResponse {
+        return self::loggerOperacion( $request, $handler, self::$sectorMesas );
+    }
+
+    public static function loggerOperacionPedidos ( IRequest $request, IHandler $handler ) : IResponse {
+        return self::loggerOperacion( $request, $handler, self::$sectorPedidos );
+    }
+
+    public static function loggerOperacionProductos ( IRequest $request, IHandler $handler ) : IResponse {
+        return self::loggerOperacion( $request, $handler, self::$sectorProductos);
+    }
 }
