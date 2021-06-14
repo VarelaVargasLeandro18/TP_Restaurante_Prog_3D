@@ -17,6 +17,8 @@ class LogIn extends MWUsrDecode {
 
     public static function obtenerUsuario( Request $request, Handler $handler ) : IResponse {
 
+        if ( str_contains($request->getRequestTarget(), "token") ) return $handler->handle($request);
+
         $jwt = $request->getHeader('Authorization');
 
         if ( empty($jwt) ) return (new Response())->withStatus( SCI::STATUS_BAD_REQUEST, 'No se especificó un JWT' );

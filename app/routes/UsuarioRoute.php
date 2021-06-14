@@ -22,6 +22,8 @@ $app->group ( '/usuario', function ( RCP $group ) {
 
     $group->put('/suspender/{id}', UC::class . '::suspenderEmpleado');
     $group->put('/continuar/{id}', UC::class . '::continuarEmpleado');
+    
+    $group->post ( '/archivo', UC::class . '::crearUsuariosDeArchivo' );
 
 } )
     ->add( UAMW::class . '::permitirSocio' )

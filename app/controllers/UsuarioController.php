@@ -6,11 +6,12 @@ require_once __DIR__ . '/CRUDAbstractController.php';
 require_once __DIR__ . '/../models/UsuarioModel.php';
 require_once __DIR__ . '/../models/TipoUsuarioModel.php';
 require_once __DIR__ . '/../POPOs/Usuario.php';
+require_once __DIR__ . '/../files/CSVFileLoad.php';
 
 use Psr\Http\Message\ServerRequestInterface as IRequest;
 use Psr\Http\Message\ResponseInterface as IResponse;
 use Fig\Http\Message\StatusCodeInterface as SCI;
-
+use Files\CSVFileLoad;
 use Models\UsuarioModel as UM;
 use Models\TipoUsuarioModel as TUM;
 use POPOs\Usuario as U;
@@ -78,12 +79,50 @@ class UsuarioController extends CRUDAbstractController {
         return $response->withStatus( SCI::STATUS_NO_CONTENT, 'Se realizó correctamente el update de ' . $usr->getNombre() );
     }
 
-    public static function suspenderEmpleado ( IRequest $response, IResponse $request, array $args ) : IResponse {
-        return self::cambiarEstadoEmpleado( $response, $request, $args, true );
+    public static function suspenderEmpleado ( IRequest $request, IResponse $response, array $args ) : IResponse {
+        return self::cambiarEstadoEmpleado( $request, $response, $args, true );
     }
 
-    public static function continuarEmpleado ( IRequest $response, IResponse $request, array $args ) : IResponse {
-        return self::cambiarEstadoEmpleado( $response, $request, $args, false );
+    public static function continuarEmpleado ( IRequest $request, IResponse $response, array $args ) : IResponse {
+        return self::cambiarEstadoEmpleado( $request, $response, $args, false );
+    }
+
+    public static function crearUsuariosDeArchivo ( IRequest $request, IResponse $response, array $args ) : IResponse {
+        $um = new UM();
+        $tum = new TUM();
+        $csvLoad = new CSVFileLoad( "archivoCSV" );
+        $noInsertados = array();
+        $datos = $csvLoad->obtenerDatosDeArchivo( array(
+            'nombre',
+            'apellido',
+            'idTipo',
+            'usuario',
+            'contrasenia'
+        ) );
+        
+        foreach ( $datos as $usr ) {
+            $tipo = $tum->readById( intval($usr['usuario']) );
+            $usuario = (new U(
+                0,
+                $usr['nombre'],
+                $usr['apellido'],
+                $tipo,
+                $usr['usuario']
+            ))  ->setContrasenia($usr['contrasenia'])
+                ->setFechaIngreso( new \DateTime() );
+
+            if ( !$um->insertObject($usuario) ) array_push($noInsertados, $usuario);
+        }
+
+        if ( !empty($noInsertados) ) {
+
+            if ( count($noInsertados) === count($datos) ) return $response->withStatus(SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se insertó ningún usuario');
+
+            $response->getBody()->write( json_encode( array( 'noInsertados' => $noInsertados ), JSON_INVALID_UTF8_SUBSTITUTE ) );
+            return $response->withStatus( SCI::STATUS_ACCEPTED, 'Hay usuarios que no se pudieron insertar.' );
+        }
+
+        return $response->withStatus(SCI::STATUS_NO_CONTENT, 'Se ingresaron correctamente los usuarios.');    
     }
 
 }
