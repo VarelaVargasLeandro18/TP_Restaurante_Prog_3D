@@ -24,7 +24,7 @@ interface ICRUD
 	/**
 	 * Inserta un objeto.
 	 */
-	public function insertObject (mixed $obj) : bool;
+	public function insertObject (mixed $obj) : mixed;
 
 	/**
 	 * Borra un objeto basado en su ID.

@@ -34,4 +34,5 @@ $app->group ( '/mesas/cambiarEstado/{codigo}/', function( RCP $group ) {
 
 } )
     ->add ( UAMW::class . '::permitirSocioYMozo' )
-    ->add ( L::class . '::loggerOperacionMesa' );
+    ->add ( L::class . '::loggerOperacionMesa' )
+    ->add( LogIn::class . '::obtenerUsuario' );

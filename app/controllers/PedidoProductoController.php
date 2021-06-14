@@ -58,16 +58,17 @@ class PedidoProductoController extends CRUDAbstractController {
     {
         $pem = new PeM();
         $pm = new PM();
+        $estado = (new PEstadoM())->readById(self::$pedidoPendiente);
 
         $pe = $pem->readById( $array['CodigoPedido'] );
         $p = $pm->readById( $array['IdProducto'] );
         
-        return new PP(
+        return (new PP(
             0,
             $pe,
             $p,
             $array['cantidad']
-        );
+        ))->setEstado($estado);
     }
 
     protected static final function updateObject(array $array, mixed $objBD): mixed
@@ -204,6 +205,29 @@ class PedidoProductoController extends CRUDAbstractController {
         if ( !$ppm->updateObject( $productoPedido ) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo realizar un update del ' . self::$nombreClase );
         
         return $response->withStatus( SCI::STATUS_NO_CONTENT, 'Se ha actualizado el estado del ' . self::$nombreClase . ' a ' . $pelisto->getEstado() );
+    }
+
+    public static function realizarPedido ( Request $request, Response $response, array $args ) : Response {
+        $bodyDecoded = json_decode($request->getBody()->__toString(), true);
+        $pm = new PM();
+        $pem = new PeM();
+        $ppm = new PPM();
+        $estado = (new PEstadoM())->readById(self::$pedidoPendiente);
+        
+        if ( ( $prod = $pm->readById($bodyDecoded['IdProducto']) ) === NULL ) return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No se encontró el producto solicitado.' );
+        if ( ( $pedido = $pem->readById($bodyDecoded['IdPedido']) ) === NULL ) return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No se encontró el pedido solicitado.' );
+
+        $pp = (new PP(
+            0,
+            $pedido,
+            $prod,
+            $bodyDecoded['Cantidad']
+        ))->setEstado($estado);
+
+        if ( !($ingresado = $ppm->insertObject($pp)) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo insertar el Producto en el Pedido' );
+
+        $response->getBody()->write( json_encode( array( 'id' => $ingresado->getId() ) ) );
+        return $response;
     }
 
 }

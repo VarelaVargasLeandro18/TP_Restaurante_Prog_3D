@@ -51,4 +51,7 @@ $app->group( '/pedidos', function ( RCP $group ) {
 
 } )
     ->add(UAMW::class . '::restringirCliente')
-    ->add ( L::class . '::loggerOperacionPedidos' );
+    ->add ( L::class . '::loggerOperacionPedidos' )
+    ->add( LogIn::class . '::obtenerUsuario' );
+
+$app->post( '/realizarPedido', PedidoProductoController::class . '::realizarPedido' ) ->add ( L::class . '::loggerPedidoCreado' );

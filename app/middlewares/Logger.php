@@ -14,7 +14,11 @@ require_once __DIR__ . '/../models/OperacionHistorialModel.php';
 require_once __DIR__ . '/../models/TipoOperacionModel.php';
 require_once __DIR__ . '/../models/UsuarioModel.php';
 require_once __DIR__ . '/../models/SectorOperacionModel.php';
+require_once __DIR__ . '/../models/PedidoProductoModel.php';
+require_once __DIR__ . '/../models/TipoOperacionPedidoModel.php';
 use Models\PedidoHistorialModel;
+use Models\TipoOperacionPedidoModel;
+use Models\PedidoProductoModel;
 use Models\UsuarioModel;
 use Models\OperacionHistorialModel;
 use Models\TipoOperacionModel;
@@ -106,4 +110,58 @@ class Logger extends MWUsrDecode
     public static function loggerOperacionProductos ( IRequest $request, IHandler $handler ) : IResponse {
         return self::loggerOperacion( $request, $handler, self::$sectorProductos);
     }
+
+    private static int $pedidoCreado = 1;
+    private static int $pedidoEnPreparacion = 2;
+    private static int $pedidoListo = 3;
+
+    private static function loggerPedidoHistorial( IRequest $request, IHandler $handler, int $operacion, int $idPP, bool $handle ) : ?IResponse {
+        $jwt = $request->getHeader('Authorization');
+
+        if ( empty($jwt) ) return (new Response())->withStatus( SCI::STATUS_BAD_REQUEST, 'No se especificó un JWT' );
+        
+        try {
+            $usr = parent::decodificarUsuario($jwt[0]);
+        } catch ( \Throwable $ex ) {
+            return (new Response())->withStatus( SCI::STATUS_BAD_REQUEST, 'El JWT es equivocado, o el usuario y/o contraseña en el lo son.' );
+        }
+
+        $idusr = $usr['id'];
+        $um = new UsuarioModel();
+        $responsable = $um->readById($idusr);
+        
+        $ppm = new PedidoProductoModel();
+        $pp = $ppm->readById($idPP);
+
+        $topm = new TipoOperacionPedidoModel();
+        $top = $topm->readById($operacion);
+        
+        $hm = new PedidoHistorialModel();
+        $historial = new PedidoHistorial(
+            0,
+            $responsable,
+            $pp,
+            $top,
+            new \DateTime()
+        );
+
+        $hm->insertObject($historial);
+
+        if ( $handle) return $handler->handle($request);   
+        return NULL;     
+    }
+
+    public static function loggerPedidoCreado ( IRequest $request, IHandler $handler ) : IResponse {
+        $response = $handler->handle($request);
+        $status = $response->getStatusCode();
+
+        if ( !($status >= 200 && $status < 300) ) return $response;
+
+        $id = json_decode($response->getBody()->__toString(), true)['id'];
+
+        self::loggerPedidoHistorial( $request, $handler, self::$pedidoCreado, $id, false );
+        
+        return $response;
+    }
+
 }

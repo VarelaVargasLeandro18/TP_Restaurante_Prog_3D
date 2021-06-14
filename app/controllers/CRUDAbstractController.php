@@ -116,9 +116,9 @@ abstract class CRUDAbstractController implements ICRUDApi {
             return new $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );
         }
 
-        $jsonObject = $request->getBody()->getContents();
+        $jsonObject = $request->getBody()->__toString();
         $decodedAssoc = json_decode ( $jsonObject, true, 512, JSON_INVALID_UTF8_SUBSTITUTE );
-       
+        
         if ( !self::checkJson($decodedAssoc) ) return $response->withStatus( SCI::STATUS_BAD_REQUEST, 'El JSON proporcionado no es válido.' );
 
         $obj = static::createObject( $decodedAssoc );
@@ -169,7 +169,7 @@ abstract class CRUDAbstractController implements ICRUDApi {
         else if ( static::$PK_type !== 0 ) 
             $id = $args['id'];
 
-        $jsonObject = $request->getBody()->getContents();
+        $jsonObject = $request->getBody()->__toString();
         $decodedAssoc = json_decode ( $jsonObject, true, 512, JSON_INVALID_UTF8_SUBSTITUTE );
         
         if ( !self::checkJson($decodedAssoc) ) return $response->withStatus( SCI::STATUS_BAD_REQUEST, 'El JSON proporcionado no es válido.' );

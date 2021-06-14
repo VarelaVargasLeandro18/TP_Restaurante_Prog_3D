@@ -26,6 +26,4 @@ $app->addErrorMiddleware(true, true, true);
 // Rutteo:
 require_once __DIR__ . '/routes/autoRoute.php';
 
-$app->add( LogIn::class . '::obtenerUsuario' );
-
 $app->run();

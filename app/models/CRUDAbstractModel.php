@@ -44,13 +44,14 @@ abstract class CRUDAbstractModel implements ICRUD {
         }
     }
 
-    public function insertObject(mixed $obj): bool
+    public function insertObject(mixed $obj): mixed
     {
         try {
             DEMF::getEntityManager()->persist($obj);
             DEMF::getEntityManager()->flush();
-            return true;
+            return $obj;
         } catch ( \Throwable $ex ) {
+            throw $ex;
             return false;   
         }
     }

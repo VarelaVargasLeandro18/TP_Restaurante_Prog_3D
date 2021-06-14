@@ -38,7 +38,7 @@ class PedidoHistorial implements \JsonSerializable {
     private ?TipoOperacionPedido $operacion;
 
     /**
-     * @Column(name="fechaHora" type="datetime")
+     * @Column(type="datetime")
      */
     private ?\DateTimeInterface $fechaCambio;
 
