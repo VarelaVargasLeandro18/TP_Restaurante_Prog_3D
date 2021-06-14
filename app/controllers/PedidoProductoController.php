@@ -6,9 +6,11 @@ namespace Controllers;
 require_once __DIR__ . '/../POPOs/Usuario.php';
 require_once __DIR__ . '/../POPOs/PedidoProducto.php';
 require_once __DIR__ . '/../POPOs/Producto.php';
+require_once __DIR__ . '/../POPOs/PedidoHistorial.php';
 use POPOs\Producto as Prod;
 use POPOs\PedidoProducto as PP;
 use POPOs\Pedido as P;
+use POPOs\PedidoHistorial as PH;
 
 
 # Models
@@ -228,6 +230,27 @@ class PedidoProductoController extends CRUDAbstractController {
 
         $response->getBody()->write( json_encode( array( 'id' => $ingresado->getId() ) ) );
         return $response;
+    }
+
+    public static function realizarEstadisticas ( Request $request, Response $response, array $args ) : Response {
+        $format = 'Y-d-m';
+        $qb = DEMF::getQueryBuilder();
+        $treintaDiasQuery =  $qb->select( 'ph' )
+                        ->from( PH::class, 'ph' )
+                        ->where(
+                            $qb->expr()->andX(
+                                $qb->expr()->lte( 'ph.fechaCambio', ':fechaActual' ),
+                                $qb->expr()->gte( 'ph.fechaCambio', ':fechamenostreinta' )
+                            )
+                        )
+                        ->setParameter(':fechaActual', (new \DateTime())->format($format))
+                        ->setParameter(':fechamenostreinta', (new \DateTime())->modify("-30 days")->format('Y-m-d'))
+                        ->getQuery();
+                        
+        $treintaDias = $treintaDiasQuery->execute();
+        $ret = json_encode($treintaDias, JSON_INVALID_UTF8_SUBSTITUTE);
+        $response->getBody()->write($ret);
+        return $response->withAddedHeader( 'Content-Type', 'application/json' );
     }
 
 }

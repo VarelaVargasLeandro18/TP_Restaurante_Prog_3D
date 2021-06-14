@@ -50,6 +50,9 @@ $app->group( '/pedidos', function ( RCP $group ) {
     /* Establece un pedido como finalizado. */
     $group->put( '/terminar/{id}', PedidoProductoController::class . '::terminarPedido' )->add ( L::class . '::loggerPedidoListoParaServir' );
 
+    /* Genera Estadísticas a 30 días */
+    $group->get('/estadisticas', PedidoProductoController::class . '::realizarEstadisticas');
+
 } )
     ->add(UAMW::class . '::restringirCliente')
     ->add ( L::class . '::loggerOperacionPedidos' )
