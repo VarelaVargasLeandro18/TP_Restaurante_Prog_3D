@@ -1,8 +1,12 @@
 <?php
 
 require_once __DIR__ . '/configuration.php';
+require_once __DIR__ . '/middlewares/Logger.php';
+require_once __DIR__ . '/middlewares/LogIn.php';
 
 use Slim\Factory\AppFactory;
+use Middleware\Logger;
+use Middleware\LogIn;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -21,5 +25,7 @@ $app->addErrorMiddleware(true, true, true);
 
 // Rutteo:
 require_once __DIR__ . '/routes/autoRoute.php';
+
+$app->add( LogIn::class . '::obtenerUsuario' );
 
 $app->run();

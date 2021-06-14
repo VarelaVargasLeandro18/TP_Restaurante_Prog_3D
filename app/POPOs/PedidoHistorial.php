@@ -45,7 +45,7 @@ class PedidoHistorial implements \JsonSerializable {
     public function __construct(
                                 int $id = -1,
                                 ?Usuario $responsable = NULL,
-                                ?PedidoProducto $pedidoProducto,
+                                ?PedidoProducto $pedidoProducto = NULL,
                                 ?TipoOperacionPedido $operacion = NULL,
                                 ?\DateTimeInterface $fechaCambio = NULL
     )
@@ -126,13 +126,14 @@ class PedidoHistorial implements \JsonSerializable {
         $ret["responsable"] = $this->responsable;
         $ret["operacion"] = $this->operacion;
         $ret["fechaCambio"] = $this->fechaCambio;
+        $ret["operacion"] = $this->operacion;
         return $ret;
     }
 
     /**
      * Get the value of operacion
      */ 
-    public function getOperacion()
+    public function getOperacion() : ?TipoOperacionPedido
     {
         return $this->operacion;
     }
@@ -142,7 +143,7 @@ class PedidoHistorial implements \JsonSerializable {
      *
      * @return  self
      */ 
-    public function setOperacion($operacion)
+    public function setOperacion(?TipoOperacionPedido $operacion)
     {
         $this->operacion = $operacion;
 

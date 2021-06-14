@@ -4,6 +4,8 @@ namespace POPOs;
 
 require_once __DIR__ . '/Usuario.php';
 require_once __DIR__ . '/TipoOperacion.php';
+require_once __DIR__ . '/SectorOperacion.php';
+
 
 /**
  * Representa una Operación de LABM.
@@ -32,20 +34,35 @@ class OperacionHistorial implements \JsonSerializable {
     private ?Usuario $responsable;
 
     /**
+     * @Column(type="datetime")
+     */
+    private ?\DateTimeInterface $fechaHora;
+
+    /**
      * @Column
      */
-    private string $fechaHora;
+    private bool $exito;
+
+    /**
+     * @ManyToOne(targetEntity="SectorOperacion")
+     * @JoinColumn(name="sector", referencedColumnName="id")
+     */
+    private ?SectorOperacion $sector;
 
     public function __construct(
                                 int $id = -1,
                                 ?TipoOperacion $operacion = NULL,
                                 ?Usuario $responsable = NULL,
-                                string $fechaHora = '')
+                                ?\DateTimeInterface $fechaHora = NULL,
+                                bool $exito = false,
+                                ?SectorOperacion $sector = NULL)
     {
         $this->id = $id;
         $this->operacion = $operacion;
         $this->responsable = $responsable;
         $this->fechaHora = $fechaHora;
+        $this->exito = $exito;
+        $this->sector = $sector;
     }
 
     /**
@@ -111,7 +128,7 @@ class OperacionHistorial implements \JsonSerializable {
     /**
      * Get the value of fechaHora
      */ 
-    public function getFechaHora() : string
+    public function getFechaHora() : ?\DateTimeInterface
     {
         return $this->fechaHora;
     }
@@ -121,9 +138,29 @@ class OperacionHistorial implements \JsonSerializable {
      *
      * @return  self
      */ 
-    public function setFechaHora(string $fechaHora)
+    public function setFechaHora(?\DateTimeInterface $fechaHora)
     {
         $this->fechaHora = $fechaHora;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of exito
+     */ 
+    public function getExito() : bool
+    {
+        return $this->exito;
+    }
+
+    /**
+     * Set the value of exito
+     *
+     * @return  self
+     */ 
+    public function setExito(bool $exito)
+    {
+        $this->exito = $exito;
 
         return $this;
     }
@@ -135,7 +172,29 @@ class OperacionHistorial implements \JsonSerializable {
             $ret["id"] = $this->id;
         $ret["operacion"] = $this->operacion;
         $ret["responsable"] = $this->responsable;
-        $ret["fechaHora"] = $this->fechaHora;
+        $ret["fechaHora"] = $this->fechaHora->format( 'd-m-Y H:i:s' );
+        $ret["exito"] = $this->exito;
+        $ret["sector"] = $this->sector;
         return $ret;
+    }
+
+    /**
+     * Get the value of sector
+     */ 
+    public function getSector() : ?SectorOperacion
+    {
+        return $this->sector;
+    }
+
+    /**
+     * Set the value of sector
+     *
+     * @return  self
+     */ 
+    public function setSector(?SectorOperacion $sector)
+    {
+        $this->sector = $sector;
+
+        return $this;
     }
 }

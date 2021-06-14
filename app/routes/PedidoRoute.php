@@ -44,4 +44,4 @@ $app->group( '/pedidos', function ( RCP $group ) {
     /* Establece un pedido como finalizado. */
     $group->put( '/terminar/{id}', PedidoProductoController::class . '::terminarPedido' );
 
-} )->add(UAMW::class . '::restringirCliente')->add ( LI::class . '::obtenerUsuario' );
+} )->add(UAMW::class . '::restringirCliente');

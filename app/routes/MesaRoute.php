@@ -28,6 +28,4 @@ $app->group ( '/mesas/cambiarEstado/{codigo}/', function( RCP $group ) {
     $group->put( 'comiendo', MC::class . '::cambiarAComiendo');
     $group->put( 'pagando', MC::class . '::cambiarAPagando');
 
-} )
-    ->add ( UAMW::class . '::permitirSocioYMozo' )
-    ->add ( LI::class . '::obtenerUsuario' );
+} )->add ( UAMW::class . '::permitirSocioYMozo' );
