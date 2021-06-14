@@ -1,0 +1,4 @@
+1,"fdae4",{"id":5,"nombre":"Cocktail Subidon de Adrenalina","tipo":"Trago","sector":{"id":1,"nombre":"Barra de tragos y vinos"},"valor":"350,50"},3,{"id":1,"estado":"Pendiente"},null,null,null
+2,"fdae4",{"id":6,"nombre":"Cocal Cola 500ml","tipo":"Gaseosa","sector":{"id":4,"nombre":"Candy Bar"},"valor":"59,99"},2,{"id":1,"estado":"Pendiente"},null,null,null
+3,"Fbze8",{"id":23,"nombre":"productoY","tipo":"Y-si es sano","sector":{"id":1,"nombre":"Barra de tragos y vinos"},"valor":"9.999,99"},2,{"id":3,"estado":"Listo Para Servir"},2021-06-14 05:16:37,2021-06-14 05:31:37,2021-06-14 05:19:33
+5,"Fbze8",{"id":3,"nombre":"Fideos","tipo":"Comida","sector":{"id":3,"nombre":"Cocina"},"valor":"455,50"},2,{"id":1,"estado":"Pendiente"},null,null,null

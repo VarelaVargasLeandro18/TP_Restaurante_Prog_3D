@@ -25,6 +25,12 @@ use Models\PedidoModel as PeM;
 use Models\UsuarioModel as UM;
 use Models\PedidoEstadoModel as PEstadoM;
 
+# Files
+require_once __DIR__ . '/../files/PDFDownload.php';
+require_once __DIR__ . '/../files/CSVDownload.php';
+use Files\PDFDownload as PDF;
+use Files\CSVDownload as CSV;
+
 # OTROS
 require_once __DIR__ . '/CRUDAbstractController.php';
 require_once __DIR__ . '/../db/DoctrineEntityManagerFactory.php';
@@ -251,6 +257,40 @@ class PedidoProductoController extends CRUDAbstractController {
         $ret = json_encode($treintaDias, JSON_INVALID_UTF8_SUBSTITUTE);
         $response->getBody()->write($ret);
         return $response->withAddedHeader( 'Content-Type', 'application/json' );
+    }
+
+    public static function descargarTodosPDF ( Request $request, Response $response, array $args ) : Response {
+        $pdf = new PDF();
+
+        $ppm = new PPM();
+        $pedidosProductos = $ppm->readAllObjects();
+        $arrayDatos = array();
+
+        foreach ( $pedidosProductos as $pp ) {
+            array_push( $arrayDatos, $pp->jsonSerialize() );
+        }
+        
+        $pdf->crearArchivo($arrayDatos);
+        $pdf->generarDescarga();
+
+        return $response;
+    }
+
+    public static function descargarTodosCSV ( Request $request, Response $response, array $args ) : Response {
+        $csv = new CSV();
+
+        $ppm = new PPM();
+        $pedidosProductos = $ppm->readAllObjects();
+        $arrayDatos = array();
+
+        foreach ( $pedidosProductos as $pp ) {
+            array_push( $arrayDatos, $pp->jsonSerialize() );
+        }
+        
+        return $response
+                ->withHeader('Content-Type', 'text/csv')
+                ->withHeader('Content-Disposition', 'attachment; filenam="archivo.csv"')
+                ->withBody( $csv->crearArchivo($arrayDatos) );
     }
 
 }

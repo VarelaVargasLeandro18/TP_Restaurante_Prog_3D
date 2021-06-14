@@ -53,6 +53,11 @@ $app->group( '/pedidos', function ( RCP $group ) {
     /* Genera Estadísticas a 30 días */
     $group->get('/estadisticas', PedidoProductoController::class . '::realizarEstadisticas');
 
+    /* Descargar PDF*/
+    $group->get('/descarga/PDF', PedidoProductoController::class . "::descargarTodosPDF");
+    /* Descargar CSV*/
+    $group->get('/descarga/CSV', PedidoProductoController::class . '::descargarTodosCSV');
+
 } )
     ->add(UAMW::class . '::restringirCliente')
     ->add ( L::class . '::loggerOperacionPedidos' )
