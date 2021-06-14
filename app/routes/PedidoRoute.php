@@ -10,6 +10,7 @@ use Controllers\PedidoController;
 use Controllers\PedidoProductoController;
 use Slim\Routing\RouteCollectorProxy as RCP;
 
+use Middleware\LogIn;
 use Middleware\Logger as L;
 use Middleware\UsrAuthorizationMW as UAMW;
 
@@ -45,9 +46,9 @@ $app->group( '/pedidos', function ( RCP $group ) {
     /* Lista pedidos disponibles para un usuario determinado. */
     $group->get( '/listar', PedidoProductoController::class . '::obtenerProductosDePedido' );
     /* Toma un pedido con un código determinado siempre que se pueda. */
-    $group->put( '/tomar/{id}', PedidoProductoController::class . '::tomarPedido' );
+    $group->put( '/tomar/{id}', PedidoProductoController::class . '::tomarPedido' )->add( L::class . '::loggerPedidoEnPreparacion' );
     /* Establece un pedido como finalizado. */
-    $group->put( '/terminar/{id}', PedidoProductoController::class . '::terminarPedido' );
+    $group->put( '/terminar/{id}', PedidoProductoController::class . '::terminarPedido' )->add ( L::class . '::loggerPedidoListoParaServir' );
 
 } )
     ->add(UAMW::class . '::restringirCliente')

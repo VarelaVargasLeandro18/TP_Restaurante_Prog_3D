@@ -164,4 +164,34 @@ class Logger extends MWUsrDecode
         return $response;
     }
 
+    public static function loggerPedidoEnPreparacion ( IRequest $request, IHandler $handler ) : IResponse {
+        $response = $handler->handle($request);
+        $status = $response->getStatusCode();
+
+        if ( !($status >= 200 && $status < 300) ) return $response;
+
+        $route = $request->getRequestTarget();
+        $id = substr($route, strrpos($route, '/') + 1);
+        $id = intval($id);
+
+        self::loggerPedidoHistorial( $request, $handler, self::$pedidoEnPreparacion, $id, false );
+        
+        return $response;
+    }
+
+    public static function loggerPedidoListoParaServir ( IRequest $request, IHandler $handler ) : IResponse {
+        $response = $handler->handle($request);
+        $status = $response->getStatusCode();
+
+        if ( !($status >= 200 && $status < 300) ) return $response;
+
+        $route = $request->getRequestTarget();
+        $id = substr($route, strrpos($route, '/') + 1);
+        $id = intval($id);
+
+        self::loggerPedidoHistorial( $request, $handler, self::$pedidoListo, $id, false );
+        
+        return $response;
+    }
+
 }
