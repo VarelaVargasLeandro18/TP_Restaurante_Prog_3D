@@ -90,7 +90,9 @@ class Logger extends MWUsrDecode
             $so
         );
 
-        $ohm->insertObject( $oh );
+        $responsable->incrementarOperaciones();
+        
+        if ( !$um->updateObject($responsable) || $ohm->insertObject( $oh ) === NULL ) return (new Response())->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'Se produjo un error al registrar la operación' );
 
         return $responseReal;
     }

@@ -8,5 +8,6 @@ use Slim\Routing\RouteCollectorProxy as RCP;
 $app->group ( "/token", function ( RCP $group ) {
 
     $group->get( '/', AC::class . '::getToken' );
+    $group->get( '/check/', AC::class . '::checkToken' );
 
 } );

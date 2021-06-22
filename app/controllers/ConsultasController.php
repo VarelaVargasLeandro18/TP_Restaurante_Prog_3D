@@ -23,6 +23,8 @@ use Psr\Http\Message\ResponseInterface as IResponse;
 
 class ConsultasController {
 
+    private static int $pedidoCancelado = 4;
+
     private static function retornarResponse ( IResponse $response, mixed $toCodified ) : IResponse {
         $ret = json_encode($toCodified, JSON_INVALID_UTF8_SUBSTITUTE);
         $response->getBody()->write($ret);
@@ -38,7 +40,7 @@ class ConsultasController {
         return self::retornarResponse($response, $fechaIngresoUsuarios);
     }
 
-    public static function cantOperacionesTodosPorSector ( IRequest $request, IResponse $response, array $args ) : IResponse {
+    public static function cantOperacionesCadaUnoPorSector ( IRequest $request, IResponse $response, array $args ) : IResponse {
         $qb = DEMF::getQueryBuilder();
         $canOpXSector = $qb->select('u.cantOperaciones, u.nombre, u.apellido')
                         ->from(U::class, 'u')
@@ -63,12 +65,29 @@ class ConsultasController {
         return self::retornarResponse($response, $canOpXSector);
     }
 
-    public static function cantOpCadaUno ( IRequest $request, IResponse $response, array $args ) : IResponse {
+    public static function cantOpXSector ( IRequest $request, IResponse $response, array $args ) : IResponse {
         $qb = DEMF::getQueryBuilder();
-        $cantOpXUno = $qb->select('u.cantOperaciones, u.nombre, u.apellido')
-                        ->from( U::class, 'u' )
-                        ->getQuery()->execute();
-        return self::retornarResponse($response, $cantOpXUno);
+        $cantOpXSector =    $qb->select( 'SUM(u.cantOperaciones) as cantidad, s.nombre as sector' )
+                            ->from( U::class, 'u' )
+                            ->innerJoin(
+                                TU::class,
+                                'tu',
+                                'WITH',
+                                $qb->expr()->eq( 'u.tipo', 'tu.id' )
+                            )
+                            ->innerJoin(
+                                S::class,
+                                's',
+                                'WITH',
+                                $qb->expr()->eq( 'tu.sector', 's.id' )
+                            )
+                            ->where( 
+                                $qb->expr()->eq( 's.id', ':IdSector' )
+                            )
+                            ->setParameter( ':IdSector', intval( $args['idSector'] ) )
+                            ->getQuery()
+                            ->execute();
+        return self::retornarResponse($response, $cantOpXSector);
     }
 
     private static function pedidoOrdenadoXV () : array {
@@ -89,14 +108,38 @@ class ConsultasController {
     }
 
     public static function masVendido  ( IRequest $request, IResponse $response, array $args ) : IResponse {
-        $masV = self::pedidoOrdenadoXV($args['codigo'])[0];
+        $masV = self::pedidoOrdenadoXV()[0];
         return self::retornarResponse($response, $masV);
     }
 
     public static function menosVendido ( IRequest $request, IResponse $response, array $args ) : IResponse {
-        $V = self::pedidoOrdenadoXV($args['codigo']);
+        $V = self::pedidoOrdenadoXV();
         $menosV = end($V);
         return self::retornarResponse($response, $menosV);
+    }
+
+    public static function pedidosEntregadosTarde ( IRequest $request, IResponse $response, array $args ) : IResponse {
+        $qb = DEMF::getQueryBuilder();
+        $tardes =   $qb->select( 'pp' )
+                    ->from( PP::class, 'pp' )
+                    ->where(
+                        $qb->expr()->lt( 'pp.horaFinEstipulada', 'pp.horaFin' )
+                    )
+                    ->getQuery()
+                    ->execute();
+        return self::retornarResponse($response, $tardes);
+    }
+
+    public static function cancelados ( IRequest $request, IResponse $response, array $args ) : IResponse {
+        $qb = DEMF::getQueryBuilder();
+        $cancelados =   $qb->select( 'pp' )
+                        ->from( PP::class, 'pp' )
+                        ->where(
+                            $qb->expr()->eq( 'pp.estado', self::$pedidoCancelado )
+                        )
+                        ->getQuery()
+                        ->execute();
+        return self::retornarResponse( $response, $cancelados );
     }
 
 }

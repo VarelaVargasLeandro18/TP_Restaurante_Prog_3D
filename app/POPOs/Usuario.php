@@ -273,4 +273,11 @@ class Usuario implements \JsonSerializable
 
         return $ret;
     }
+
+    /**
+     * Esta función permite incrementar el número de operaciones realizadas por un usuario en la cantidad especificada.
+     */
+    public function incrementarOperaciones (int $cant = 1) : void {
+        $this->cantOperaciones += $cant;
+    }
 }

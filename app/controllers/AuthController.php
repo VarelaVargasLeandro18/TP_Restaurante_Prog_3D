@@ -33,4 +33,19 @@ class AuthController implements IGetAuthApi {
         $response->getBody()->write($token);
         return $response;
     }
+
+    public static function checkToken(Request $request, Response $response, array $args): Response {
+
+        $jwt = json_decode( $request->getBody()->__toString(), true );
+
+        try {
+            $datos = Auth::ObtenerDatos($jwt['token']);
+        } catch( \Throwable $ex ) {
+            return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR );
+        }
+
+        $response->getBody()->write($datos);
+        return $response->withAddedHeader('Content-Type', 'application/json');
+    }
+
 }
