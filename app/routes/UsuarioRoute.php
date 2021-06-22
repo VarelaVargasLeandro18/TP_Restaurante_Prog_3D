@@ -19,6 +19,7 @@ $app->group ( '/usuario', function ( RCP $group ) {
     $group->post( '/', UC::class . '::insert' );
     $group->delete ( '/{id}', UC::class . '::delete' );
     $group->put ( '/{id}', UC::class . '::update' );
+    $group->put ( '-cambiar-tipo', UC::class . '::cambiarTipoEmpleado' );
 
     $group->put('/suspender/{id}', UC::class . '::suspenderEmpleado');
     $group->put('/continuar/{id}', UC::class . '::continuarEmpleado');

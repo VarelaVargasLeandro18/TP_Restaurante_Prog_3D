@@ -4,6 +4,7 @@ namespace POPOs;
 
 require_once __DIR__ . '/TipoComentario.php';
 require_once __DIR__ . '/Usuario.php';
+require_once __DIR__ . '/Pedido.php';
 
 /**
  * Representa un comentario realizado por un cliente al restaurante.
@@ -41,12 +42,19 @@ class Comentario implements \JsonSerializable {
      */
     private string $comentario;
 
+    /**
+     * @ManyToOne(targetEntity = "Pedido")
+     * @JoinColumn(name = "pedido", referencedColumnName = "codigo")
+     */
+    private ?Pedido $pedido;
+
     public function __construct(
                                 int $id = -1,
                                 ?TipoComentario $tipo = NULL,
                                 ?Usuario $cliente = NULL,
                                 int $puntuacion = 0,
-                                string $comentario = ''
+                                string $comentario = '',
+                                ?Pedido $pedido = NULL
     )
     {
         $this->id = $id;
@@ -54,6 +62,7 @@ class Comentario implements \JsonSerializable {
         $this->cliente = $cliente;
         $this->puntuacion = $puntuacion;
         $this->comentario = $comentario;
+        $this->pedido = $pedido;
     }
 
     /**
@@ -152,6 +161,26 @@ class Comentario implements \JsonSerializable {
     public function setComentario(string $comentario) : self
     {
         $this->comentario = $comentario;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of pedido
+     */ 
+    public function getPedido() : ?Pedido
+    {
+        return $this->pedido;
+    }
+
+    /**
+     * Set the value of pedido
+     *
+     * @return  self
+     */ 
+    public function setPedido(?Pedido $pedido)
+    {
+        $this->pedido = $pedido;
 
         return $this;
     }

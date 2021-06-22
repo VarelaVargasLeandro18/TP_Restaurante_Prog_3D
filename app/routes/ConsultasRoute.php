@@ -16,6 +16,13 @@ $app->group ( '/consulta', function ( RouteCollectorProxy $group ) {
     $group->get( '/entregadosTarde', CC::class . '::pedidosEntregadosTarde' );
     $group->get( '/cancelados', CC::class . '::cancelados' );
 
-    
+    $group->get( '/masUsada', CC::class . '::mesaMasUsada' );
+    $group->get( '/menosUsada', CC::class . '::mesaMenosUsada' );
+    $group->get( '/masFactura', CC::class . '::mesaMasFactura' );
+    $group->get( '/menosFactura', CC::class . '::mesaMenosFactura' );
+    $group->get( '/mesaConMayorImporte', CC::class . '::mesaConMayorFactura' );
+    $group->get( '/mesaConMenorImporte', CC::class . '::mesaConMenorFactura' );
+    $group->get( '/mesaMayorPuntuacion', CC::class . '::mesaMayorPuntuación' );
+    $group->get( '/mesaMenorPuntuacion', CC::class . '::mesaMenorPuntuacion' );
 
 } );

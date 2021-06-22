@@ -140,8 +140,12 @@ class PedidoProductoController extends CRUDAbstractController {
         return $qb->select('pp')
                 ->from(PP::class, 'pp')
                 ->where(
-                    $qb->expr()->eq( 'pp.responsable', ':idResponsable' )
-                );
+                    $qb->expr()->andX(
+                        $qb->expr()->eq( 'pp.responsable', ':idResponsable' ),
+                        $qb->expr()->eq( 'pp.estado', ':estadoEnPreparacion' )
+                    )
+                )
+                ->setParameter( ':estadoEnPreparacion', 2 );
     }
 
     private static function queryNoTomadaSector() {

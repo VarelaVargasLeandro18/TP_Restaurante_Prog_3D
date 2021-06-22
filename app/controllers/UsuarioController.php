@@ -125,4 +125,28 @@ class UsuarioController extends CRUDAbstractController {
         return $response->withStatus(SCI::STATUS_NO_CONTENT, 'Se ingresaron correctamente los usuarios.');    
     }
 
+    public static function cambiarTipoEmpleado ( IRequest $request, IResponse $response, array $args ) : IResponse {
+        $json = $request->getBody()->__toString();
+        $decodedBody = json_decode( $json, true );
+        
+        if ( !key_exists( 'id', $decodedBody ) || !key_exists( 'tipo', $decodedBody ) ) return $response->withStatus( SCI::STATUS_BAD_REQUEST, 'El json enviado no es correcto.' );
+
+        $id = intval($decodedBody['id']);
+        $tipo = intval($decodedBody['tipo']);
+
+        $um = new UM();
+        $u = $um->readById( $id );
+        $tum = new TUM();
+        $tu = $tum->readById( $tipo );
+
+        if ( $u === NULL ) return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No se ha encontrado el usuario con el id especificado.' );
+        if ( $tu === NULL ) return $response->withStatus( SCI::STATUS_NOT_FOUND, 'No se encontró el tipo de usuario especificado.' );
+
+        $u->setTipo( $tu );
+        
+        if ( !$um->updateObject( $u ) ) return $response->withStatus( SCI::STATUS_INTERNAL_SERVER_ERROR, 'No se pudo cambiar el tipo del usuario.' );
+        
+        return $response->withStatus( SCI::STATUS_NO_CONTENT, 'Se ha cambiado el tipo de empleado correctamente.' );
+    }
+
 }
