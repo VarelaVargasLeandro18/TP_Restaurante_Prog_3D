@@ -43,7 +43,6 @@ use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Fig\Http\Message\StatusCodeInterface as SCI;
 
-
 class PedidoProductoController extends CRUDAbstractController {
 
     protected static string $modelName = PPM::class;
@@ -281,7 +280,7 @@ class PedidoProductoController extends CRUDAbstractController {
         $pdf->crearArchivo($arrayDatos);
         $pdf->generarDescarga();
 
-        return $response;
+        return $response->withStatus(SCI::STATUS_OK, 'Archivo Creado Correctamente');
     }
 
     public static function descargarTodosCSV ( Request $request, Response $response, array $args ) : Response {

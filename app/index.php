@@ -5,8 +5,6 @@ require_once __DIR__ . '/middlewares/Logger.php';
 require_once __DIR__ . '/middlewares/LogIn.php';
 
 use Slim\Factory\AppFactory;
-use Middleware\Logger;
-use Middleware\LogIn;
 
 require __DIR__ . '/../vendor/autoload.php';
 

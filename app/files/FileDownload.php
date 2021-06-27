@@ -6,6 +6,9 @@ use Slim\Psr7\Stream;
 
 require_once __DIR__ . '/IArchivoDescarga.php';
 
+/**
+ * @Deprecated
+ */
 class FileDownload implements IArchivoDescarga {
 
     private IArchivoDescarga $creador;
