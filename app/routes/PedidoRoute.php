@@ -70,6 +70,8 @@ $app->group( '/pedidos', function ( RCP $group ) {
     ->add ( L::class . '::loggerOperacionPedidos' )
     ->add( LogIn::class . '::obtenerUsuario' );
 
+
+$app->post( '/empezarPedido', PedidoController::class . '::insert' );
 $app->post( '/realizarPedido', PedidoProductoController::class . '::realizarPedido' ) ->add ( L::class . '::loggerPedidoCreado' );
 $app->post( '/realizarComentario', ComentarioController::class . '::insert' );
 $app->get( '/leerComentarios', ComentarioController::class . '::readAll' )
